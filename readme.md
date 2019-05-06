@@ -58,7 +58,7 @@ After that you must add these line inside the src/server.py file to enable your 
     Server.Process.add_task("Task.YourFileOrClass.YourStaticMethodOrClassMethod", second=30)
 ```
 
-Note the task your registering must be before the line:
+Note the task you are registering must be before the line:
 
 ```python
     Server.Process.start(args)
