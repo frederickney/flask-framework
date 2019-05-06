@@ -146,4 +146,4 @@ export CONFIG_FILE=config/config.orig.json
 
 # LICENSE
 
-#### See [License file](../blob/master/LICENSE)
+#### See [License file](LICENSE)
