@@ -74,6 +74,8 @@ The src/static folder contains all static file for your web based application.
 The src/template folder contains layouts and templates file for your web based application.
 Those files are content configurable, you can also import layout inside the your template file, it allow you to have only content editable part into your template file.
 
+---
+
 # Using docker-compose file:
 
 * At first start of the flask server:
@@ -101,6 +103,7 @@ docker-compose stop
 ```
 
 ---
+
 # Running on local desktop:
 
 We assume that your system already had python v3+ and pip v3+ installed.
@@ -138,3 +141,9 @@ export CONFIG_FILE=config/config.orig.json
 ```bash 
 ./src/server.py
 ```
+
+---
+
+# LICENSE
+
+#### See [License file](../blob/master/LICENSE)
