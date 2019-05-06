@@ -1,0 +1,36 @@
+version: '3.5'
+services:
+  fask:
+    image: debian-buster/python3.7:flask
+    build:
+      context: .
+    container_name: flask
+    entrypoint: /entrypoint
+    command: server.py -lp 5000 -D
+    working_dir: /srv/http
+    shm_size: 512m
+    environment:
+      LOG_FILE: /var/log/server/process.log
+    ports:
+      - 5000:5000
+    volumes:
+      - ./src/:/srv/http/
+      - ./log/:/var/log/server/
+    depends_on:
+      - mysql-server
+    links:
+      - mysql-server
+
+  mysql-server:
+    container_name: mysql-server
+    image: mysql/mysql-server:5.7
+    shm_size: 1024m
+    environment:
+      MYSQL_DATABASE: flask
+      MYSQL_ROOT_PASSWORD: "mysql-root-pass"
+      MYSQL_PASSWORD: "mysql-pass"
+      MYSQL_USER: "mysql-user"
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql/:/var/lib/mysql/

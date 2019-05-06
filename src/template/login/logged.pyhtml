@@ -1,0 +1,16 @@
+{% extends "layout/index.pyhtml" %}
+{% block title %}
+    <h1>
+        Welcome!
+    </h1>
+{% endblock %}
+{% block content %}
+    <div>
+        Hello {{ name }}
+    </div>
+{% endblock %}
+{% block scripts %}
+    {% for script in scripts %}
+    <script type="application/javascript" src="{{url_for("static", filename=script)}}"></script>
+    {% endfor %}
+{% endblock %}
