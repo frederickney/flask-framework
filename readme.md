@@ -29,7 +29,7 @@ All Rest API based controllers must be placed under the src/Controllers/WS folde
 #### Creating models:
 
 All models are stored inside the src/Models folder.
-The models that you register into the app must be an Database.Model object, you could import these object using the following line into your database model:
+The models that you register into the app must be an Database.Model object, you could import this object using the following line into your database model:
 
 ```python
 from Database import Database
