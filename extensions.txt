@@ -5,3 +5,5 @@ Flask-Profile==0.2
 Flask-Builder==0.9
 Flask-Auth==0.85
 Flask-APScheduler==1.11.0
+flask-sqlalchemy==2.3.2
+PyMySQL==0.9.3
