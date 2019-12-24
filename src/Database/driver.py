@@ -13,10 +13,9 @@ class Driver(object):
     Managers = []
 
     @classmethod
-    def setup(cls, app, driver, user, pwd, host, db, echo=False):
+    def setup(cls, driver, user, pwd, host, db, echo=False):
         """
         Setup function that will configure all the required resources for communicating with the database
-        :param app: Flask server
         :param driver: Database driver that will be used when the server need to store persistant data
         :param user: Database user
         :param pwd: Database password
@@ -28,8 +27,7 @@ class Driver(object):
         from sqlalchemy import create_engine
         from sqlalchemy.orm import scoped_session, sessionmaker
         from sqlalchemy.ext.declarative import declarative_base
-        database_uri = driver + '://' + user + ':' + pwd + '@' + host + '/' + db + '?charset=utf8'
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+        database_uri = driver + '://' + user + ':' + pwd + '@' + host + '/' + db
         cls.engine = create_engine(database_uri, echo=echo)
         cls.session = sessionmaker(bind=cls.engine)
         cls.session = scoped_session(cls.session)
@@ -72,7 +70,16 @@ class Driver(object):
         Function that create schema tables based on imported models within this function
         :return: N/A
         """
+        import Models
         cls.Model.metadata.create_all(bind=cls.engine)
+
+    @classmethod
+    def save(cls):
+        pass
+
+    @staticmethod
+    def update():
+        Driver.session.remove()
 
     @staticmethod
     @deprecated

@@ -12,12 +12,10 @@ class OutdatedFunctionCall(DeprecationWarning):
     """
     def __init__(self, *args, **kwargs): # real signature unknown
         super(OutdatedFunctionCall, self).__init__(*args, **kwargs)
-        pass
 
     @staticmethod # known case of __new__
     def __new__(*args, **kwargs): # real signature unknown
         """ Create and return a new object.  See help(type) for accurate signature. """
-        #return args
         return args[1]
 
 
@@ -27,12 +25,10 @@ class DeprecatedFunctionCall(DeprecationWarning):
     """
     def __init__(self, *args, **kwargs): # real signature unknown
         super(DeprecatedFunctionCall, self).__init__(*args, **kwargs)
-        pass
 
     @staticmethod # known case of __new__
     def __new__(*args, **kwargs): # real signature unknown
         """ Create and return a new object.  See help(type) for accurate signature. """
-        #return args
         return args[1]
 
 

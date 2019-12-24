@@ -14,5 +14,4 @@ class Route(object):
         :return: Route object
         """
         import Controllers
-        from Config import Environment
         return

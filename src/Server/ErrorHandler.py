@@ -15,6 +15,6 @@ class Route(object):
         :return: Route object
         """
         import Controllers
-        server.register_error_handler(404, Controllers.Web.HTTP40XController.error404)
+        server.register_error_handler(404, Controllers.Web.HTTP40XController.page_or_error404)
         server.register_error_handler(500, Controllers.Web.HTTP50XController.error500)
         return
