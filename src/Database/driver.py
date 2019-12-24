@@ -16,7 +16,6 @@ class Driver(object):
     def setup(cls, driver, user, pwd, host, db, echo=False):
         """
         Setup function that will configure all the required resources for communicating with the database
-        :param app: Flask server
         :param driver: Database driver that will be used when the server need to store persistant data
         :param user: Database user
         :param pwd: Database password

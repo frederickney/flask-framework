@@ -71,23 +71,6 @@
     <body>
         <div class="flex-center position-ref full-height">
                 <div class="top-right links navbar">
-                    {% if g.user %}
-                        <a href="/home">Home</a>
-                        <a href=""
-                            onclick="
-                                event.preventDefault();
-                                document.getElementById('logout-form').submit();
-                            "
-                        >
-                            Logout
-                        </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            {{ csrf_field() }}
-                        </form>
-                    {% else %}
-                        <a href="{{ url_for("login") }}">Login</a>
-                        <a href="">Register</a>
-                    {% endif %}
                 </div>
             <!--img src="asset('images/background.jpg')" style="width:100%; position:fixed;"-->
 

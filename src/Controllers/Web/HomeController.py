@@ -9,7 +9,7 @@ class Controller(object):
 
     @staticmethod
     def default():
-        return template("index.pyhtml")
+        return template("welcome.jinja2")
 
 
 
