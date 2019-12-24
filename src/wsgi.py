@@ -5,7 +5,7 @@ __author__ = 'Frederick NEY'
 
 import multiprocessing
 import gunicorn.app.base
-from gunicorn.six import iteritems
+from six import iteritems
 
 
 class Server(gunicorn.app.base.Application):
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         from Database import Database
         db_conf = Environment.Databases['default']
         Database.setup(
-            db_conf['driver'], db_conf['user'], db_conf['password'], db_conf['address'], db_conf['database'],
+            db_conf['driver'], db_conf['user'], db_conf['password'], db_conf['address'], db_conf['database'], Environment.SERVER_DATA['CAPTURE']
         )
         Database.init()
         logger.debug("Default database connected...")

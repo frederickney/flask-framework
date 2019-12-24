@@ -71,7 +71,7 @@ class Driver(object):
         Function that create schema tables based on imported models within this function
         :return: N/A
         """
-        import Models.ModelsRegistry
+        import Models
         cls.Model.metadata.create_all(bind=cls.engine)
 
     @classmethod

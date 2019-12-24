@@ -53,7 +53,7 @@ def main():
     if 'default' in Environment.Databases:
         db_conf = Environment.Databases['default']
         Database.setup(
-            db_conf['driver'], db_conf['user'], db_conf['password'], db_conf['address'], db_conf['database'],
+            db_conf['driver'], db_conf['user'], db_conf['password'], db_conf['address'], db_conf['database'], Environment.SERVER_DATA['CAPTURE']
         )
         Database.init()
     logger.debug("Default database connected...")
