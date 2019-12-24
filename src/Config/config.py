@@ -143,8 +143,6 @@ class Environment(object):
                 "Not permitted to change login method '%s'  while app is running" % login_name
             )
 
-        pass
-
     @classmethod
     def set_default_login(cls, login_conf):
         logger = logging.getLogger("GLOBAL")

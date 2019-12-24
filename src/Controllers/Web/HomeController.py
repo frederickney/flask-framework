@@ -3,13 +3,14 @@
 __author__ = 'Frederick NEY'
 
 from flask import render_template as template
-
+from flask import session
 
 class Controller(object):
 
     @staticmethod
     def default():
-        return template("welcome.pyhtml")
+        return template("index.pyhtml")
+
 
 
 

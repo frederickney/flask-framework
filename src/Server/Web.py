@@ -15,6 +15,6 @@ class Route(object):
         :return: Route object
         """
         import Controllers
-        from Config import Environment
-        server.add_url_rule("/", "Flask", Controllers.Web.HomeController.default, methods=["GET"])
+        server.add_url_rule('/', "home", Controllers.Web.HomeController.default, methods=["GET"])
         return
+

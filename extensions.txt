@@ -1,11 +1,11 @@
 Flask-GeoIP==0.1.3
 Flask-LoginManager==1.1.6
-flask-monitor==0.1.2
+flask-monitor==0.2.6
 Flask-Profile==0.2
 Flask-Builder==0.9
 Flask-Auth==0.85
 Flask-APScheduler==1.11.0
-flask-sqlalchemy==2.3.2
+flask-sqlalchemy==2.4.1
 Flask-Sessions==0.1.5
 Flask-Login==0.4.1
 PyMySQL==0.9.3
