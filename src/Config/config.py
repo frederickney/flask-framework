@@ -94,12 +94,11 @@ class Environment(object):
 
     @classmethod
     def add_database(cls, db_type, db_conf):
-        logger = logging.getLogger("GLOBAL")
         db = cls.Databases.get(db_type, None)
         if db is None and cls.__runtime_change is False:
             cls.Databases[db_type] = db_conf
         elif db is not None:
-            logger.warning("Database '%s' already set" % db_type)
+            logging.warning("Database '%s' already set" % db_type)
         else:
             raise Exceptions.RuntimeExceptions.DatabaseChangeException(
                 "Not permitted to change database '%s'  while app is running" % db_type
@@ -107,13 +106,12 @@ class Environment(object):
 
     @classmethod
     def set_default_database(cls, db_conf):
-        logger = logging.getLogger("GLOBAL")
         db = cls.Databases.get('default', None)
         if db is None and cls.__default_runtime_change is False:
             cls.Databases['default'] = db_conf
             cls.__default_runtime_change = True
         elif db is not None:
-            logger.warning("Default database already set")
+            logging.warning("Default database already set")
         else:
             raise Exceptions.RuntimeExceptions.DatabaseChangeException(
                 "Not permitted to change default database while app is running"
@@ -132,12 +130,11 @@ class Environment(object):
 
     @classmethod
     def add_login(cls, login_name, login_conf):
-        logger = logging.getLogger("GLOBAL")
         login = cls.Logins.get(login_name, None)
         if login is None and cls.__login_change is False:
             cls.Logins[login_name] = login_conf
         elif login is not None:
-            logger.warning("Database '%s' already set" % login_name)
+            logging.warning("Database '%s' already set" % login_name)
         else:
             raise Exceptions.RuntimeExceptions.LoginChangeException(
                 "Not permitted to change login method '%s'  while app is running" % login_name
@@ -145,13 +142,12 @@ class Environment(object):
 
     @classmethod
     def set_default_login(cls, login_conf):
-        logger = logging.getLogger("GLOBAL")
         login = cls.Logins.get('default', None)
         if login is None and cls.__default_login_change is False:
             cls.Logins['default'] = login_conf
             cls.__default_login_change = True
         elif login is not None:
-            logger.warning("Default login already set")
+            logging.warning("Default login already set")
         else:
             raise Exceptions.RuntimeExceptions.LoginChangeException(
                 "Not permitted to change default login while app is running"
@@ -179,12 +175,11 @@ class Environment(object):
 
     @classmethod
     def add_service(cls, service_name, service_conf):
-        logger = logging.getLogger("GLOBAL")
         db = cls.Services.get(service_name, None)
         if db is None and cls.__services_loaded is False:
             cls.Services[service_name] = service_conf
         elif db is not None:
-            logger.warning("Service '%s' already set" % service_name)
+            logging.warning("Service '%s' already set" % service_name)
         else:
             raise Exceptions.RuntimeExceptions.ServiceChangeException(
                 "Not permitted to change service '%s' while app is running" % service_conf

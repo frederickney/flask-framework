@@ -1,12 +1,31 @@
 # coding: utf-8
+from apscheduler.jobstores.redis import RedisJobStore
 
 __author__ = 'Frederick NEY'
 
-from . import WS, Web, ErrorHandler
-from flask_sessions import Session
+import functools
+import warnings
+from . import WS, Web, ErrorHandler,  Middleware, Socket
+from flask_session import Session
+from datetime import datetime, timedelta
+from flask_apscheduler import APScheduler
+from flask import Flask
+from flask_apscheduler import APScheduler
 
 
 def configure_logs(name, format, output_file, debug='info'):
+    """
+
+    :param name:
+    :type name: str
+    :param format:
+    :type format: str
+    :param output_file:
+    :type output_file: str
+    :param debug:
+    :type debug: str
+    :return:
+    """
     import logging
     logger = logging.getLogger(name)
     formatter = logging.Formatter(format)
@@ -19,13 +38,21 @@ def configure_logs(name, format, output_file, debug='info'):
 
 class Process(object):
 
-    _app = None
-    _process = None
-    _scheduler = None
+    _app: Flask = None
+    _scheduler: APScheduler = None
     _pidfile = "/run/rh-bot-srv.pid"
+    _socket = None
 
     @classmethod
     def init(cls, tracking_mode=False):
+        """
+
+        :param tracking_mode:
+        :type tracking_mode: bool
+        :return:
+        :rtype: flask.Flask
+        """
+        from flask_socketio import SocketIO
         from flask import Flask
         from Config import Environment
         cls._app = Flask(
@@ -34,17 +61,79 @@ class Process(object):
             static_folder=Environment.SERVER_DATA['STATIC_PATH'],
             template_folder=Environment.SERVER_DATA['TEMPLATE_PATH']
         )
+        if 'CORS' in Environment.SERVER_DATA:
+            from flask_cors import CORS
+            cls._app.config["CORS_ALLOW_HEADERS"] = Environment.SERVER_DATA['CORS']['ALLOW_HEADERS']
+            cls._app.config["CORS_ALWAYS_SEND"] = Environment.SERVER_DATA['CORS']['ALWAYS_SEND']
+            cls._app.config["CORS_AUTOMATIC_OPTIONS"] = Environment.SERVER_DATA['CORS']['AUTOMATIC_OPTIONS']
+            cls._app.config["CORS_EXPOSE_HEADERS"] = Environment.SERVER_DATA['CORS']['EXPOSE_HEADERS']
+            cls._app.config["CORS_INTERCEPT_EXCEPTIONS"] = Environment.SERVER_DATA['CORS']['INTERCEPT_EXCEPTIONS']
+            cls._app.config["CORS_MAX_AGE"] = Environment.SERVER_DATA['CORS']['MAX_AGE']
+            cls._app.config["CORS_METHODS"] = Environment.SERVER_DATA['CORS']['METHODS']
+            cls._app.config["CORS_ORIGINS"] = Environment.SERVER_DATA['CORS']['ORIGINS']
+            cls._app.config["CORS_RESOURCES"] = r"/*"
+            cls._app.config["CORS_SEND_WILDCARD"] = Environment.SERVER_DATA['CORS']['SEND_WILDCARD']
+            cls._app.config["CORS_SUPPORTS_CREDENTIALS"] = Environment.SERVER_DATA['CORS']['SUPPORTS_CREDENTIALS']
+            cls._app.config["CORS_VARY_HEADER"] = Environment.SERVER_DATA['CORS']['VARY_HEADER']
+            cors = CORS(cls._app, origins=Environment.SERVER_DATA['CORS']['ORIGINS'])
         if 'APP_KEY' in Environment.SERVER_DATA:
+            from flask_wtf.csrf import CSRFProtect
             cls._session = Session()
+            #cls._app.config['TESTING'] = True
+            #cls._app.config['TEMPLATES_AUTO_RELOAD'] = True
             cls._app.config['SECRET_KEY'] = Environment.SERVER_DATA['APP_KEY']
-            cls._app.config['SESSION_TYPE'] = 'filesystem'
-            cls._app.config['SESSION_FILE_DIR'] = Environment.SERVER_DATA['SESSION_FILE_DIR']
+            cls._app.config['SESSION_TYPE'] = Environment.SERVER_DATA['SESSION']
+            if Environment.SERVER_DATA['SESSION'] == 'filesystem':
+                cls._app.config['SESSION_FILE_DIR'] = Environment.Services[Environment.SERVER_DATA['SESSION']]['PATH']
+            if Environment.SERVER_DATA['SESSION'] == 'memcached':
+                import pymemcache
+                cls._app.config['SESSION_MEMCACHED'] = pymemcache.Client(
+                    (
+                        Environment.Services[Environment.SERVER_DATA['SESSION']]['HOST'],
+                        Environment.Services[Environment.SERVER_DATA['SESSION']]['PORT']
+                    )
+                )
+            if Environment.SERVER_DATA['SESSION'] == 'redis':
+                import redis
+                cls._app.config['SESSION_REDIS'] = redis.from_url("%s://%s:%d/redis" % (
+                        Environment.SERVER_DATA['SESSION'],
+                        Environment.Services[Environment.SERVER_DATA['SESSION']]['HOST'],
+                        Environment.Services[Environment.SERVER_DATA['SESSION']]['PORT']
+                    )
+                )
+            if Environment.SERVER_DATA['SESSION'] == 'sqlalchemy':
+                from Database import Database
+                cls._app = Database.setup_sessions(
+                    cls._app
+                )
+            if Environment.SERVER_DATA['SESSION'] == 'mongodb':
+                from pymongo import MongoClient
+                db_conf = Environment.Databases[Environment.SERVER_DATA['SESSION']]
+                cls._app.config['SESSION_MONGODB'] = MongoClient(
+                    "%s://%s:%s@%s:%d" % (
+                        db_conf['driver'],
+                        db_conf['user'],
+                        db_conf['password'],
+                        db_conf['address'],
+                        db_conf['port']
+                    )
+                )
+                cls._app.config['SESSION_MONGODB_DB'] = db_conf['database']
+                cls._app.config['SESSION_MONGODB_COLLECT'] = db_conf['collection']
             cls._session.init_app(cls._app)
-        cls._app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = tracking_mode
+            cls._csrf = CSRFProtect()
+            cls._csrf.init_app(cls._app)
+        cls._socket = SocketIO()
+        cls._socket.init_app(cls._app)
         return cls._app
 
     @classmethod
     def start(cls, args):
+        """
+
+        :param args:
+        :return:
+        """
         cls._args = args
         from flask_apscheduler import APScheduler
         from werkzeug.serving import make_server, make_ssl_devcert
@@ -90,6 +179,11 @@ class Process(object):
 
     @classmethod
     def wsgi_setup(cls):
+        """
+
+        :return:
+        :rtype: flask.Flask
+        """
         from flask_apscheduler import APScheduler
         cls._scheduler = APScheduler()
         if 'JOBS' not in cls._app.config:
@@ -101,18 +195,63 @@ class Process(object):
         return cls._app
 
     @classmethod
+    def load_socket_events(cls):
+        if cls._socket is not None:
+            Socket.Handler(cls._socket)
+
+
+    @classmethod
     def load_routes(cls):
+        """
+
+        :return:
+        """
         WS.Route(cls._app)
         Web.Route(cls._app)
         ErrorHandler.Route(cls._app)
 
     @classmethod
-    def add_task(cls, function, args=(), trigger='interval', seconds=0, minutes=0, hours=0, days=0, weeks=0):
+    def load_middleware(cls):
+        """
+
+        :return:
+        """
+        Middleware.Load(cls._app)
+
+    @classmethod
+    def get_ws(cls):
+        return cls._socket
+
+    @classmethod
+    def add_task(cls, function, id=None, args=(), trigger='interval', seconds=0, minutes=0, hours=0, days=0, weeks=0):
+        """
+
+        :param function:
+        :type function: str
+        :param id:
+        :type id: str
+        :param args:
+        :type args: tuple
+        :param trigger:
+        :type trigger: str
+        :param seconds:
+        :type seconds: int
+        :param minutes:
+        :type minutes: int
+        :param hours:
+        :type hours: int
+        :param days:
+        :type days: int
+        :param weeks:
+        :type weeks: int
+        :return:
+        """
+        from Config import Environment
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
         jobs = cls._app.config['JOBS']
         task = {
-            "id": function,
+            "id": id if id is not None else function,
             "func": function.replace('.', ':', 1),
             'args': args,
             'trigger': trigger,
@@ -127,13 +266,77 @@ class Process(object):
             task["hours"] = hours
         elif days != 0:
             task["days"] = days
+
         jobs.append(task)
         cls._app.config['JOBS'] = jobs
+        if 'SCHEDULER_API_ENABLED' not in cls._app.config:
+            cls._app.config['SCHEDULER_JOBSTORES']= {
+                'default': RedisJobStore(
+                    port = Environment.Services['redis']['PORT'],
+                    host = Environment.Services['redis']['HOST'],
+                    db=10
+                )
+            }
+            cls._app.config['SCHEDULER_API_ENABLED'] = True
+
+    @classmethod
+    def add_cron(cls, function, id=None, args=(), trigger='interval', seconds=0, minutes=0, hours=0, days=0, weeks=0):
+        """
+
+        :param function:
+        :type function: str
+        :param id:
+        :type id: str
+        :param args:
+        :type args: tuple
+        :param trigger:
+        :type trigger: str
+        :param seconds:
+        :type seconds: int
+        :param minutes:
+        :type minutes: int
+        :param hours:
+        :type hours: int
+        :param days:
+        :type days: int
+        :param weeks:
+        :type weeks: int
+        :return:
+        """
+        from Config import Environment
+        if seconds == 0 and minutes == 0 and hours == 0 and days == 0 and weeks == 0:
+            seconds = 1
+        cls._scheduler.add_job(id=id if id is not None else function, func=function.replace('.', ':', 1), args=args, trigger=trigger, hours=hours, minutes=minutes, seconds=seconds, days=days)
+        if 'SCHEDULER_API_ENABLED' not in cls._app.config:
+            cls._app.config['SCHEDULER_API_ENABLED'] = True
+
+    @classmethod
+    def add_parallel_task(cls, function, id=None, args=(), trigger='date', date=datetime.now() + timedelta(0, 0)):
+        """
+
+        :param function:
+        :type function: str
+        :param id:
+        :type id: str
+        :param args:
+        :type args: tuple
+        :param trigger:
+        :type trigger: str
+        :param date:
+        :type date: datetime.datetime
+        :return:
+        """
+        cls._scheduler.add_job(id=function, func=function.replace('.', ':', 1), args=args, trigger=trigger, run_date=date)
+        cls._scheduler.run_job(id=id if id is not None else function)
         if 'SCHEDULER_API_ENABLED' not in cls._app.config:
             cls._app.config['SCHEDULER_API_ENABLED'] = True
 
     @classmethod
     def pid(cls):
+        """
+
+        :return:
+        """
         import os
         import sys
         pid = str(os.getpid())
@@ -146,11 +349,79 @@ class Process(object):
 
     @classmethod
     def shutdown(cls):
+        """
+
+        :return:
+        """
         import os
         os.unlink(cls._pidfile)
 
     @classmethod
+    def get(cls):
+        """
+
+        :return:
+        :rtype: flask.Flask
+        """
+        return cls._app
+
+    @classmethod
     def stop(cls, code=0):
+        """
+
+        :param code:
+        :type: int
+        :return:
+        """
         if cls._args.pid:
             cls.shutdown()
         exit(code)
+
+    @classmethod
+    def init_sheduler(cls):
+        from Config import Environment
+        if 'JOBS' not in cls._app.config:
+            cls._app.config['JOBS'] = []
+        cls._app.config['SCHEDULER_API_ENABLED'] = True
+        cls._app.config['SCHEDULER_JOBSTORES'] = {
+            'default': RedisJobStore(
+                port=Environment.Services['redis']['PORT'],
+                host=Environment.Services['redis']['HOST'],
+                db=10
+            )
+        }
+        return
+
+
+class WebDenyFunctionCall(DeprecationWarning):
+
+    """
+    Base class for disabling call of function.
+    """
+    def __init__(self, *args, **kwargs): # real signature unknown
+        super(WebDenyFunctionCall, self).__init__(*args, **kwargs)
+
+    @staticmethod # known case of __new__
+    def __new__(*args, **kwargs): # real signature unknown
+        """ Create and return a new object.  See help(type) for accurate signature. """
+        return args[1]
+
+
+def deniedwebcall(func):
+    """Deprecation decorator which can be used to mark functions / classes
+    as deprecated. It will result in a warning being emitted
+    when the function is used."""
+    @functools.wraps(func)
+    def deny(*args, **kwargs):
+        import logging
+        from flask import redirect
+        from flask import request
+        from flask import url_for
+        if len(dir(request)) != 0:
+            warnings.simplefilter('always', WebDenyFunctionCall)  # turn off filter
+            warnings.warn("Access denied to function %s." % func.__name__, category=WebDenyFunctionCall, stacklevel=2)
+            warnings.simplefilter('default', WebDenyFunctionCall)  # reset filter
+            return redirect(request.referrer or url_for('home'))
+        return func(*args, **kwargs)
+
+    return deny

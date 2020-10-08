@@ -12,6 +12,7 @@ class Route(object):
         """
         Constructor
         :param server: Flask server
+        :type server: flask.Flask
         :return: Route object
         """
         import Controllers

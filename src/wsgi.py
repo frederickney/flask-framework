@@ -24,22 +24,33 @@ class Server(gunicorn.app.base.Application):
         import logging
         from Server import Process
         import Task
-        logger = logging.getLogger('GLOBAL')
-        logger.info("Initializing the server...")
+        import Extensions
+        logging.info("Initializing the server...")
         Process.init(tracking_mode=False)
-        logger.info("Server initialized...")
-        logger.debug("Loading server routes...")
+        logging.info("Server initialized...")
+        #Process.init_sheduler()
+        logging.debug("Loading server routes...")
         Process.load_routes()
-        logger.debug("Server routes loaded...")
+        Process.load_middleware()
+        Extensions.load()
+        logging.debug("Server routes loaded...")
         # app.teardown_appcontext(Database.save)
-
-        logger.info("Server started...")
+        logging.info("Server started...")
         return Process.wsgi_setup()
 
     def __init__(self, options=None):
         self.options = options or {}
         self.application = Server.application()
         super(Server, self).__init__()
+
+    def reload(self):
+        """
+        reload app function
+        :return:
+        """
+        logging.info('reloading')
+        self.prog = Server.application()
+        super(Server, self).reload()
 
     def load_config(self):
         config = dict([(key, value) for key, value in iteritems(self.options)
@@ -49,6 +60,8 @@ class Server(gunicorn.app.base.Application):
 
     def load(self):
         return self.application
+
+
 
 
 if __name__ == '__main__':
@@ -64,15 +77,14 @@ if __name__ == '__main__':
     else:
         Environment.load("/etc/server/config.json")
     loglevel = Environment.SERVER_DATA['LOG_LEVEL']
-    Process.configure_logs(
-        'GLOBAL',
-        '[%(asctime)s] [%(levelname)s]: %(message)s',
-        os.environ.get("log_file"),
-        loglevel
+
+    logging.basicConfig(
+        level=loglevel.upper(),
+        format='[%(asctime)s] [%(levelname)s]: %(message)s',
+        filename=os.environ.get('log_file')
     )
-    logger = logging.getLogger('GLOBAL')
-    logger.info("Configuration file loaded...")
-    logger.info("Loading options...")
+    logging.info("Configuration file loaded...")
+    logging.info("Loading options...")
     options = {
         'bind': '%s:%i' % (Environment.SERVER_DATA['BIND']['ADDRESS'], Environment.SERVER_DATA['BIND']['PORT']),
         'workers': Server.number_of_workers(),
@@ -81,20 +93,17 @@ if __name__ == '__main__':
         "errorlog": os.path.join(os.environ.get("log_dir"), 'flask-error.log'),
         "accesslog": os.path.join(os.environ.get("log_dir"), 'flask-access.log'),
         "loglevel": loglevel,
-        "worker_class": 'sync'
+        "worker_class": 'sync',
     }
-    logger.info("Options loaded...")
+    logging.info("Options loaded...")
 
     if 'default' in Environment.Databases:
-        logger.debug("Connecting to default database...")
+        logging.debug("Connecting to default database...")
         from Database import Database
-        db_conf = Environment.Databases['default']
-        Database.setup(
-            db_conf['driver'], db_conf['user'], db_conf['password'], db_conf['address'], db_conf['database'], Environment.SERVER_DATA['CAPTURE']
-        )
+        Database.register_engines()
         Database.init()
-        logger.debug("Default database connected...")
+        logging.debug("Default database connected...")
 
-    logger.info("Starting the server...")
+    logging.info("Starting the server...")
     Server(options).run()
 

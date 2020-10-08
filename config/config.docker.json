@@ -1,33 +1,21 @@
 {
     "SERVER_ENV": {
         "APP_NAME": "Flask",
-        "APP_KEY" : "app-key",
         "ENV": "dev",
         "BIND": {
             "ADDRESS" :  "localhost",
             "PORT": 5000
         },
-        "SECRET" : "secure-key",
-        "LOG_LEVEL": "info",
+        "LOG_LEVEL": "debug",
         "CAPTURE": false,
         "STATIC_PATH": "src/static",
         "TEMPLATE_PATH": "src/template",
-	    "SESSION_FILE_DIR": "sessions/",
-	    "UPLOAD_FILE_DIR": "uploads/",
         "THREADS_PER_CORE": 16,
         "LOG_DIR": "log/"
     },
     "LOGIN_DATA": {
     },
     "DATABASE": {
-        "default": "mysql",
-        "mysql": {
-          "driver": "mysql+pymysql",
-          "user": "mysql-user",
-          "password": "mysql-pass",
-          "database": "flask",
-          "address": "mysql-server"
-        }
     },
     "SERVICES": {
     }

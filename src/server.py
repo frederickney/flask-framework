@@ -32,36 +32,40 @@ def args_parser():
 
 def main():
     import os, logging
-    import Task
     import Server
     from Database import Database
     from Config import Environment
     args = args_parser()
     os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
-    Server.configure_logs('GLOBAL', '[%(asctime)s] [%(levelname)s]: %(message)s', os.environ.get("log_file"), "debug")
-    logger = logging.getLogger('GLOBAL')
-    logger.info("Starting server...")
-    logger.debug("Loading configuration file...")
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format='[%(asctime)s] [%(levelname)s]: %(message)s',
+        filename=os.environ.get('log_file')
+    )
+    logging.info("Starting server...")
+    logging.debug("Loading configuration file...")
     if 'CONFIG_FILE' in os.environ:
         Environment.load(os.environ['CONFIG_FILE'])
     else:
         Environment.load("/etc/server/config.json")
-    logger.debug("Configuration file loaded...")
-    app = Server.Process.init(tracking_mode=False)
-    logger.debug("Server initialized...")
-    logger.debug("Connecting to default database...")
+    logging.debug("Configuration file loaded...")
     if 'default' in Environment.Databases:
-        db_conf = Environment.Databases['default']
-        Database.setup(
-            db_conf['driver'], db_conf['user'], db_conf['password'], db_conf['address'], db_conf['database'], Environment.SERVER_DATA['CAPTURE']
-        )
+        logging.debug("Connecting to default database...")
+        Database.register_engines(args.debug)
         Database.init()
-    logger.debug("Default database connected...")
-    logger.debug("Loading server routes...")
+        logging.debug("Default database connected...")
+    Server.Process.init(tracking_mode=False)
+    #Server.Process.init_sheduler()
+    logging.debug("Server initialized...")
+    logging.debug("Loading server routes...")
     Server.Process.load_routes()
-    logger.debug("Server routes loaded...")
+    Server.Process.load_middleware()
+    Server.Process.load_socket_events()
+    logging.debug("Server routes loaded...")
     #app.teardown_appcontext(Database.save)
-    logger.info("Server is now starting...")
+    logging.info("Server is now starting...")
+    import Extensions
+    Extensions.load()
     Server.Process.start(args)
 
 

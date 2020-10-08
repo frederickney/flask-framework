@@ -12,9 +12,10 @@ class Route(object):
         """
         Constructor
         :param server: Flask server
+        :type server: flask.Flask
         :return: Route object
         """
         import Controllers
-        server.add_url_rule('/', "home", Controllers.Web.HomeController.default, methods=["GET"])
+
         return
 
