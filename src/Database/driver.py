@@ -187,7 +187,7 @@ class Driver(object):
     @classmethod
     def init_db(cls, name, models):
         import importlib
-        importlib.import_module('Models.Persistant.%s' % models)
+        importlib.import_module('Models.Persistent.%s' % models)
         cls.models[name].metadata.create_all(bind=cls.engines[name])
 
     @classmethod

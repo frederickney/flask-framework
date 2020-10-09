@@ -19,7 +19,7 @@ You can add default database using only the configuration file.
           "password": "replace this with your database user's password",
           "database": "replace this with your database name",
           "address": "replace this with your hostname",
-          "models": "mysql (python module that require to be put under models.persistent module)"
+          "models": "mysql (python module that require to be put under Models.Persistent module)"
     }
   },
   ...
@@ -40,7 +40,7 @@ You can add default database using only the configuration file.
           "password": "replace this with your database user's password",
           "database": "replace this with your database name",
           "address": "replace this with your hostname",
-          "models": "informix (python module that require to be put under models.persistent module)",
+          "models": "informix (python module that require to be put under Models.Persistent module)",
           "params": {
               "SERVER": "replace with your server name",
               "CLIENT_LOCALE" : "replace with your client locale",
@@ -125,7 +125,7 @@ Session based on sqlalchemy will use the default configured database
               "password": "replace this with your database user's password",
               "database": "replace this with your database name",
               "address": "replace this with your hostname",
-              "models": "mysql (python module that require to be put under models.persistent module)"
+              "models": "mysql (python module that require to be put under Models.Persistent module)"
         },
         "mongodb": {
               "driver": "mongodb",
@@ -133,7 +133,8 @@ Session based on sqlalchemy will use the default configured database
               "password": "replace this with your database user's password",
               "database": "replace this with your database name",
               "address": "replace this with your hostname",
-              "models": "mongodb (python module that require to be put under models.persistent module)"
+              "collection": "rreplace this with your collection name for the sessions",
+              "models": "mongodb (python module that require to be put under Models.Persistent module)"
         }
   },
   ...
@@ -281,7 +282,7 @@ pip3 install -r extensions.txt
 mkdir log
 ```
 
-* On every startup of the flask server 
+* On every startup of the flask server in standalone
 
 ```bash 
 export LOG_FILE=log/process.log
@@ -291,10 +292,26 @@ export LOG_FILE=log/process.log
 export CONFIG_FILE=config/config.orig.json
 ```
 
-* Starting the flask server
+* Starting the flask server in standalone
 
 ```bash 
 ./src/server.py
+```
+
+* On every startup of the flask server in standalone
+
+```bash 
+export LOG_DIR=log/
+```
+
+```bash 
+export CONFIG_FILE=config/config.orig.json
+```
+
+* Starting the flask server with workers
+
+```bash 
+./src/wsgi.py
 ```
 
 ---
