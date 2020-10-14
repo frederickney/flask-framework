@@ -196,14 +196,17 @@ All Rest API based controllers must be placed under the src/Controllers/WS folde
 
 #### Creating models:
 
-All models are stored inside the src/Models folder.
-The models that you register into the app must be an Database.Model object, you could import this object using the following line into your database model:
+
+you can create SQLAlchemy models by creating a new module under the ```Models.Persistent``` module and place each models inside your module that you previously created. 
+
+The models that you register into the app must be an ```Database.Model ``` or ```Database.get_models_by_name('replace that with your database connection name')``` object, you could import this object using the following line into your database model:
+
 
 ```python
 from Database import Database
 ```
 
-All models must be registered inside the Models.ModelsRegistry
+All models must be imported inside the ```__init__.py``` of your base module and you must import this module in the ```__init__.py``` of the ```Models.Persistent``` module
 
 #### Creating scheduling tasks:
 
