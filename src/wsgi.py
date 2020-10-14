@@ -7,6 +7,8 @@ import multiprocessing
 import gunicorn.app.base
 from six import iteritems
 
+import gevent.monkey
+gevent.monkey.patch_all()
 
 class Server(gunicorn.app.base.Application):
 
@@ -93,16 +95,15 @@ if __name__ == '__main__':
         "errorlog": os.path.join(os.environ.get("log_dir"), 'flask-error.log'),
         "accesslog": os.path.join(os.environ.get("log_dir"), 'flask-access.log'),
         "loglevel": loglevel,
-        "worker_class": 'sync',
+        "worker_class": 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker',
     }
     logging.info("Options loaded...")
 
-    if 'default' in Environment.Databases:
-        logging.debug("Connecting to default database...")
-        from Database import Database
-        Database.register_engines()
-        Database.init()
-        logging.debug("Default database connected...")
+    logging.debug("Connecting database(s)...")
+    from Database import Database
+    Database.register_engines()
+    Database.init()
+    logging.debug("Database(s) connected...")
 
     logging.info("Starting the server...")
     Server(options).run()

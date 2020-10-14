@@ -4,7 +4,27 @@ __author__ = 'Frederick NEY'
 
 from Deprecation import deprecated
 from Config import Environment
+from flask_sqlalchemy import BaseQuery, Model, Lock
 
+class SQLAlchemy(object):
+
+    def __init__(self, app=None, use_native_unicode=True,query=BaseQuery,session=None, model=Model, engine=None):
+        import sqlalchemy, sqlalchemy.orm
+        self.use_native_unicode = use_native_unicode
+        self.Query = query
+        self.engine = engine
+        self.session = session
+        self.Model = model
+        self._engine_lock = Lock()
+        self.app = app
+        for module in sqlalchemy, sqlalchemy.orm:
+            for key in module.__all__:
+                if not hasattr(self, key):
+                    setattr(self, key, getattr(module, key))
+            # Note: obj.Table does not attempt to be a SQLAlchemy Table class.
+    @property
+    def metadata(self):
+        return self.Model.metadata
 
 class Driver(object):
 
@@ -17,6 +37,8 @@ class Driver(object):
     sessions = {}
     models = {}
     _sessionmakers = {}
+    _sqlalchemy = None
+    _sqlalchemy_array = {}
 
     @staticmethod
     def _params(args={}):
@@ -54,7 +76,9 @@ class Driver(object):
         cls.session = scoped_session(cls._sessionmaker)
         cls.Model = declarative_base(cls.session)
         cls.Model.query = cls.session.query_property()
+        cls._sqlalchemy = SQLAlchemy(engine=cls.engine, query=cls.session.query_property(), session=cls.session, model=cls.Model)
         cls.session.close()
+
 
     @classmethod
     def register_engine(cls, name, driver, user, pwd, host, db, params=None, dialects=None,  echo=False):
@@ -72,6 +96,7 @@ class Driver(object):
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
         cls.models[name] = declarative_base(cls.sessions[name])
         cls.models[name].query = cls.sessions[name].query_property()
+        cls._sqlalchemy_array[name] = SQLAlchemy(engine=cls.engines[name], query=cls.sessions[name].query_property(), session=cls.sessions[name], model=cls.models[name])
         cls.sessions[name].close()
 
     @classmethod
@@ -188,6 +213,7 @@ class Driver(object):
     def init_db(cls, name, models):
         import importlib
         importlib.import_module('Models.Persistent.%s' % models)
+        cls.engines[name].metadata = cls.models[name]
         cls.models[name].metadata.create_all(bind=cls.engines[name])
 
     @classmethod
@@ -199,6 +225,9 @@ class Driver(object):
         for driver, conf in Environment.Databases.items():
             if driver == 'default':
                 if not conf['readonly']:
+                    import importlib
+                    cls.engine.metadata=cls.Model.metadata
+                    importlib.import_module('Models.Persistent.%s' % conf['models'])
                     cls.Model.metadata.create_all(bind=cls.engine)
             else:
                 if not conf['readonly']:

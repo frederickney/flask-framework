@@ -3,6 +3,9 @@
 
 __author__ = 'Frederick NEY'
 
+import gevent.monkey
+gevent.monkey.patch_all()
+
 
 def args_parser():
     import argparse
@@ -49,11 +52,10 @@ def main():
     else:
         Environment.load("/etc/server/config.json")
     logging.debug("Configuration file loaded...")
-    if 'default' in Environment.Databases:
-        logging.debug("Connecting to default database...")
-        Database.register_engines(args.debug)
-        Database.init()
-        logging.debug("Default database connected...")
+    logging.debug("Connecting to default database...")
+    Database.register_engines(args.debug)
+    Database.init()
+    logging.debug("Default database connected...")
     Server.Process.init(tracking_mode=False)
     #Server.Process.init_sheduler()
     logging.debug("Server initialized...")
