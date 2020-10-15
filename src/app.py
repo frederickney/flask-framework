@@ -1,3 +1,9 @@
+#!/usr/bin/python3
+# coding: utf-8
+
+__author__ = 'Frederick NEY'
+
+
 import os, logging
 import Server
 from Database import Database
