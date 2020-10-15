@@ -1,0 +1,22 @@
+{
+    "SERVER_ENV": {
+        "APP_NAME": "Flask",
+        "ENV": "dev",
+        "BIND": {
+            "ADDRESS" :  "localhost",
+            "PORT": 5000
+        },
+        "LOG_LEVEL": "debug",
+        "CAPTURE": false,
+        "STATIC_PATH": "src/static",
+        "TEMPLATE_PATH": "src/template",
+        "THREADS_PER_CORE": 16,
+        "LOG_DIR": "log/"
+    },
+    "LOGIN_DATA": {
+    },
+    "DATABASE": {
+    },
+    "SERVICES": {
+    }
+}

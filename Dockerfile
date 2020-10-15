@@ -20,9 +20,10 @@ RUN pip3 install --upgrade pip && \
     mkdir -p /etc/server/ && \
     mkdir -p /var/log/server/ && \
     chown -R dev:dev /var/log/server/ && \
+    chmod -R 775 /var/log/server/ && \
     echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-COPY ./config/config.docker.json /etc/server/config.json
+COPY ./config/config.json /etc/server/config.json
 
 USER dev
 

@@ -13,7 +13,10 @@ def moduleloader(module):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
     form_module = lambda fp : '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
     importlib.import_module(module)
@@ -30,7 +33,10 @@ def modulereloader(module):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
     form_module = lambda fp : '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
     imported_mod = importlib.import_module(module)
@@ -61,7 +67,10 @@ def initmodule(module, db):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
     importlib.import_module(module)
@@ -93,7 +102,10 @@ def routesloader(module, app):
     :return :
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
     importlib.import_module(module)
@@ -126,7 +138,10 @@ def blueprintsloader(module, app):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
     importlib.import_module(module)

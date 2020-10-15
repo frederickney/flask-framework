@@ -2,6 +2,6 @@
 
 set -e
 #set -o pipefail
-source $(pwd)/run.sh
-rc=$(run $@ >> $LOG_FILE)
+source /srv/http/run.sh
+rc=$(run $@)
 exit $rc

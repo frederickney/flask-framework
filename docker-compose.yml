@@ -1,12 +1,12 @@
 version: '3.5'
 services:
-  fask:
+  flask:
     image: debian-buster/python3.7:flask
     build:
       context: .
     container_name: flask
     entrypoint: /entrypoint
-    command: server.py -lp 5000 -D
+    command: wsgi.py
     working_dir: /srv/http
     shm_size: 512m
     environment:
