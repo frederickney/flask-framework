@@ -1,12 +1,12 @@
-# Introduction to the structure of the files:
+# Introduction
 
-#### Configuration
+## Configuration
 
 The base configuration file is located on the config dir.
 
 You can add default database using only the configuration file.
 
-##### default database with builtin driver in sqlalchemy 
+### Default database with builtin driver in sqlalchemy 
 
 ```json
 {
@@ -27,7 +27,7 @@ You can add default database using only the configuration file.
 }
 ```
 
-##### default database with non builtin driver in sqlalchemy 
+### Default database with non builtin driver in sqlalchemy 
 
 ```json
 {
@@ -62,7 +62,7 @@ In that example using informix database __"SERVER"__, __"CLIENT_LOCALE"__ and __
 
 __"dialects"__ are the python modules configuration to translate models into sql statements to query the database
 
-##### multiple databases
+### Multiple databases
 
 ```json
 {
@@ -81,7 +81,7 @@ __"dialects"__ are the python modules configuration to translate models into sql
 ```
 
 
-##### Adding users session
+### Adding users session
 
 To enable sessions in the server you need to add __"APP_KEY"__ and __"SESSION"__ into the __"SERVER_DATA"__ section in the configuration file
 
@@ -89,7 +89,7 @@ __"APP_KEY"__ : random string value (keep that secret)
 
 __"SESSION"__ : string value, possible values are [__"filesystem"__, __"memcahed"__, __"redis"__, __"mongodb"__, __"sqlalchemy"__]
 
-##### Using filesystem, redis or memcached based sessions
+### Using filesystem, redis or memcached based sessions
 
 ```json
 {
@@ -110,7 +110,7 @@ __"SESSION"__ : string value, possible values are [__"filesystem"__, __"memcahed
 }
 ```
 
-##### Using mongodb or sqlalchemy based sessions
+### Using mongodb or sqlalchemy based sessions
 
 Session based on sqlalchemy will use the default configured database
 
@@ -141,7 +141,7 @@ Session based on sqlalchemy will use the default configured database
 }
 ```
 
-##### Adding cors to the server
+### Adding cors to the server
 
 ```json
 {
@@ -168,7 +168,7 @@ Session based on sqlalchemy will use the default configured database
 }
 ``` 
 
-#### Creating server routes
+## Creating server routes
 
 There are 3 files where you could register your flask server routes, You could find these file under the src/Server folder:
 
@@ -200,7 +200,7 @@ Example:
 server.add_url_rule('/api/', 'api', Controllers.WS.ApiController.index, methods=['GET'])
 ```
 
-#### Creating controllers:
+## Creating controllers:
 
 * Web based http file controllers:
 
@@ -219,7 +219,7 @@ The class based controllers that you register into the app must be imported into
 
 The file based that contain your view functions must  must also be inmported into the ```__init__.py``` file of the ```Controller.Web``` module.
 
-#### Creating models:
+## Creating models:
 
 
 you can create SQLAlchemy models by creating a new module under the ```Models.Persistent``` module and place each models inside your module that you previously created. 
@@ -233,7 +233,7 @@ from Database import Database
 
 All models must be imported inside the ```__init__.py``` of your base module and you must import this module in the ```__init__.py``` of the ```Models.Persistent``` module
 
-#### Creating scheduling tasks:
+## Creating scheduling tasks:
 
 Tasks are some python code that are running at specific interval time. These task must be placed inside the src/Task folder.
 After that you must add these line inside the src/server.py file to enable your task function:
@@ -249,11 +249,11 @@ Note the task you are registering must be before the line:
 ```
 
 
-#### Static folder:
+## Static folder:
 
 The src/static folder contains all static file for your web based application.
 
-#### Template folder:
+## Template folder:
 
 The src/template folder contains layouts and templates file for your web based application.
 Those files are content configurable, you can also import layout inside the your template file, it allow you to have only content editable part into your template file.
