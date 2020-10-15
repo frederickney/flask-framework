@@ -27,4 +27,4 @@ COPY ./config/config.json /etc/server/config.json
 
 USER dev
 
-CMD /bin/bash
+ENTRYPOINT /bin/bash

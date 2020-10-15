@@ -15,7 +15,6 @@ services:
       - 5000:5000
     volumes:
       - ./src/:/srv/http/
-      - ./log/:/var/log/server/
     depends_on:
       - mysql-server
     links:
