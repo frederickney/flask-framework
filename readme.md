@@ -176,23 +176,48 @@ There are 3 files where you could register your flask server routes, You could f
 
 All the server http error code must be registered inside the __init__ method of the ErrorHandler.py file.
 
+Example:
+```python
+server.register_error_handler(500, Controllers.Web.HTTP50XController.error500)
+```
+
 * Web based http file routes:
 
 All the web based http routes must be registered inside the __init__ method of the Web.py file.
+
+Example:
+```python
+server.add_url_rule('/', 'home', Controllers.Web.HomeController.index, methods=['GET'])
+```
 
 * Rest api routes:
 
 All the Rest API based routes must be registered inside the __init__ method of the WS.py file.
 
+
+Example:
+```python
+server.add_url_rule('/api/', 'api', Controllers.WS.ApiController.index, methods=['GET'])
+```
+
 #### Creating controllers:
 
 * Web based http file controllers:
 
-All web based http file controllers must be placed under the src/Controllers/Web folder.
+All web based http file controllers must be placed under the ```Controllers.Web``` module.
+
+The class based controllers that you register into the app must be imported into the ```__init__.py``` file of the ```Controller.Web``` module.
+
+The file based that contain your view functions must  must also be inmported into the ```__init__.py``` file of the ```Controller.Web``` module.
+
 
 * Rest api controllers:
 
 All Rest API based controllers must be placed under the src/Controllers/WS folder.
+
+The class based controllers that you register into the app must be imported into the ```__init__.py``` file of the ```Controller.Web``` module.
+
+The file based that contain your view functions must  must also be inmported into the ```__init__.py``` file of the ```Controller.Web``` module.
 
 #### Creating models:
 
@@ -237,19 +262,19 @@ Those files are content configurable, you can also import layout inside the your
 
 # Using docker-compose file:
 
-* At first start of the flask server:
+* First start of the flask server:
 
 ```bash
 docker-compose up 
 ```
 
-* On restart of the flask server:
+* To start the flask server:
 
 ```bash
 docker-compose start 
 ```
 
-####     Or
+* To restart the flask server
 
 ```bash
 docker-compose restart 
@@ -294,6 +319,14 @@ export LOG_FILE=log/process.log
 ```bash 
 export CONFIG_FILE=config/config.orig.json
 ```
+
+* Starting the flask server attached to an ide such as PyCharm
+
+Setup the configuration as seen bellow in the screenshots
+
+![Configurations](configuration.png)
+
+![Environment variables](variables.png)
 
 * Starting the flask server in standalone
 
