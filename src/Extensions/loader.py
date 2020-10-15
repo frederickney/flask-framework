@@ -13,7 +13,7 @@ def moduleloader(module):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+    if os.path.exists(os.path.join(os.path.join(os.curdir, 'src'))):
         mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
     else:
         mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
@@ -33,7 +33,7 @@ def modulereloader(module):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+    if os.path.exists(os.path.join(os.path.join(os.curdir, 'src'))):
         mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
     else:
         mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
@@ -67,7 +67,7 @@ def initmodule(module, db):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+    if os.path.exists(os.path.join(os.path.join(os.curdir, 'src'))):
         mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
     else:
         mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
@@ -102,7 +102,7 @@ def routesloader(module, app):
     :return :
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+    if os.path.exists(os.path.join(os.path.join(os.curdir, 'src'))):
         mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
     else:
         mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
@@ -138,7 +138,7 @@ def blueprintsloader(module, app):
     :return:
     """
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    if os.path.exist(os.path.join(os.path.join(os.curdir, 'src'))):
+    if os.path.exists(os.path.join(os.path.join(os.curdir, 'src'))):
         mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), module)))
     else:
         mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))

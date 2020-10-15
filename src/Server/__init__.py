@@ -128,6 +128,28 @@ class Process(object):
         return cls._app
 
     @classmethod
+    def instanciate(cls):
+        """
+            :param
+            args:
+            :return:
+        """
+        import logging
+        from  Config import Environment
+        from flask_apscheduler import APScheduler
+        from werkzeug.serving import make_server, make_ssl_devcert
+        from gevent.pywsgi import WSGIServer
+        cls._scheduler = APScheduler()
+        if 'JOBS' not in cls._app.config:
+            cls._app.config['JOBS'] = []
+        if 'SCHEDULER_API_ENABLED' not in cls._app.config:
+            cls._app.config['SCHEDULER_API_ENABLED'] = False
+            cls._scheduler.init_app(cls._app)
+            cls._scheduler.start()
+            #logger.info("Starting listening on " + args.listening_address + " on port " + args.listening_port)
+        return cls._app
+
+    @classmethod
     def start(cls, args):
         """
 
