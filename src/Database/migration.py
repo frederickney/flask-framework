@@ -3,8 +3,10 @@
 __author__ = "Frederick NEY"
 
 
-from flask_migrate import Migrate as Migration, MigrateCommand
+from flask_migrate import Migrate as Migration
+from flask_migrate import MigrateCommand
 from flask_script import Manager
+
 
 class Migrate(object):
 

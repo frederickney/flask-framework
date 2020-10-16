@@ -1,8 +1,13 @@
+# coding : utf-8
+
+__author__ = "Frederick NEY"
+
+import importlib
+import logging
 import os
 import re
 import sys
-import logging
-import importlib
+
 import Exceptions
 
 

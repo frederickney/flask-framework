@@ -37,4 +37,3 @@ class NotAConfigurationFileError(ConfException):
 
     def __str__(self):
         return self.message
-

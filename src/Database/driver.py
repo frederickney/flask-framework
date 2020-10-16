@@ -2,9 +2,11 @@
 
 __author__ = 'Frederick NEY'
 
-from Deprecation import deprecated
+from flask_sqlalchemy import BaseQuery, Lock, Model
+
 from Config import Environment
-from flask_sqlalchemy import BaseQuery, Model, Lock
+from Deprecation import deprecated
+
 
 class SQLAlchemy(object):
 
@@ -261,4 +263,3 @@ class Driver(object):
                 logging.warning("Unable to properly stop thread '%s'" % manager.getName())
         Driver.session.remove()
         logging.info("Server is now shut down...")
-

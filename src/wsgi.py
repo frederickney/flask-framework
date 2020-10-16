@@ -4,10 +4,11 @@
 __author__ = 'Frederick NEY'
 
 import multiprocessing
+
+import gevent.monkey
 import gunicorn.app.base
 from six import iteritems
 
-import gevent.monkey
 gevent.monkey.patch_all()
 
 class Server(gunicorn.app.base.Application):
@@ -107,4 +108,3 @@ if __name__ == '__main__':
 
     logging.info("Starting the server...")
     Server(options).run()
-

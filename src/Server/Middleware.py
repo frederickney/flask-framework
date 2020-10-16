@@ -2,9 +2,11 @@
 
 __author__ = 'Frederick NEY'
 
-from flask import session
+import logging
 from uuid import uuid4
-import  logging
+
+from flask import session
+
 
 class Load(object):
 

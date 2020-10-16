@@ -3,11 +3,14 @@
 
 __author__ = 'Frederick NEY'
 
+import logging
+import os
 
-import os, logging
+import Extensions
 import Server
-from Database import Database
 from Config import Environment
+from Database import Database
+
 os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
 logging.basicConfig(
     level=logging.INFO,
@@ -37,7 +40,6 @@ Server.Process.load_socket_events()
 logging.debug("Server routes loaded...")
 # app.teardown_appcontext(Database.save)
 logging.info("Server is now starting...")
-import Extensions
 Extensions.load()
 app = Server.Process.instanciate()
 

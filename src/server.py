@@ -4,6 +4,7 @@
 __author__ = 'Frederick NEY'
 
 import gevent.monkey
+
 gevent.monkey.patch_all()
 
 
@@ -73,4 +74,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

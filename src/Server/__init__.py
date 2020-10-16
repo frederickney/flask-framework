@@ -40,7 +40,7 @@ class Process(object):
 
     _app: Flask = None
     _scheduler: APScheduler = None
-    _pidfile = "/run/rh-bot-srv.pid"
+    _pidfile = "/run/flask.pid"
     _socket = None
 
     @classmethod

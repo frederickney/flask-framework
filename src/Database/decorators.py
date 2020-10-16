@@ -23,4 +23,3 @@ def use(databases=['default']):
         return decorator
 
     return using
-
