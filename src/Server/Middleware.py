@@ -11,4 +11,3 @@ class Load(object):
         :param server:
         :type server: flask.Flask
         """
-

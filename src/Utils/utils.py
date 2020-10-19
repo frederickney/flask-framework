@@ -3,7 +3,9 @@
 __author__ = "Frederick NEY"
 
 import os
+
 from .module import generate
+
 
 def make_auth():
     pass
