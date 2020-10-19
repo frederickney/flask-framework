@@ -10,6 +10,30 @@ import Extensions
 import Server
 from Config import Environment
 from Database import Database
+from Utils import make_auth, make_controller, make_middleware
+
+
+def parser():
+    import argparse
+    parser = argparse.ArgumentParser(description='Python FLASK server')
+    parser.add_argument(
+        '-cc', '--create-controller',
+        help='Create controller',
+        required=False
+    )
+    parser.add_argument(
+        '-cm', '--create-middleware',
+        help='Create middleware',
+        required=False
+    )
+    args = parser.parse_args()
+    if args.create_controller:
+        make_controller(os.path.dirname(os.path.realpath(__file__)), args.create_controller)
+        exit(0)
+    elif args.create_middleware:
+        make_middleware(os.path.dirname(os.path.realpath(__file__)), args.create_middleware)
+        exit(0)
+
 
 os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
 logging.basicConfig(
@@ -44,4 +68,5 @@ Extensions.load()
 app = Server.Process.instanciate()
 
 if __name__ == '__main__':
+    parser()
     app.run()

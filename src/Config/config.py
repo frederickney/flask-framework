@@ -125,7 +125,8 @@ class Environment(object):
             for login in conf['LOGIN_DATA']:
                 cls.add_login(login, conf['LOGIN_DATA'][login])
             cls.__login_change = True
-            cls.set_default_login(conf['LOGIN_DATA'][cls.SERVER_DATA['DEFAULT_LOGIN']][cls.SERVER_DATA['AUTH_DRIVER']])
+            if 'DEFAULT_LOGIN' in cls.SERVER_DATA:
+                cls.set_default_login(conf['LOGIN_DATA'][cls.SERVER_DATA['DEFAULT_LOGIN']][cls.SERVER_DATA['AUTH_DRIVER']])
         except KeyError:
             cls.Logins = {}
 

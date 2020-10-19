@@ -4,6 +4,8 @@
 
 - Add AD based authentication settable within the configuration file
 
+- Add SSO based authentication settable within the configuration file
+
 - ~~Simplify the database models load and creation~~
 
 - Create model migration procedure

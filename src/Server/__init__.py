@@ -5,12 +5,12 @@ __author__ = 'Frederick NEY'
 
 import functools
 import warnings
-from . import WS, Web, ErrorHandler,  Middleware, Socket
+from . import WS, Web, ErrorHandler, Middleware,  RequestHandler, Socket
 from flask_session import Session
 from datetime import datetime, timedelta
-from flask_apscheduler import APScheduler
 from flask import Flask
 from flask_apscheduler import APScheduler
+from flask_sso import SSO
 
 
 def configure_logs(name, format, output_file, debug='info'):
@@ -42,6 +42,7 @@ class Process(object):
     _scheduler: APScheduler = None
     _pidfile = "/run/flask.pid"
     _socket = None
+    _sso: SSO = None
 
     @classmethod
     def init(cls, tracking_mode=False):
@@ -123,6 +124,12 @@ class Process(object):
             cls._session.init_app(cls._app)
             cls._csrf = CSRFProtect()
             cls._csrf.init_app(cls._app)
+            if 'SSO' in Environment.Logins:
+                cls._sso = SSO()
+                cls._app.config['SSO_LOGIN_URL'] = Environment.Logins['SSO']['LOGIN_URL']
+                cls._app.config['SSO_LOGIN_ENDPOINT'] = Environment.Logins['SSO']['LOGIN_ENDPOINT']
+                cls._app.config['SSO_ATTRIBUTE_MAP'] = { (item['value'], item['attr']) for item in Environment.Logins['SSO']['ATTRIBUTE_MAP'] }
+                cls._sso.init_app(cls._app)
         cls._socket = SocketIO()
         cls._socket.init_app(cls._app)
         return cls._app
@@ -228,6 +235,7 @@ class Process(object):
 
         :return:
         """
+        RequestHandler.Init(cls._app)
         WS.Route(cls._app)
         Web.Route(cls._app)
         ErrorHandler.Route(cls._app)
