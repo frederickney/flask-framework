@@ -215,7 +215,7 @@ class Driver(object):
     def init_db(cls, name, models):
         import importlib
         importlib.import_module('Models.Persistent.%s' % models)
-        cls.engines[name].metadata = cls.models[name]
+        cls.engines[name].metadata = cls.models[name].metadata
         cls.models[name].metadata.create_all(bind=cls.engines[name])
 
     @classmethod

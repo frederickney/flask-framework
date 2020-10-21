@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # coding: utf-8
+from builtins import AttributeError
 
 __author__ = 'Frederick NEY'
 
@@ -22,9 +23,32 @@ def parser():
         required=False
     )
     parser.add_argument(
+        '-db', '--database',
+        help="Run database operations",
+        required=False,
+        nargs="*"
+    )
+    parser.add_argument(
+        '-s', '--shell',
+        help="Run interactive shell",
+        required=False,
+        action="store_true"
+    )
+    parser.add_argument(
+        '-r', '--run',
+        help="Run server",
+        required=False,
+        action="store_true"
+    )
+    parser.add_argument(
         '-cm', '--create-middleware',
         help='Create middleware',
         required=False
+    )
+    parser.add_argument(
+        '-?', '--manager-help',
+        help='Command helper',
+        action="store_true"
     )
     args = parser.parse_args()
     if args.create_controller:
@@ -33,6 +57,19 @@ def parser():
     elif args.create_middleware:
         make_middleware(os.path.dirname(os.path.realpath(__file__)), args.create_middleware)
         exit(0)
+    elif args.database or args.shell or args.run or args.manager_help:
+        import sys
+        for i in range(0, len(sys.argv)):
+            if sys.argv[i] == '-db' or sys.argv[i] == '--database':
+                sys.argv[i] = 'database'
+            elif sys.argv[i] == '-s' or sys.argv[i] == '--shell':
+                sys.argv[i] = 'shell'
+            elif sys.argv[i] == '-r' or sys.argv[i] == '--run':
+                sys.argv[i] = 'runserver'
+        from Database.migration import Migrate
+        Migrate.run(app)
+        exit(0)
+
 
 
 os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))

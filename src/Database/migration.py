@@ -12,22 +12,20 @@ class Migrate(object):
 
     __migrate: Migration = None
 
-    @classmethod
-    def migration(cls, server, models, db):
-        if models is not 'default':
-            import importlib
-            importlib.import_module('Models.Persistent.%s' % models)
-        cls.__migrate.init_app(server, db)
 
     @classmethod
     def run(cls, server):
-        cls.__migrate = Migration()
         from .driver import Driver
-        for name, session in Driver._sqlalchemy_array.items():
-            if name is not 'default':
-                import importlib
-                importlib.import_module('Models.Persistent.%s' % name)
-            cls.migration(server, name, session)
+        from flask_migrate import Migrate
+        from flask_migrate import MigrateCommand
+        from flask_script import Manager
         manager = Manager(server)
-        manager.add_command('db', MigrateCommand)
-        manager.run()
+        manager.add_command('database', MigrateCommand)
+        for name, db in Driver.engines.items():
+            try:
+                migrate = Migrate(server, db)
+                manager.run()
+            except AttributeError as e:
+                continue
+        if len(Driver.engines) == 0:
+            manager.run()
