@@ -26,7 +26,7 @@ def parser():
         '-db', '--database',
         help="Run database operations",
         required=False,
-        nargs="*"
+        nargs="+"
     )
     parser.add_argument(
         '-s', '--shell',
@@ -45,11 +45,6 @@ def parser():
         help='Create middleware',
         required=False
     )
-    parser.add_argument(
-        '-?', '--manager-help',
-        help='Command helper',
-        action="store_true"
-    )
     args = parser.parse_args()
     if args.create_controller:
         make_controller(os.path.dirname(os.path.realpath(__file__)), args.create_controller)
@@ -57,7 +52,7 @@ def parser():
     elif args.create_middleware:
         make_middleware(os.path.dirname(os.path.realpath(__file__)), args.create_middleware)
         exit(0)
-    elif args.database or args.shell or args.run or args.manager_help:
+    elif args.database or args.shell or args.run:
         import sys
         for i in range(0, len(sys.argv)):
             if sys.argv[i] == '-db' or sys.argv[i] == '--database':
