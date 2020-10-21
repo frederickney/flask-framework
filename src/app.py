@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 # coding: utf-8
-from builtins import AttributeError
 
 __author__ = 'Frederick NEY'
 
