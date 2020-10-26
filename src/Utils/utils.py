@@ -49,8 +49,7 @@ def make_controller(basepath, controller):
         ),
         "w"
     )
-    fp.write("""
-# coding : utf-8
+    fp.write("""# coding : utf-8
 
 
 class Controller(object):

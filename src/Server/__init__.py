@@ -10,7 +10,6 @@ from flask_session import Session
 from datetime import datetime, timedelta
 from flask import Flask
 from flask_apscheduler import APScheduler
-from flask_sso import SSO
 
 
 def configure_logs(name, format, output_file, debug='info'):
@@ -42,7 +41,9 @@ class Process(object):
     _scheduler: APScheduler = None
     _pidfile = "/run/flask.pid"
     _socket = None
-    _sso: SSO = None
+    sso = None
+    openid = None
+    ad = None
 
     @classmethod
     def init(cls, tracking_mode=False):
@@ -62,7 +63,7 @@ class Process(object):
             static_folder=Environment.SERVER_DATA['STATIC_PATH'],
             template_folder=Environment.SERVER_DATA['TEMPLATE_PATH']
         )
-        if 'CORS' in Environment.SERVER_DATA:
+        if 'CORS' in Environment.Logins:
             from flask_cors import CORS
             cls._app.config["CORS_ALLOW_HEADERS"] = Environment.SERVER_DATA['CORS']['ALLOW_HEADERS']
             cls._app.config["CORS_ALWAYS_SEND"] = Environment.SERVER_DATA['CORS']['ALWAYS_SEND']
@@ -125,11 +126,21 @@ class Process(object):
             cls._csrf = CSRFProtect()
             cls._csrf.init_app(cls._app)
             if 'SSO' in Environment.Logins:
+                from flask_sso import SSO
                 cls._sso = SSO()
                 cls._app.config['SSO_LOGIN_URL'] = Environment.Logins['SSO']['LOGIN_URL']
                 cls._app.config['SSO_LOGIN_ENDPOINT'] = Environment.Logins['SSO']['LOGIN_ENDPOINT']
-                cls._app.config['SSO_ATTRIBUTE_MAP'] = { (item['value'], item['attr']) for item in Environment.Logins['SSO']['ATTRIBUTE_MAP'] }
+                cls._app.config['SSO_ATTRIBUTE_MAP'] = {
+                    (value['value'], value['attr']) for item, value in Environment.Logins['SSO']['ATTRIBUTE_MAP'].items()
+                }
                 cls._sso.init_app(cls._app)
+            if 'OpenID' in Environment.Logins:
+                from flask_oidc import OpenIDConnect
+                from flask_openid import OpenID
+                cls.openid = OpenIDConnect()
+                for key, value in Environment.Logins['OpenID'].items():
+                    cls._app.config[key] = value
+                cls.openid.init_app(cls._app)
         cls._socket = SocketIO()
         cls._socket.init_app(cls._app)
         return cls._app
