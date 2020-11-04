@@ -46,6 +46,17 @@ FIELDS = (
     'jpegPhoto'
 )
 
+def login_required(f):
+    """
+    Decorator for views that require login.
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'username' in session:
+            return f(*args, **kwargs)
+        return redirect(url_for(current_app.config['LDAP_LOGIN_VIEW']))
+    return decorated
+
 
 class LDAPForm(FlaskForm):
 
@@ -55,9 +66,9 @@ class LDAPForm(FlaskForm):
 
 
 class LDAP(object):
-    def __init__(self, app=None, mongo=None):
+    def __init__(self, app=None):
         self.app = app
-        self.mongo = mongo
+        self.login_required = login_required
         if app is not None:
             self.init_app(app)
 
@@ -186,15 +197,3 @@ class LDAP(object):
     def other_err(exc):
         flash(message=exc.message, category='error')
         return False
-
-
-def login_required(f):
-    """
-    Decorator for views that require login.
-    """
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if 'username' in session:
-            return f(*args, **kwargs)
-        return redirect(url_for(current_app.config['LDAP_LOGIN_VIEW']))
-    return decorated
