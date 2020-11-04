@@ -43,7 +43,7 @@ class Process(object):
     _socket = None
     sso = None
     openid = None
-    ad = None
+    ldap = None
 
     @classmethod
     def init(cls, tracking_mode=False):
@@ -127,20 +127,33 @@ class Process(object):
             cls._csrf.init_app(cls._app)
             if 'SSO' in Environment.Logins:
                 from flask_sso import SSO
-                cls._sso = SSO()
+                cls.sso = SSO()
                 cls._app.config['SSO_LOGIN_URL'] = Environment.Logins['SSO']['LOGIN_URL']
                 cls._app.config['SSO_LOGIN_ENDPOINT'] = Environment.Logins['SSO']['LOGIN_ENDPOINT']
                 cls._app.config['SSO_ATTRIBUTE_MAP'] = {
-                    (value['value'], value['attr']) for item, value in Environment.Logins['SSO']['ATTRIBUTE_MAP'].items()
+                    item: (value['value'], value['attr']) for item, value in Environment.Logins['SSO']['ATTRIBUTE_MAP'].items()
                 }
-                cls._sso.init_app(cls._app)
+                cls.sso.init_app(cls._app)
             if 'OpenID' in Environment.Logins:
-                from flask_oidc import OpenIDConnect
+                from Utils.Auth.openid import OpenIDConnect
                 from flask_openid import OpenID
                 cls.openid = OpenIDConnect()
                 for key, value in Environment.Logins['OpenID'].items():
                     cls._app.config[key] = value
                 cls.openid.init_app(cls._app)
+            if 'LDAP' in Environment.Logins:
+                if 'LDAP_HOST' not in Environment.Logins['LDAP'] and 'LDAP_DOMAIN' in Environment.Logins['LDAP']:
+                    from activedirectory import Locator
+                    ldap = Locator()
+                    Environment.Logins['LDAP']['LDAP_HOST'] = ldap.locate_many(
+                        Environment.Logins['LDAP']['LDAP_DOMAIN']
+                    )[0]
+                if 'LDAP_REQUIRED_GROUP' not in Environment.Logins['LDAP']:
+                    Environment.Logins['LDAP']['LDAP_REQUIRED_GROUP'] = None
+                from Utils.Auth.ldap import LDAP
+                for key, val in Environment.Logins['LDAP'].items():
+                    cls._app.config[key] = val
+                cls.ldap = LDAP(cls._app)
         cls._socket = SocketIO()
         cls._socket.init_app(cls._app)
         return cls._app
