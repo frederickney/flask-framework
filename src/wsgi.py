@@ -80,24 +80,32 @@ if __name__ == '__main__':
     else:
         Environment.load("/etc/server/config.json")
     loglevel = Environment.SERVER_DATA['LOG_LEVEL']
-
-    logging.basicConfig(
-        level=loglevel.upper(),
-        format='[%(asctime)s] [%(levelname)s]: %(message)s',
-        filename=os.environ.get('log_file')
-    )
-    logging.info("Configuration file loaded...")
+    logging_dir_exist = False
+    try:
+        logging.basicConfig(
+            level=loglevel.upper(),
+            format='[%(asctime)s] [%(levelname)s]: %(message)s',
+            filename=os.environ.get('log_file')
+        )
+        logging_dir_exist = True
+    except FileNotFoundError:
+        logging.basicConfig(
+            level=loglevel.upper(),
+            format='[%(asctime)s] [%(levelname)s]: %(message)s'
+        )
+        logging.info("Configuration file loaded...")
     logging.info("Loading options...")
     options = {
         'bind': '%s:%i' % (Environment.SERVER_DATA['BIND']['ADDRESS'], Environment.SERVER_DATA['BIND']['PORT']),
         'workers': Server.number_of_workers(),
         'threads': Environment.SERVER_DATA['THREADS_PER_CORE'],
         'capture_output': Environment.SERVER_DATA['CAPTURE'],
-        "errorlog": os.path.join(os.environ.get("log_dir"), 'flask-error.log'),
-        "accesslog": os.path.join(os.environ.get("log_dir"), 'flask-access.log'),
         "loglevel": loglevel,
         "worker_class": 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker',
     }
+    if logging_dir_exist:
+        options["errorlog"] = os.path.join(os.environ.get("log_dir"), 'flask-error.log')
+        options["accesslog"] = os.path.join(os.environ.get("log_dir"), 'flask-access.log')
     logging.info("Options loaded...")
 
     logging.debug("Connecting database(s)...")
