@@ -67,11 +67,18 @@ def parser():
 
 
 os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
-logging.basicConfig(
-    level=logging.INFO,
-    format='[%(asctime)s] [%(levelname)s]: %(message)s',
-    filename=os.environ.get('log_file')
-)
+try:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='[%(asctime)s] [%(levelname)s]: %(message)s',
+        filename=os.environ.get('log_file')
+    )
+    logging_dir_exist = True
+except FileNotFoundError:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='[%(asctime)s] [%(levelname)s]: %(message)s'
+    )
 logging.info("Starting server...")
 logging.info("Loading configuration file...")
 if 'CONFIG_FILE' in os.environ:

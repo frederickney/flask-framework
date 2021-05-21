@@ -41,11 +41,18 @@ def main():
     from Config import Environment
     args = args_parser()
     os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
-    logging.basicConfig(
-        level=logging.DEBUG if args.debug else logging.INFO,
-        format='[%(asctime)s] [%(levelname)s]: %(message)s',
-        filename=os.environ.get('log_file')
-    )
+    try:
+        logging.basicConfig(
+            level=logging.DEBUG if args.debug else logging.INFO,
+            format='[%(asctime)s] [%(levelname)s]: %(message)s',
+            filename=os.environ.get('log_file')
+        )
+        logging_dir_exist = True
+    except FileNotFoundError:
+        logging.basicConfig(
+            level=logging.DEBUG if args.debug else logging.INFO,
+            format='[%(asctime)s] [%(levelname)s]: %(message)s'
+        )
     logging.info("Starting server...")
     logging.debug("Loading configuration file...")
     if 'CONFIG_FILE' in os.environ:

@@ -93,7 +93,7 @@ if __name__ == '__main__':
             level=loglevel.upper(),
             format='[%(asctime)s] [%(levelname)s]: %(message)s'
         )
-        logging.info("Configuration file loaded...")
+    logging.info("Configuration file loaded...")
     logging.info("Loading options...")
     options = {
         'bind': '%s:%i' % (Environment.SERVER_DATA['BIND']['ADDRESS'], Environment.SERVER_DATA['BIND']['PORT']),
