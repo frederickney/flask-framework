@@ -13,6 +13,5 @@ requests
 six
 urllib3
 Werkzeug
-gevent
 gunicorn
-gevent-websocket
+gevent
