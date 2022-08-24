@@ -30,7 +30,6 @@ class Server(gunicorn.app.base.Application):
         logging.info("Initializing the server...")
         Process.init(tracking_mode=False)
         logging.info("Server initialized...")
-        Process.init_sheduler()
         logging.debug("Loading server routes...")
         Process.load_routes()
         Process.load_middleware()
