@@ -135,6 +135,9 @@ if __name__ == '__main__':
     if logging_dir_exist:
         options["errorlog"] = os.path.join(os.environ.get("log_dir"), 'flask-error.log')
         options["accesslog"] = os.path.join(os.environ.get("log_dir"), 'flask-access.log')
+    if 'SSL' in Environment.SERVER_DATA:
+        options["certfile"] = Environment.SERVER_DATA['SSL']['Certificate']
+        options["keyfile"] = Environment.SERVER_DATA['SSL']['PrivateKey']
     logging.info("Options loaded...")
     if 'default' in Environment.Databases:
         logging.debug("Connecting to default database...")

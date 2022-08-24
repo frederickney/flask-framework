@@ -191,6 +191,7 @@ class Process(object):
         from flask_apscheduler import APScheduler
         from werkzeug.serving import make_server, make_ssl_devcert
         from gevent.pywsgi import WSGIServer
+        from Config import Environment
         cls._scheduler = APScheduler()
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
@@ -201,34 +202,60 @@ class Process(object):
             cls._scheduler.start()
             #logger.info("Starting listening on " + args.listening_address + " on port " + args.listening_port)
             print("Starting listening on %s on port %d" % (args.listening_address, int(args.listening_port)))
-            if args.debug:
-                cls._app.run(host=args.listening_address, port=int(args.listening_port), debug=args.debug)
+            if 'SSL' in Environment.SERVER_DATA:
+                if args.debug:
+                    cls._app.run(host=args.listening_address, port=int(args.listening_port), debug=args.debug, ssl_context=(Environment.SERVER_DATA['SSL']['Certificate'], Environment.SERVER_DATA['SSL']['PrivateKey']))
+                else:
+                    try:
+                        if args.pid:
+                            cls.pid()
+                        cls._server = WSGIServer((args.listening_address, int(args.listening_port)), cls._app,  keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'], certfile=Environment.SERVER_DATA['SSL']['Certificate'])
+                        cls._server.serve_forever()
+                    finally:
+                        if args.pid:
+                            cls.shutdown()
             else:
-                try:
-                    if args.pid:
-                        cls.pid()
-                    cls._server = WSGIServer((args.listening_address, int(args.listening_port)), cls._app)
-                    cls._server.serve_forever()
-                finally:
-                    if args.pid:
-                        cls.shutdown()
+                if args.debug:
+                    cls._app.run(host=args.listening_address, port=int(args.listening_port), debug=args.debug)
+                else:
+                    try:
+                        if args.pid:
+                            cls.pid()
+                        cls._server = WSGIServer((args.listening_address, int(args.listening_port)), cls._app)
+                        cls._server.serve_forever()
+                    finally:
+                        if args.pid:
+                            cls.shutdown()
         else:
             cls._scheduler.init_app(cls._app)
             cls._scheduler.start()
             #logger.info("Starting listening on 0.0.0.0 on port " + args.listening_port)
             print("Starting listening on 0.0.0.0 on port %d" % int(args.listening_port))
-            if args.debug:
-                cls._app.run(host="0.0.0.0", port=int(args.listening_port), debug=args.debug)
+            if 'SSL' in Environment.SERVER_DATA:
+                if args.debug:
+                    cls._app.run(host="0.0.0.0", port=int(args.listening_port), debug=args.debug, ssl_context=(Environment.SERVER_DATA['SSL']['Certificate'], Environment.SERVER_DATA['SSL']['PrivateKey']))
+                else:
+                    try:
+                        if args.pid:
+                            cls.pid()
+                        cls._server = WSGIServer(("0.0.0.0", int(args.listening_port)), cls._app,  keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'], certfile=Environment.SERVER_DATA['SSL']['Certificate'])
+                        cls._server.serve_forever()
+                    finally:
+                        if args.pid:
+                            cls.shutdown()
             else:
-                try:
-                    if args.pid:
-                        cls.pid()
-                    cls._server = WSGIServer(("0.0.0.0", int(args.listening_port)), cls._app)
-                    cls._server.serve_forever()
-                finally:
-                    if args.pid:
-                        cls.shutdown()
-        #logger.info("Server is running")
+                if args.debug:
+                    cls._app.run(host="0.0.0.0", port=int(args.listening_port), debug=args.debug)
+                else:
+                    try:
+                        if args.pid:
+                            cls.pid()
+                        cls._server = WSGIServer(("0.0.0.0", int(args.listening_port)), cls._app)
+                        cls._server.serve_forever()
+                    finally:
+                        if args.pid:
+                            cls.shutdown()
+            #logger.info("Server is running")
 
     @classmethod
     def wsgi_setup(cls):

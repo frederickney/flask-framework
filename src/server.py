@@ -100,7 +100,6 @@ def main():
         Database.init()
         logging.debug("Default database connected...")
     Server.Process.init(tracking_mode=False)
-    Server.Process.init_sheduler()
     logging.debug("Server initialized...")
     logging.debug("Loading server routes...")
     Server.Process.load_routes()
