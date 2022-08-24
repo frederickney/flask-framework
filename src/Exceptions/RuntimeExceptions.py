@@ -25,6 +25,7 @@ class DatabaseChangeException(RuntimeException):
     def __str__(self):
         return self.message
 
+
 class LoginChangeException(RuntimeException):
     message = None
 
@@ -34,6 +35,7 @@ class LoginChangeException(RuntimeException):
 
     def __str__(self):
         return self.message
+
 
 class ServiceChangeException(RuntimeException):
     message = None

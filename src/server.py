@@ -36,19 +36,33 @@ def args_parser():
 
 def main():
     import os, logging
+    from logging.handlers import TimedRotatingFileHandler
     import Server
     from Database import Database
     from Config import Environment
     args = args_parser()
     os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
-    try:
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format='[%(asctime)s] [%(levelname)s]: %(message)s',
+        filename=os.environ.get('log_file')
+    )
+    if os.environ.get("LOG_FILE", None) or os.environ.get("LOG_DIR", None):
+        os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
+        os.environ.setdefault("log_file", os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log')))
+    if os.environ.get("log_file", None):
         logging.basicConfig(
             level=logging.DEBUG if args.debug else logging.INFO,
             format='[%(asctime)s] [%(levelname)s]: %(message)s',
-            filename=os.environ.get('log_file')
+            handlers=[
+                TimedRotatingFileHandler(
+                    filename=os.environ.get('log_file'),
+                    when='midnight',
+                    backupCount=30
+                )
+            ]
         )
-        logging_dir_exist = True
-    except FileNotFoundError:
+    else:
         logging.basicConfig(
             level=logging.DEBUG if args.debug else logging.INFO,
             format='[%(asctime)s] [%(levelname)s]: %(message)s'
@@ -59,13 +73,34 @@ def main():
         Environment.load(os.environ['CONFIG_FILE'])
     else:
         Environment.load("/etc/server/config.json")
+    try:
+        loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
+        logging.getLogger().setLevel(loglevel.upper())
+    except KeyError as e:
+        pass
+    try:
+        RotatingLogs = TimedRotatingFileHandler(
+            filename=os.path.join(Environment.SERVER_DATA["LOG"]["DIR"], 'process.log'),
+            when='midnight',
+            backupCount=30
+        )
+        RotatingLogs.setFormatter(logging.Formatter('[%(asctime)s] [%(levelname)s]: %(message)s'))
+        logging.getLogger().handlers = [
+            RotatingLogs
+        ]
+        logging.info('Logging handler initialized')
+    except KeyError as e:
+        pass
+    except FileNotFoundError as e:
+        pass
     logging.debug("Configuration file loaded...")
-    logging.debug("Connecting to default database...")
-    Database.register_engines(args.debug)
-    Database.init()
-    logging.debug("Default database connected...")
+    if 'default' in Environment.Databases:
+        logging.debug("Connecting to default database...")
+        Database.register_engines(args.debug)
+        Database.init()
+        logging.debug("Default database connected...")
     Server.Process.init(tracking_mode=False)
-    #Server.Process.init_sheduler()
+    Server.Process.init_sheduler()
     logging.debug("Server initialized...")
     logging.debug("Loading server routes...")
     Server.Process.load_routes()
@@ -81,3 +116,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

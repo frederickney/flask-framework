@@ -2,31 +2,16 @@
 
 __author__ = 'Frederick NEY'
 
-import logging
 
+import logging
 import Exceptions
 
 
-def _load_json_file(file):
-    import os.path, json
-    from json import JSONDecodeError
-    if isinstance(file, str):
-        if os.path.exists(file):
-            if os.path.isfile(file):
-                try:
-                    return json.load(open(file))
-                except JSONDecodeError as e:
-                    raise Exceptions.ConfigExceptions.InvalidConfigurationFileError(file + ": Expected json file format.")
-            else:
-                raise Exceptions.ConfigExceptions.NotAConfigurationFileError(file + ": Not a valid file.")
-        else:
-            raise Exceptions.ConfigExceptions.NotAConfigurationFileError(file + ": File did not exist.")
-    else:
-        raise Exceptions.ConfigExceptions.NotAConfigurationFileError(
-            "Expected " + type(str) + ", got " + type(file) + "."
-        )
+def _load_yaml_file():
+    return
 
-def load_conf_file(file):
+
+def load_file(file):
     import os.path, json, Exceptions
     if isinstance(file, str):
         if os.path.exists(file):
@@ -44,9 +29,6 @@ def load_conf_file(file):
         raise Exceptions.ConfigExceptions.NotAConfigurationFileError(
             "Expected " + type(str) + ", got " + type(file) + "."
         )
-
-def load_json_file(file):
-    return _load_json_file(file)
 
 
 class Services(object):
@@ -70,12 +52,18 @@ class Environment(object):
     __default_login_change = False
 
     @staticmethod
-    def _load_json_file(file):
-        return load_json_file(file)
+    def _load(file, loader):
+        return loader.load(file)
 
     @classmethod
     def load(cls, file):
-        conf = cls._load_json_file(file)
+        try:
+            from . import json
+            conf = cls._load(file, json)
+        except Exceptions.ConfigExceptions.InvalidConfigurationFileError as e:
+            logging.info(e.message)
+            from . import yaml
+            conf = cls._load(file, yaml)
         cls.load_runtime(conf)
         cls.load_databases(conf)
         cls.load_logins(conf)
@@ -125,9 +113,8 @@ class Environment(object):
             for login in conf['LOGIN_DATA']:
                 cls.add_login(login, conf['LOGIN_DATA'][login])
             cls.__login_change = True
-            if 'DEFAULT_LOGIN' in cls.SERVER_DATA:
-                cls.set_default_login(conf['LOGIN_DATA'][cls.SERVER_DATA['DEFAULT_LOGIN']][cls.SERVER_DATA['AUTH_DRIVER']])
-        except KeyError:
+            cls.set_default_login(conf['LOGIN_DATA'][cls.SERVER_DATA['DEFAULT_LOGIN']])
+        except KeyError as e:
             cls.Logins = {}
 
     @classmethod

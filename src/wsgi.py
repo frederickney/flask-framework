@@ -9,7 +9,6 @@ import gevent.monkey
 import gunicorn.app.base
 from six import iteritems
 
-gevent.monkey.patch_all()
 
 class Server(gunicorn.app.base.Application):
 
@@ -31,7 +30,7 @@ class Server(gunicorn.app.base.Application):
         logging.info("Initializing the server...")
         Process.init(tracking_mode=False)
         logging.info("Server initialized...")
-        #Process.init_sheduler()
+        Process.init_sheduler()
         logging.debug("Loading server routes...")
         Process.load_routes()
         Process.load_middleware()
@@ -71,29 +70,60 @@ if __name__ == '__main__':
     import os
     import Server as Process
     import logging
+    from logging.handlers import TimedRotatingFileHandler
     from Config import Environment
-    loglevel = 'info'
-    os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
-    os.environ.setdefault("log_file", os.path.join(os.environ.get("log_dir"), 'process.log'))
+    loglevel = 'warning'
+    logging_dir_exist = False
+    if os.environ.get("LOG_DIR", None):
+        os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
+        os.environ.setdefault("log_file", os.path.join(os.environ.get("log_dir"), 'process.log'))
+    if os.environ.get("log_file", None):
+        logging.basicConfig(
+            level=loglevel.upper(),
+            format='[%(u)s %(t)s] [%(levelname)s]: %(message)s',
+            handlers=[
+                TimedRotatingFileHandler(
+                    filename=os.environ.get('log_file'),
+                    when='midnight',
+                    backupCount=30
+                )
+            ]
+        )
+        logging_dir_exist = True
+    else:
+        logging.basicConfig(
+            level=loglevel.upper(),
+            format='[%(u)s %(t)s] [%(levelname)s]: %(message)s',
+        )
+    logging.info("Loading configuration file...")
     if 'CONFIG_FILE' in os.environ:
         Environment.load(os.environ['CONFIG_FILE'])
     else:
         Environment.load("/etc/server/config.json")
-    loglevel = Environment.SERVER_DATA['LOG_LEVEL']
+    logging.info("Configuration file loaded...")
+    try:
+        loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
+        logging.getLogger().setLevel(loglevel.upper())
+    except KeyError as e:
+        pass
     logging_dir_exist = False
     try:
-        logging.basicConfig(
-            level=loglevel.upper(),
-            format='[%(asctime)s] [%(levelname)s]: %(message)s',
-            filename=os.environ.get('log_file')
+        RotatingLogs = TimedRotatingFileHandler(
+            filename=os.path.join(Environment.SERVER_DATA["LOG"]["DIR"], 'process.log'),
+            when='midnight',
+            backupCount=30
         )
+        RotatingLogs.setFormatter(logging.Formatter('[%(asctime)s] [%(levelname)s]: %(message)s'))
+        logging.getLogger().handlers = [
+            RotatingLogs
+        ]
+        logging.info('Logging handler initialized')
+        os.environ.setdefault("log_dir", Environment.SERVER_DATA["LOG"]["DIR"])
         logging_dir_exist = True
-    except FileNotFoundError:
-        logging.basicConfig(
-            level=loglevel.upper(),
-            format='[%(asctime)s] [%(levelname)s]: %(message)s'
-        )
-    logging.info("Configuration file loaded...")
+    except KeyError as e:
+        pass
+    except FileNotFoundError as e:
+        pass
     logging.info("Loading options...")
     options = {
         'bind': '%s:%i' % (Environment.SERVER_DATA['BIND']['ADDRESS'], Environment.SERVER_DATA['BIND']['PORT']),
@@ -101,18 +131,18 @@ if __name__ == '__main__':
         'threads': Environment.SERVER_DATA['THREADS_PER_CORE'],
         'capture_output': Environment.SERVER_DATA['CAPTURE'],
         "loglevel": loglevel,
-        "worker_class": 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker',
+        "worker_class": Environment.SERVER_DATA['WORKERS'],
     }
     if logging_dir_exist:
         options["errorlog"] = os.path.join(os.environ.get("log_dir"), 'flask-error.log')
         options["accesslog"] = os.path.join(os.environ.get("log_dir"), 'flask-access.log')
     logging.info("Options loaded...")
-
-    logging.debug("Connecting database(s)...")
-    from Database import Database
-    Database.register_engines()
-    Database.init()
-    logging.debug("Database(s) connected...")
+    if 'default' in Environment.Databases:
+        logging.debug("Connecting to default database...")
+        from Database import Database
+        Database.register_engines()
+        Database.init()
+        logging.debug("Default database connected...")
 
     logging.info("Starting the server...")
     Server(options).run()

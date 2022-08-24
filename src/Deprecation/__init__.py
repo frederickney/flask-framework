@@ -45,6 +45,7 @@ def deprecated(func):
 
     return deprecation
 
+
 def outdated(func):
     """Outdated decorator which can be used to mark functions
     as obsolete. It will result in a error being emitted

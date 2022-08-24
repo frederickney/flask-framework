@@ -2,31 +2,9 @@
 
 __author__ = 'Frederick NEY'
 
-from flask_sqlalchemy import BaseQuery, Lock, Model
-
-from Config import Environment
 from Deprecation import deprecated
+from Config import Environment
 
-
-class SQLAlchemy(object):
-
-    def __init__(self, app=None, use_native_unicode=True,query=BaseQuery,session=None, model=Model, engine=None):
-        import sqlalchemy, sqlalchemy.orm
-        self.use_native_unicode = use_native_unicode
-        self.Query = query
-        self.engine = engine
-        self.session = session
-        self.Model = model
-        self._engine_lock = Lock()
-        self.app = app
-        for module in sqlalchemy, sqlalchemy.orm:
-            for key in module.__all__:
-                if not hasattr(self, key):
-                    setattr(self, key, getattr(module, key))
-            # Note: obj.Table does not attempt to be a SQLAlchemy Table class.
-    @property
-    def metadata(self):
-        return self.Model.metadata
 
 class Driver(object):
 
@@ -39,8 +17,6 @@ class Driver(object):
     sessions = {}
     models = {}
     _sessionmakers = {}
-    _sqlalchemy = None
-    _sqlalchemy_array = {}
 
     @staticmethod
     def _params(args={}):
@@ -74,16 +50,14 @@ class Driver(object):
         database_uri =  "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
                         + ('?{}'.format(cls._params(params)) if params is not None else '')
         cls.engine = create_engine(database_uri, echo=echo)
-        cls._sessionmaker = sessionmaker(bind=cls.engine)
+        cls._sessionmaker = sessionmaker(bind=cls.engine, autocommit=True, autoflush=True)
         cls.session = scoped_session(cls._sessionmaker)
         cls.Model = declarative_base(cls.session)
         cls.Model.query = cls.session.query_property()
-        cls._sqlalchemy = SQLAlchemy(engine=cls.engine, query=cls.session.query_property(), session=cls.session, model=cls.Model)
         cls.session.close()
 
-
     @classmethod
-    def register_engine(cls, name, driver, user, pwd, host, db, params=None, dialects=None,  echo=False):
+    def register_engine(cls, name, driver, user, pwd, host, db, params=None, dialects=None,  echo=True):
         from sqlalchemy import create_engine
         from sqlalchemy.orm import scoped_session, sessionmaker
         from sqlalchemy.ext.declarative import declarative_base
@@ -94,11 +68,10 @@ class Driver(object):
         database_uri = "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
                        + (';{}'.format(cls._params(params)) if params is not None else '')
         cls.engines[name] = create_engine(database_uri, echo=echo)
-        cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name])
+        cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name], autocommit=True, autoflush=False)
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
         cls.models[name] = declarative_base(cls.sessions[name])
         cls.models[name].query = cls.sessions[name].query_property()
-        cls._sqlalchemy_array[name] = SQLAlchemy(engine=cls.engines[name], query=cls.sessions[name].query_property(), session=cls.sessions[name], model=cls.models[name])
         cls.sessions[name].close()
 
     @classmethod
@@ -212,10 +185,13 @@ class Driver(object):
         return getattr(Driver, task_name, None)
 
     @classmethod
-    def init_db(cls, name, models):
-        import importlib
-        importlib.import_module('Models.Persistent.%s' % models)
-        cls.engines[name].metadata = cls.models[name].metadata
+    def init_default_db(cls):
+        import Models.Persistant
+        cls.Model.metadata.create_all(bind=cls.engine)
+
+    @classmethod
+    def init_db(cls, name):
+        import Models.Persistant
         cls.models[name].metadata.create_all(bind=cls.engines[name])
 
     @classmethod
@@ -227,16 +203,19 @@ class Driver(object):
         for driver, conf in Environment.Databases.items():
             if driver == 'default':
                 if not conf['readonly']:
-                    import importlib
-                    cls.engine.metadata=cls.Model.metadata
-                    importlib.import_module('Models.Persistent.%s' % conf['models'])
-                    cls.Model.metadata.create_all(bind=cls.engine)
-            else:
-                if not conf['readonly']:
-                    cls.init_db(name=driver, models=conf['models'])
+                    cls.init_default_db()
+            if not conf['readonly']:
+                cls.init_db(name=driver)
 
+    @classmethod
+    def disconnect(cls, engine):
+        engine.dispose()
 
-
+    @classmethod
+    def disconnect_all(cls):
+        cls.disconnect(cls.engine)
+        for name, engine in cls.engines.items():
+            cls.disconnect(engine)
 
     @classmethod
     def save(cls):
@@ -263,3 +242,4 @@ class Driver(object):
                 logging.warning("Unable to properly stop thread '%s'" % manager.getName())
         Driver.session.remove()
         logging.info("Server is now shut down...")
+

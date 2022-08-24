@@ -3,5 +3,3 @@
 __author__ = 'Frederick NEY'
 
 from .driver import Driver as Database
-from .decorators import use
-from .migration import Migrate

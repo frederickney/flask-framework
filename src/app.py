@@ -66,15 +66,22 @@ def parser():
 
 
 
-os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
-try:
+if os.environ.get("LOG_FILE", None) or os.environ.get("LOG_DIR", None):
+    os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
+    os.environ.setdefault("log_file", os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log')))
+if os.environ.get("log_file", None):
     logging.basicConfig(
         level=logging.INFO,
         format='[%(asctime)s] [%(levelname)s]: %(message)s',
-        filename=os.environ.get('log_file')
+        handlers=[
+            TimedRotatingFileHandler(
+                filename=os.environ.get('log_file'),
+                when='midnight',
+                backupCount=30
+            )
+        ]
     )
-    logging_dir_exist = True
-except FileNotFoundError:
+else:
     logging.basicConfig(
         level=logging.INFO,
         format='[%(asctime)s] [%(levelname)s]: %(message)s'
@@ -85,9 +92,27 @@ if 'CONFIG_FILE' in os.environ:
     Environment.load(os.environ['CONFIG_FILE'])
 else:
     Environment.load("/etc/server/config.json")
+try:
+    loglevel = Environment.SERVER_DATA['LOG_LEVEL']
+    logging.getLogger().setLevel(loglevel.upper())
+except KeyError as e:
+    pass
+try:
+    RotatingLogs = TimedRotatingFileHandler(
+        filename=os.path.join(Environment.SERVER_DATA["LOG_DIR"], 'process.log'),
+        when='midnight',
+        backupCount=30
+    )
+    RotatingLogs.setFormatter(logging.Formatter('[%(asctime)s] [%(levelname)s]: %(message)s'))
+    logging.getLogger().handlers = [
+        RotatingLogs
+    ]
+    logging.info('Logging handler initialized')
+except KeyError as e:
+    pass
+except FileNotFoundError as e:
+    pass
 logging.info("Configuration file loaded...")
-logging.basicConfig()
-logging.getLogger().setLevel(Environment.SERVER_DATA['LOG_LEVEL'].upper()),
 logging.debug("Connecting to default database...")
 Database.register_engines(Environment.SERVER_DATA['LOG_LEVEL'] == 'debug')
 Database.init()

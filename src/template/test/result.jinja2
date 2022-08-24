@@ -1,0 +1,13 @@
+{% macro display() %}
+    {% if results %}
+        {% for key, value in results.items() %}
+            <div class="col-md-12 row ">
+            <h2>{{ key }}</h2>
+            {% for orientation, result in value.items() %}
+                <h3>{{ orientation }}</h3>
+                <p>{{ result }}</p>
+            {% endfor %}
+            </div>
+        {% endfor %}
+    {% endif %}
+{%  endmacro %}

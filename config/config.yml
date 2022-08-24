@@ -1,0 +1,22 @@
+SERVER_ENV:
+    APP_NAME: Flask
+    APP_KEY : secret
+    ENV: dev
+    BIND:
+        ADDRESS :  localhost
+        PORT: 4200
+    WORKERS: sync
+    CAPTURE: false
+    STATIC_PATH: src/static
+    TEMPLATE_PATH: src/template
+    SESSION: filesystem
+    THREADS_PER_CORE: 16
+    LOG:
+        DIR: ${LOG_DIR}
+        LEVEL: ${LOG_LEVEL}
+
+#DATABASES: {}
+
+SERVICES: 
+  filesystem:
+    PATH: sessions
