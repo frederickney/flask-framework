@@ -29,7 +29,7 @@ class Driver(object):
         return params
 
     @classmethod
-    def setup(cls, driver, user, pwd, host, db, echo=False, params=None, dialects=None, **kwargs):
+    def setup(cls, driver, user, pwd, host, db, port=None, echo=False, params=None, dialects=None, **kwargs):
         """
         Setup function that will configure all the required resources for communicating with the database
         :param driver: Database driver that will be used when the server need to store persistant data
@@ -47,8 +47,10 @@ class Driver(object):
             from sqlalchemy.dialects import registry
             for name, values in dialects.items():
                 registry.register(name, values['module'], values['class'])
-        database_uri =  "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
-                        + ('?{}'.format(cls._params(params)) if params is not None else '')
+        database_uri =  ("{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db) \
+                       + (';{}'.format(cls._params(params)) if params is not None else '')) if port else \
+                       ("{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
+                       + ('?{}'.format(cls._params(params)) if params is not None else ''))
         cls.engine = create_engine(database_uri, echo=echo)
         cls._sessionmaker = sessionmaker(bind=cls.engine, autocommit=True, autoflush=True)
         cls.session = scoped_session(cls._sessionmaker)
@@ -57,7 +59,7 @@ class Driver(object):
         cls.session.close()
 
     @classmethod
-    def register_engine(cls, name, driver, user, pwd, host, db, params=None, dialects=None,  echo=True):
+    def register_engine(cls, name, driver, user, pwd, host, db, port=None, params=None, dialects=None,  echo=True):
         from sqlalchemy import create_engine
         from sqlalchemy.orm import scoped_session, sessionmaker
         from sqlalchemy.ext.declarative import declarative_base
@@ -65,8 +67,10 @@ class Driver(object):
             from sqlalchemy.dialects import registry
             for registry_name, values in dialects.items():
                 registry.register(registry_name, values['module'], values['class'])
-        database_uri = "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
-                       + (';{}'.format(cls._params(params)) if params is not None else '')
+        database_uri = ("{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db) \
+                       + (';{}'.format(cls._params(params)) if params is not None else '')) if port else \
+                       ("{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
+                       + (';{}'.format(cls._params(params)) if params is not None else ''))
         cls.engines[name] = create_engine(database_uri, echo=echo)
         cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name], autocommit=True, autoflush=False)
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
@@ -107,6 +111,7 @@ class Driver(object):
                 config['password'],
                 config['address'],
                 config['database'],
+                port=(config['port'] if 'port' in config else None),
                 params=(config['params'] if 'params' in config else None),
                 dialects=(config['dialects'] if 'dialects' in config else None),
                 echo=echo
@@ -118,6 +123,7 @@ class Driver(object):
                     config['password'],
                     config['address'],
                     config['database'],
+                    port=(config['port'] if 'port' in config else None),
                     params=(config['params'] if 'params' in config else None),
                     dialects=(config['dialects'] if 'dialects' in config else None),
                     echo=echo
