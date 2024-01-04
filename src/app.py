@@ -11,6 +11,7 @@ import Server
 from Config import Environment
 from Database import Database
 from Utils import make_auth, make_controller, make_middleware
+from logging.handlers import TimedRotatingFileHandler
 
 
 def parser():
@@ -93,13 +94,13 @@ if 'CONFIG_FILE' in os.environ:
 else:
     Environment.load("/etc/server/config.json")
 try:
-    loglevel = Environment.SERVER_DATA['LOG_LEVEL']
+    loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
     logging.getLogger().setLevel(loglevel.upper())
 except KeyError as e:
     pass
 try:
     RotatingLogs = TimedRotatingFileHandler(
-        filename=os.path.join(Environment.SERVER_DATA["LOG_DIR"], 'process.log'),
+        filename=os.path.join(Environment.SERVER_DATA["LOG"]['DIR'], 'process.log'),
         when='midnight',
         backupCount=30
     )
@@ -114,7 +115,7 @@ except FileNotFoundError as e:
     pass
 logging.info("Configuration file loaded...")
 logging.debug("Connecting to default database...")
-Database.register_engines(Environment.SERVER_DATA['LOG_LEVEL'] == 'debug')
+Database.register_engines(Environment.SERVER_DATA['LOG']['LEVEL'] == 'debug')
 Database.init()
 logging.debug("Default database connected...")
 Server.Process.init(tracking_mode=False)
@@ -128,8 +129,8 @@ logging.debug("Server routes loaded...")
 # app.teardown_appcontext(Database.save)
 logging.info("Server is now starting...")
 Extensions.load()
-app = Server.Process.instanciate()
+app = Server.Process.init()
 
 if __name__ == '__main__':
     parser()
-    app.run()
+    app.run(host=Environment.SERVER_DATA['BIND']['ADDRESS'], port=Environment.SERVER_DATA['BIND']['PORT'])

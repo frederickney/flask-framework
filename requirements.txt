@@ -15,3 +15,5 @@ urllib3
 Werkzeug
 gunicorn
 gevent
+pyyaml
+pyopenssl

@@ -63,21 +63,7 @@ class Process(object):
             static_folder=Environment.SERVER_DATA['STATIC_PATH'],
             template_folder=Environment.SERVER_DATA['TEMPLATE_PATH']
         )
-        if 'CORS' in Environment.Logins:
-            from flask_cors import CORS
-            cls._app.config["CORS_ALLOW_HEADERS"] = Environment.SERVER_DATA['CORS']['ALLOW_HEADERS']
-            cls._app.config["CORS_ALWAYS_SEND"] = Environment.SERVER_DATA['CORS']['ALWAYS_SEND']
-            cls._app.config["CORS_AUTOMATIC_OPTIONS"] = Environment.SERVER_DATA['CORS']['AUTOMATIC_OPTIONS']
-            cls._app.config["CORS_EXPOSE_HEADERS"] = Environment.SERVER_DATA['CORS']['EXPOSE_HEADERS']
-            cls._app.config["CORS_INTERCEPT_EXCEPTIONS"] = Environment.SERVER_DATA['CORS']['INTERCEPT_EXCEPTIONS']
-            cls._app.config["CORS_MAX_AGE"] = Environment.SERVER_DATA['CORS']['MAX_AGE']
-            cls._app.config["CORS_METHODS"] = Environment.SERVER_DATA['CORS']['METHODS']
-            cls._app.config["CORS_ORIGINS"] = Environment.SERVER_DATA['CORS']['ORIGINS']
-            cls._app.config["CORS_RESOURCES"] = r"/*"
-            cls._app.config["CORS_SEND_WILDCARD"] = Environment.SERVER_DATA['CORS']['SEND_WILDCARD']
-            cls._app.config["CORS_SUPPORTS_CREDENTIALS"] = Environment.SERVER_DATA['CORS']['SUPPORTS_CREDENTIALS']
-            cls._app.config["CORS_VARY_HEADER"] = Environment.SERVER_DATA['CORS']['VARY_HEADER']
-            cors = CORS(cls._app, origins=Environment.SERVER_DATA['CORS']['ORIGINS'])
+        cls._app.config.update(Environment.FLASK['CONFIG'])
         if 'APP_KEY' in Environment.SERVER_DATA:
             from flask_wtf.csrf import CSRFProtect
             cls._session = Session()
@@ -128,19 +114,20 @@ class Process(object):
             if 'SSO' in Environment.Logins:
                 from flask_sso import SSO
                 cls.sso = SSO()
-                cls._app.config['SSO_LOGIN_URL'] = Environment.Logins['SSO']['LOGIN_URL']
-                cls._app.config['SSO_LOGIN_ENDPOINT'] = Environment.Logins['SSO']['LOGIN_ENDPOINT']
-                cls._app.config['SSO_ATTRIBUTE_MAP'] = {
-                    item: (value['value'], value['attr']) for item, value in Environment.Logins['SSO']['ATTRIBUTE_MAP'].items()
-                }
                 cls.sso.init_app(cls._app)
             if 'OpenID' in Environment.Logins:
                 from Utils.Auth.openid import OpenIDConnect
                 from flask_openid import OpenID
                 cls.openid = OpenIDConnect()
-                for key, value in Environment.Logins['OpenID'].items():
-                    cls._app.config[key] = value
                 cls.openid.init_app(cls._app)
+            if 'SAML2' in Environment.Logins:
+                import flask_saml
+                cls.saml = flask_saml.FlaskSAML()
+                cls._csrf.exempt("flask_saml.login_acs")
+                cls._csrf.exempt("flask_saml.login")
+                cls._csrf.exempt("flask_saml.logout")
+                cls._csrf.exempt("flask_saml.metadata")
+                cls.saml.init_app(cls._app)
             if 'LDAP' in Environment.Logins:
                 if 'LDAP_HOST' not in Environment.Logins['LDAP'] and 'LDAP_DOMAIN' in Environment.Logins['LDAP']:
                     from activedirectory import Locator

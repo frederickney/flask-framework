@@ -68,6 +68,7 @@ class Environment(object):
         cls.load_databases(conf)
         cls.load_logins(conf)
         cls.load_services(conf)
+        cls.FLASK = conf['FLASK']
 
     @classmethod
     def load_databases(cls, conf):
@@ -109,11 +110,7 @@ class Environment(object):
     @classmethod
     def load_logins(cls, conf):
         try:
-            cls.Logins = {}
-            for login in conf['LOGIN_DATA']:
-                cls.add_login(login, conf['LOGIN_DATA'][login])
-            cls.__login_change = True
-            cls.set_default_login(conf['LOGIN_DATA'][cls.SERVER_DATA['DEFAULT_LOGIN']])
+            cls.Logins = conf['LOGINS']
         except KeyError as e:
             cls.Logins = {}
 
