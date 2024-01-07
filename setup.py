@@ -12,10 +12,10 @@ _load_requirements("requirements.txt")
 _load_requirements("extensions.txt")
 
 
-with open("README.md", "r") as fh:
+with open("readme.md", "r") as fh:
     long_description = fh.read()
     setuptools.setup(
-        name = "Flask-Fraamewok",
+        name = "Flask-Framework",
         version = "0.1.5",
         author = "Frédérick NEY",
         author_email = "frederick.ney@gmail.com",
