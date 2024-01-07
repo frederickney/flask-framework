@@ -15,7 +15,7 @@ _load_requirements("extensions.txt")
 with open("readme.md", "r") as fh:
     long_description = fh.read()
     setuptools.setup(
-        name = "Flask-Framework",
+        name = "flask_framework",
         version = "0.1.5",
         author = "Frédérick NEY",
         author_email = "frederick.ney@gmail.com",
