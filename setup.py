@@ -10,8 +10,7 @@ def _load_requirements(filename:str):
 
 _load_requirements("requirements.txt") 
 _load_requirements("extensions.txt")
-
-
+namespaces = setuptools.find_namespace_packages(where="src")
 with open("readme.md", "r") as fh:
     long_description = fh.read()
     setuptools.setup(
@@ -23,6 +22,7 @@ with open("readme.md", "r") as fh:
         long_description = long_description,
         long_description_content_type = "text/markdown",
         url = "https://github.com/frederickney/flask-framework",
-        packages=setuptools.find_packages(),
+        packages=namespaces,
+        package_dir={'': 'src'},
         install_requires  = requirements
     )

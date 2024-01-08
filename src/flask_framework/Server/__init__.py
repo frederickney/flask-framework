@@ -56,14 +56,16 @@ class Process(object):
         """
         from flask_socketio import SocketIO
         from flask import Flask
-        from Config import Environment
+        from flask_framework.Config import Environment
         cls._app = Flask(
             Environment.SERVER_DATA['APP_NAME'],
             static_url_path="/file",
             static_folder=Environment.SERVER_DATA['STATIC_PATH'],
             template_folder=Environment.SERVER_DATA['TEMPLATE_PATH']
         )
-        cls._app.config.update(Environment.FLASK['CONFIG'])
+        if 'CONFIG' in Environment.FLASK:
+            if Environment.FLASK['CONFIG'] is not None:
+                cls._app.config.update(Environment.FLASK['CONFIG'])
         if 'APP_KEY' in Environment.SERVER_DATA:
             from flask_wtf.csrf import CSRFProtect
             cls._session = Session()
@@ -90,7 +92,7 @@ class Process(object):
                     )
                 )
             if Environment.SERVER_DATA['SESSION'] == 'sqlalchemy':
-                from Database import Database
+                from flask_framework.Database import Database
                 cls._app = Database.setup_sessions(
                     cls._app
                 )
@@ -137,7 +139,7 @@ class Process(object):
                     )[0]
                 if 'LDAP_REQUIRED_GROUP' not in Environment.Logins['LDAP']:
                     Environment.Logins['LDAP']['LDAP_REQUIRED_GROUP'] = None
-                from Utils.Auth.ldap import LDAP
+                from flask_framework.Utils.Auth.ldap import LDAP
                 for key, val in Environment.Logins['LDAP'].items():
                     cls._app.config[key] = val
                 cls.ldap = LDAP(cls._app)
@@ -153,7 +155,7 @@ class Process(object):
             :return:
         """
         import logging
-        from  Config import Environment
+        from  flask_framework.Config import Environment
         from flask_apscheduler import APScheduler
         from werkzeug.serving import make_server, make_ssl_devcert
         from gevent.pywsgi import WSGIServer
@@ -178,7 +180,7 @@ class Process(object):
         from flask_apscheduler import APScheduler
         from werkzeug.serving import make_server, make_ssl_devcert
         from gevent.pywsgi import WSGIServer
-        from Config import Environment
+        from flask_framework.Config import Environment
         cls._scheduler = APScheduler()
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
@@ -314,7 +316,7 @@ class Process(object):
         :type weeks: int
         :return:
         """
-        from Config import Environment
+        from flask_framework.Config import Environment
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
         jobs = cls._app.config['JOBS']
@@ -371,7 +373,7 @@ class Process(object):
         :type weeks: int
         :return:
         """
-        from Config import Environment
+        from flask_framework.Config import Environment
         if seconds == 0 and minutes == 0 and hours == 0 and days == 0 and weeks == 0:
             seconds = 1
         cls._scheduler.add_job(id=id if id is not None else function, func=function.replace('.', ':', 1), args=args, trigger=trigger, hours=hours, minutes=minutes, seconds=seconds, days=days)
@@ -447,7 +449,7 @@ class Process(object):
 
     @classmethod
     def init_sheduler(cls):
-        from Config import Environment
+        from flask_framework.Config import Environment
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
         cls._app.config['SCHEDULER_API_ENABLED'] = True

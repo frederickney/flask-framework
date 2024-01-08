@@ -6,11 +6,11 @@ __author__ = 'Frederick NEY'
 import logging
 import os
 
-import Extensions
-import Server
-from Config import Environment
-from Database import Database
-from Utils import make_auth, make_controller, make_middleware
+import flask_framework.Extensions as Extensions
+import flask_framework.Server as Server
+from flask_framework.Config import Environment
+from flask_framework.Database import Database
+from flask_framework.Utils import make_auth, make_controller, make_middleware
 from logging.handlers import TimedRotatingFileHandler
 
 

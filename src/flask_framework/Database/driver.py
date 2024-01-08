@@ -2,8 +2,8 @@
 
 __author__ = 'Frederick NEY'
 
-from Deprecation import deprecated
-from Config import Environment
+from flask_framework.Deprecation import deprecated
+from flask_framework.Config import Environment
 
 
 class Driver(object):

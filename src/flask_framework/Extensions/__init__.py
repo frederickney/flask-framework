@@ -10,8 +10,8 @@ class Loader(object):
     @classmethod
     def load(cls):
         from . import loader
-        from Database import Database
-        from Server import Process
+        from flask_framework.Database import Database
+        from flask_framework.Server import Process
         import logging
         logging.info('Loading plugins')
         loader.moduleloader('Extensions')
@@ -24,8 +24,8 @@ class Loader(object):
     @classmethod
     def reload(cls):
         from . import loader
-        from Database import Database
-        from Server import Process
+        from flask_framework.Database import Database
+        from flask_framework.Server import Process
         import logging
         logging.info('Reloading plugins')
         loader.modulereloader('Extensions')

@@ -17,7 +17,7 @@ class Init(object):
     def before_request(self, *args, **kwargs):
         import logging
         from flask import request
-        from Database import Database
+        from flask_framework.Database import Database
         Database.start_sessions()
         try:
             Database.session.begin()
@@ -33,7 +33,7 @@ class Init(object):
 
     def after_request(self, *args, **kwargs):
         import logging
-        from Database import Database
+        from flask_framework.Database import Database
         from flask import request
         try:
             Database.session.commit()

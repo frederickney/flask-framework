@@ -3,7 +3,7 @@
 __author__ = 'Frederick NEY'
 
 
-import Exceptions
+import flask_framework.Exceptions as Exceptions
 
 
 def _load(file):

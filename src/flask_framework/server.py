@@ -37,9 +37,9 @@ def args_parser():
 def main():
     import os, logging
     from logging.handlers import TimedRotatingFileHandler
-    import Server
-    from Database import Database
-    from Config import Environment
+    import flask_framework.Server as Server
+    from flask_framework.Database import Database
+    from flask_framework.Config import Environment
     args = args_parser()
     os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
     logging.basicConfig(
@@ -108,7 +108,7 @@ def main():
     logging.debug("Server routes loaded...")
     #app.teardown_appcontext(Database.save)
     logging.info("Server is now starting...")
-    import Extensions
+    import flask_framework.Extensions as Extensions
     Extensions.load()
     Server.Process.start(args)
 

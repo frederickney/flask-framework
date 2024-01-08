@@ -2,7 +2,7 @@
 
 __author__ = 'Frederick NEY'
 
-import Exceptions
+import flask_framework.Exceptions as Exceptions
 import re
 import os
 
@@ -24,7 +24,7 @@ def __env_constructor(loader, node):
 
 
 def _load(file):
-    import os.path, yaml, Exceptions
+    import os.path, yaml
     yaml.add_implicit_resolver('!env', __env_matcher)
     yaml.add_constructor('!env', __env_constructor)
     if isinstance(file, str):

@@ -4,7 +4,7 @@ __author__ = 'Frederick NEY'
 
 
 import logging
-import Exceptions
+from flask_framework import Exceptions
 
 
 def _load_yaml_file():
@@ -12,7 +12,7 @@ def _load_yaml_file():
 
 
 def load_file(file):
-    import os.path, json, Exceptions
+    import os.path, json
     if isinstance(file, str):
         if os.path.exists(file):
             if os.path.isfile(file):

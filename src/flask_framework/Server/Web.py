@@ -15,5 +15,12 @@ class Route(object):
         :type server: flask.Flask
         :return: Route object
         """
-        import Controllers
+        import logging
+        try:
+            import Controllers
+            import Server
+            Server.Web.Route(server)
+        except Exception as e:
+            logging.warning("Web: Fallback to default controller as : {}".format(e))
+            import flask_framework.Controllers as Controller
         return
