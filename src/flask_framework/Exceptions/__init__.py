@@ -5,4 +5,4 @@ __author__ = 'Frederick NEY'
 
 from . import ConfigExceptions
 from . import RuntimeExceptions
-from . import QueryExceptionscd
+from . import QueryExceptions
