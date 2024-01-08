@@ -52,9 +52,9 @@ class Driver(object):
                        ("{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
                        + ('?{}'.format(cls._params(params)) if params is not None else ''))
         cls.engine = create_engine(database_uri, echo=echo)
-        cls._sessionmaker = sessionmaker(bind=cls.engine, autocommit=True, autoflush=True)
+        cls._sessionmaker = sessionmaker(bind=cls.engine, autoflush=True)
         cls.session = scoped_session(cls._sessionmaker)
-        cls.Model = declarative_base(cls.session)
+        cls.Model = declarative_base()
         cls.Model.query = cls.session.query_property()
         cls.session.close()
 
@@ -72,9 +72,9 @@ class Driver(object):
                        ("{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
                        + (';{}'.format(cls._params(params)) if params is not None else ''))
         cls.engines[name] = create_engine(database_uri, echo=echo)
-        cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name], autocommit=True, autoflush=False)
+        cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name], autoflush=False)
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
-        cls.models[name] = declarative_base(cls.sessions[name])
+        cls.models[name] = declarative_base()
         cls.models[name].query = cls.sessions[name].query_property()
         cls.sessions[name].close()
 
