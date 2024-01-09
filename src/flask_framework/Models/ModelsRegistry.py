@@ -2,4 +2,4 @@
 
 __author__ = 'Frederick NEY'
 
-from Models.Persistant import *
+from Models.Persistent import *

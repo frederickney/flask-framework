@@ -32,7 +32,7 @@ class Driver(object):
     def setup(cls, driver, user, pwd, host, db, port=None, echo=False, params=None, dialects=None, **kwargs):
         """
         Setup function that will configure all the required resources for communicating with the database
-        :param driver: Database driver that will be used when the server need to store persistant data
+        :param driver: Database driver that will be used when the server need to store persistent data
         :param user: Database user
         :param pwd: Database password
         :param host: Database host
@@ -192,12 +192,12 @@ class Driver(object):
 
     @classmethod
     def init_default_db(cls):
-        import Models.Persistant
+        import Models.Persistent
         cls.Model.metadata.create_all(bind=cls.engine)
 
     @classmethod
     def init_db(cls, name):
-        import Models.Persistant
+        import Models.Persistent
         cls.models[name].metadata.create_all(bind=cls.engines[name])
 
     @classmethod
