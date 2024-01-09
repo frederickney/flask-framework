@@ -1,6 +1,8 @@
 # coding: utf-8
 
+
 __author__ = "Frederick NEY"
+
 
 import flask_framework.Deprecation
 import flask_framework.Exceptions

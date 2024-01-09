@@ -4,6 +4,7 @@
 
 __author__ = 'Frederick NEY'
 
+
 import logging
 import os
 
@@ -13,6 +14,10 @@ from flask_framework.Config import Environment
 from flask_framework.Database import Database
 from flask_framework.Utils import make_auth, make_controller, make_middleware
 from logging.handlers import TimedRotatingFileHandler
+import gevent.monkey
+
+
+gevent.monkey.patch_all()
 
 
 def parser():
@@ -66,27 +71,16 @@ def parser():
         Migrate.run(app)
         exit(0)
 
-
-
-if os.environ.get("LOG_FILE", None) or os.environ.get("LOG_DIR", None):
-    os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
-    os.environ.setdefault("log_file", os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log')))
-if os.environ.get("log_file", None):
+try:
+    loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
     logging.basicConfig(
-        level=logging.INFO,
-        format='[%(asctime)s] [%(levelname)s]: %(message)s',
-        handlers=[
-            TimedRotatingFileHandler(
-                filename=os.environ.get('log_file'),
-                when='midnight',
-                backupCount=30
-            )
-        ]
+        level=logging.getLevelName(loglevel.upper()),
+        format='%(asctime)s %(levelname)s %(message)s'
     )
-else:
+except KeyError as e:
     logging.basicConfig(
         level=logging.INFO,
-        format='[%(asctime)s] [%(levelname)s]: %(message)s'
+        format='%(asctime)s %(levelname)s %(message)s'
     )
 logging.info("Starting server...")
 logging.info("Loading configuration file...")
@@ -94,27 +88,6 @@ if 'CONFIG_FILE' in os.environ:
     Environment.load(os.environ['CONFIG_FILE'])
 else:
     Environment.load("/etc/server/config.json")
-try:
-    loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
-    logging.getLogger().setLevel(loglevel.upper())
-except KeyError as e:
-    pass
-try:
-    RotatingLogs = TimedRotatingFileHandler(
-        filename=os.path.join(Environment.SERVER_DATA["LOG"]['DIR'], 'process.log'),
-        when='midnight',
-        backupCount=30
-    )
-    RotatingLogs.setFormatter(logging.Formatter('[%(asctime)s] [%(levelname)s]: %(message)s'))
-    logging.getLogger().handlers = [
-        RotatingLogs
-    ]
-    logging.info('Logging handler initialized')
-except KeyError as e:
-    pass
-except FileNotFoundError as e:
-    pass
-logging.info("Configuration file loaded...")
 logging.debug("Connecting to default database...")
 Database.register_engines(Environment.SERVER_DATA['LOG']['LEVEL'] == 'debug')
 Database.init()

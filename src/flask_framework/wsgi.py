@@ -4,6 +4,7 @@
 
 __author__ = 'Frederick NEY'
 
+
 import multiprocessing
 
 import gevent.monkey
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     if os.environ.get("log_file", None):
         logging.basicConfig(
             level=loglevel.upper(),
-            format='[%(u)s %(t)s] [%(levelname)s]: %(message)s',
+            format='%(asctime)s %(levelname)s %(message)s',
             handlers=[
                 TimedRotatingFileHandler(
                     filename=os.environ.get('log_file'),
@@ -93,7 +94,7 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(
             level=loglevel.upper(),
-            format='[%(u)s %(t)s] [%(levelname)s]: %(message)s',
+            format='%(asctime)s %(levelname)s %(message)s',
         )
     logging.info("Loading configuration file...")
     if 'CONFIG_FILE' in os.environ:
@@ -113,7 +114,7 @@ if __name__ == '__main__':
             when='midnight',
             backupCount=30
         )
-        RotatingLogs.setFormatter(logging.Formatter('[%(asctime)s] [%(levelname)s]: %(message)s'))
+        RotatingLogs.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
         logging.getLogger().handlers = [
             RotatingLogs
         ]

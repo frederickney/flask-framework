@@ -6,6 +6,7 @@ __author__ = 'Frederick NEY'
 
 import gevent.monkey
 
+
 gevent.monkey.patch_all()
 
 
@@ -45,7 +46,7 @@ def main():
     os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO,
-        format='[%(asctime)s] [%(levelname)s]: %(message)s',
+        format='%(asctime)s %(levelname)s %(message)s',
         filename=os.environ.get('log_file')
     )
     if os.environ.get("LOG_FILE", None) or os.environ.get("LOG_DIR", None):
@@ -54,7 +55,7 @@ def main():
     if os.environ.get("log_file", None):
         logging.basicConfig(
             level=logging.DEBUG if args.debug else logging.INFO,
-            format='[%(asctime)s] [%(levelname)s]: %(message)s',
+            format='%(asctime)s %(levelname)s %(message)s',
             handlers=[
                 TimedRotatingFileHandler(
                     filename=os.environ.get('log_file'),
@@ -66,7 +67,7 @@ def main():
     else:
         logging.basicConfig(
             level=logging.DEBUG if args.debug else logging.INFO,
-            format='[%(asctime)s] [%(levelname)s]: %(message)s'
+            format='%(asctime)s %(levelname)s %(message)s'
         )
     logging.info("Starting server...")
     logging.debug("Loading configuration file...")
@@ -85,7 +86,7 @@ def main():
             when='midnight',
             backupCount=30
         )
-        RotatingLogs.setFormatter(logging.Formatter('[%(asctime)s] [%(levelname)s]: %(message)s'))
+        RotatingLogs.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
         logging.getLogger().handlers = [
             RotatingLogs
         ]
