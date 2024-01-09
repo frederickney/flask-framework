@@ -1,5 +1,6 @@
 # coding: utf-8
 
+
 __author__ = 'Frederick NEY'
 
 
@@ -13,7 +14,6 @@ class BaseException(Exception):
 
     def __str__(self):
         return self.message
-
 
 
 class PrimaryKeyChangeException(BaseException):

@@ -1,6 +1,8 @@
-# coding : utf-8
+# coding: utf-8
+
 
 __author__ = "Frederick NEY"
+
 
 import importlib
 import logging
@@ -10,6 +12,7 @@ import sys
 
 import flask_framework.Exceptions as Exceptions
 from flask_framework.Config import Environment
+
 
 def moduleloader(module):
     """

@@ -1,6 +1,8 @@
 # coding: utf-8
 
+
 __author__ = 'Frederick NEY'
+
 
 from flask_framework.Deprecation import deprecated
 from flask_framework.Config import Environment

@@ -1,4 +1,5 @@
-# coding : utf-8
+# coding: utf-8
+
 
 __author = "Frederick NEY"
 
@@ -36,7 +37,7 @@ from . import {}
                 "w"
             )
             fp.write(
-"""# coding : utf-8
+"""# coding: utf-8
 
 
 from . import {}
@@ -52,5 +53,5 @@ from . import {}
                 os.path.join(os.path.join(os.path.join(basepath, 'Controllers'), os.path.dirname(module)), '__init__.py'),
                 "w"
             )
-            fp.write('# coding : utf-8\n\n\n')
+            fp.write('# coding: utf-8\n\n\n')
             fp.close()

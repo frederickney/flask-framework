@@ -1,8 +1,10 @@
 # coding: utf-8
-from apscheduler.jobstores.redis import RedisJobStore
+
 
 __author__ = 'Frederick NEY'
 
+
+import apscheduler.jobstores.redis
 import functools
 import warnings
 from . import WS, Web, ErrorHandler, Middleware,  RequestHandler, Socket
@@ -341,7 +343,7 @@ class Process(object):
         cls._app.config['JOBS'] = jobs
         if 'SCHEDULER_API_ENABLED' not in cls._app.config:
             cls._app.config['SCHEDULER_JOBSTORES']= {
-                'default': RedisJobStore(
+                'default': apscheduler.jobstores.redis.RedisJobStore(
                     port = Environment.Services['redis']['PORT'],
                     host = Environment.Services['redis']['HOST'],
                     db=10
@@ -454,7 +456,7 @@ class Process(object):
             cls._app.config['JOBS'] = []
         cls._app.config['SCHEDULER_API_ENABLED'] = True
         cls._app.config['SCHEDULER_JOBSTORES'] = {
-            'default': RedisJobStore(
+            'default': apscheduler.jobstores.redis.RedisJobStore(
                 port=Environment.Services['redis']['PORT'],
                 host=Environment.Services['redis']['HOST'],
                 db=10

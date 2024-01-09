@@ -1,4 +1,5 @@
-# coding=utf-8
+# coding: utf-8
+
 
 __author__ = "Frederick NEY"
 
@@ -45,6 +46,7 @@ FIELDS = (
     'userPrincipalName',
     'jpegPhoto'
 )
+
 
 def login_required(f):
     """
