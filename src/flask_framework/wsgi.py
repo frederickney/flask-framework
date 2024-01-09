@@ -39,7 +39,7 @@ class Server(gunicorn.app.base.Application):
         Extensions.load()
         logging.debug("Server routes loaded...")
         logging.debug("Loading websocket events")
-        Server.Process.load_socket_events()
+        Process.load_socket_events()
         logging.debug("Websocket events loaded...")
         # app.teardown_appcontext(Database.save)
         logging.info("Server started...")
