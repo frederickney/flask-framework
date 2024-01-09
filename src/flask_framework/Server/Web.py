@@ -21,6 +21,8 @@ class Route(object):
             import Server
             Server.Web.Route(server)
         except Exception as e:
+            import traceback
             logging.warning("Web: Fallback to default controller as : {}".format(e))
+            logging.debug(traceback.print_exc())
             import flask_framework.Controllers as Controller
         return

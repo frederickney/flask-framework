@@ -18,8 +18,10 @@ class Route(object):
         try:
             import Controllers
             import Server
-            Server.Web.Route(server)
+            Server.WS.Route(server)
         except Exception as e:
+            import traceback
             logging.warning("WS: Fallback to default controller as : {}".format(e))
+            logging.debug(traceback.print_exc())
             import flask_framework.Controllers as Controller
         return
