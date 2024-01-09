@@ -108,6 +108,9 @@ def main():
     Server.Process.load_middleware()
     Server.Process.load_socket_events()
     logging.debug("Server routes loaded...")
+    logging.debug("Loading websocket events")
+    Server.Process.load_socket_events()
+    logging.debug("Websocket events loaded...")
     #app.teardown_appcontext(Database.save)
     logging.info("Server is now starting...")
     import flask_framework.Extensions as Extensions
