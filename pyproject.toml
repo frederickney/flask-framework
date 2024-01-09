@@ -1,0 +1,82 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flask_framework"
+authors = [
+    {name = "Frédérick NEY", email = "frederick.ney@gmail.com"},
+]
+description = "Flask MVC framework"
+readme = "readme.md"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+classifiers = [
+    "Framework :: Flask",
+    "Programming Language :: Python :: 3",
+]
+version="1.0.1"
+dependencies = [
+    "appdirs",
+    "certifi",
+    "chardet",
+    "Click",
+    "Flask",
+    "idna",
+    "itsdangerous",
+    "Jinja2",
+    "MarkupSafe",
+    "packaging",
+    "pyparsing",
+    "requests",
+    "six",
+    "urllib3",
+    "Werkzeug",
+    "gunicorn",
+    "gevent",
+    "pyyaml",
+    "pyopenssl",
+    "SQLAlchemy",
+    "Flask-GeoIP",
+    "Flask-LoginManager",
+    "flask-monitor",
+    "Flask-Profile",
+    "Flask-Builder",
+    "Flask-Auth",
+    "Flask-APScheduler",
+    "flask-sqlalchemy",
+    "Flask-Sessions",
+    "Flask-Login",
+    "Flask-SocketIO",
+    "PyMySQL",
+    "WTForms",
+    "PyCrypto",
+    "Flask-WTF",
+    "Flask-Admin",
+    "Flask-Session",
+    "redis",
+    "pymongo",
+    "pymemcache",
+    "memcache-cli",
+    "Flask-Script",
+    "Flask-Migrate",
+    "flask-saml",
+    "python-ldap",
+    'importlib-metadata; python_version>"3.7"'
+]
+
+
+[metadata]
+version = {"attr" =  "flask_framework.__version__"}
+
+[project.urls]
+Homepage = "https://github.com/frederickney/flask_framework"
+Documentation = "https://github.com/frederickney/flask_framework/blob/master/readme.md"
+Repository = "https://github.com/mfrederickney/flask_framework.git"
+Issues = "https://github.com/frederickney/flask_framework/issues"
+source = "github.com/frederickney/flask_framework"
+
+[project.entry-points."flask_framework"]
+wsgi = "flask_framework:wsgi"
+server =  "flask_framework:server"
+app =  "flask_framework:app"

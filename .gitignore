@@ -7,3 +7,6 @@ log/
 sessions/
 mysql/
 migrations/
+build
+dist/
+src/*.egg-info
