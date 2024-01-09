@@ -10,7 +10,6 @@ class Handler(object):
         """
         import logging
         try:
-            import Controllers
             import Server
             Server.Socket.Handler(socketio)
         except Exception as e:

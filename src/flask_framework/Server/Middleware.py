@@ -13,7 +13,6 @@ class Load(object):
         """
         import logging
         try:
-            import Controllers
             import Server
             Server.Middleware.Load(server)
         except Exception as e:

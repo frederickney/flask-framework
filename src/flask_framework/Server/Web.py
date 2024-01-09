@@ -17,7 +17,6 @@ class Route(object):
         """
         import logging
         try:
-            import Controllers
             import Server
             Server.Web.Route(server)
         except Exception as e:
