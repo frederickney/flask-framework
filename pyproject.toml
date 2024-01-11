@@ -67,7 +67,7 @@ dependencies = [
 
 
 [metadata]
-version = {"attr" =  "flask_framework.__version__"}
+version = {"attr" =  "1.0.1"}
 
 [project.urls]
 Homepage = "https://github.com/frederickney/flask_framework"
