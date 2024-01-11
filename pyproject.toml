@@ -7,6 +7,7 @@ name = "flask_framework"
 authors = [
     {name = "Frédérick NEY", email = "frederick.ney@gmail.com"},
 ]
+url="https://github.com/frederickney/flask-framework/archive/refs/tags/1.0.1.tar.gz"
 description = "Flask MVC framework"
 readme = "readme.md"
 requires-python = ">=3.7"
@@ -69,12 +70,13 @@ dependencies = [
 [metadata]
 version = {"attr" =  "1.0.1"}
 
+
 [project.urls]
 Homepage = "https://github.com/frederickney/flask_framework"
 Documentation = "https://github.com/frederickney/flask_framework/blob/master/readme.md"
 Repository = "https://github.com/mfrederickney/flask_framework.git"
 Issues = "https://github.com/frederickney/flask_framework/issues"
-source = "github.com/frederickney/flask_framework"
+source = "https://github.com/frederickney/flask-framework"
 
 [project.entry-points."flask_framework"]
 wsgi = "flask_framework:wsgi"
