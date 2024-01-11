@@ -36,4 +36,4 @@ jobs:
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
         user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        password: pypi-AgEIcHlwaS5vcmcCJDViMDRmZTgxLWNjMmMtNGQ2Yi1hODNkLTgyM2ZlN2RiY2EwNAACKlszLCJmYTA5ZTFkYi0wNDlkLTQyYTctODMzOS1kNmJjOGFkMzU5ODEiXQAABiDGHewpThEu4m-NKF5_OTnsCkEm37fxLA8MPrbBL0f6pg
