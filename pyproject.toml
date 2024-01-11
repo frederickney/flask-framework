@@ -7,7 +7,6 @@ name = "flask_framework"
 authors = [
     {name = "Frédérick NEY", email = "frederick.ney@gmail.com"},
 ]
-url="https://github.com/frederickney/flask-framework/archive/refs/tags/1.0.1.tar.gz"
 description = "Flask MVC framework"
 readme = "readme.md"
 requires-python = ">=3.7"
