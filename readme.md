@@ -8,54 +8,50 @@ You can add default database using only the configuration file.
 
 ### Default database with builtin driver in sqlalchemy 
 
-```json
-{
-  ...,
-  "DATABASE": {
-    "default": "mysql",
-    "mysql": {
-          "driver": "mysql+pymysql",
-          "user": "replace this with your database user",
-          "password": "replace this with your database user's password",
-          "database": "replace this with your database name",
-          "address": "replace this with your hostname",
-          "models": "mysql (python module that require to be put under Models.Persistent module)"
-    }
-  },
-  ...
-
-}
+```yaml
+...
+DATABASE: 
+  default: mysql
+  mysql: 
+    driver: mysql+pymysql
+    user: "replace this with your database user"
+    password: "replace this with your database user's password"
+    database: "replace this with your database name"
+    address: "replace this with your hostname"
+    models: "mysql (python module that require to be put under Models.Persistent module)"
+    readonly: false
+...
 ```
 
 ### Default database with non builtin driver in sqlalchemy 
 
-```json
-{
-  ...,
-  "DATABASE": {
-    "default": "informix",
-    "informix" : {
-          "driver": "informix",
-          "user": "replace this with your database user",
-          "password": "replace this with your database user's password",
-          "database": "replace this with your database name",
-          "address": "replace this with your hostname",
-          "models": "informix (python module that require to be put under Models.Persistent module)",
-          "params": {
-              "SERVER": "replace with your server name",
-              "CLIENT_LOCALE" : "replace with your client locale",
-              "DB_LOCALE": "replace with your server locale"
-          },
-          "dialects": {
-            "informix":  {"module": "IfxAlchemy.IfxPy", "class":"IfxDialect_IfxPy"},
-            "informix.IfxPy": {"module": "IfxAlchemy.IfxPy", "class": "IfxDialect_IfxPy"},
-            "informix.pyodbc": {"module":  "IfxAlchemy.pyodbc", "class": "IfxDialect_pyodbc"}
-          }
-      }
-  },
-  ...
-
-}
+```yaml
+...
+DATABASE:
+  default: informix
+  informix:
+    driver: informix
+      user: "replace this with your database user"
+      password: "replace this with your database user's password"
+      database: "replace this with your database name"
+      address: "replace this with your hostname"
+      models: "informix (python module that require to be put under Models.Persistent module)"
+      params:
+        SERVER: "replace with your server name"
+        CLIENT_LOCALE: "replace with your client locale"
+        DB_LOCALE: "replace with your server locale"
+      dialects:
+        informix: 
+          module: IfxAlchemy.IfxPy
+          class: IfxDialect_IfxPy
+        informix.IfxPy: 
+          module: IfxAlchemy.IfxPy
+          class: IfxDialect_IfxPy
+        informix.pyodbc: 
+          module: IfxAlchemy.pyodbc
+          class: IfxDialect_pyodbc
+      readonly: false
+...
 ```
 __"params"__ are parameters that need to be send within the connection to the database.
 In that example using informix database __"SERVER"__, __"CLIENT_LOCALE"__ and __"DB_LOCALE"__ are required parameters for the connection to the database.
@@ -64,20 +60,14 @@ __"dialects"__ are the python modules configuration to translate models into sql
 
 ### Multiple databases
 
-```json
-{
-  ...,
-  "DATABASE": {
-    "db01" : {
-      ...
-    },
-    "db02" : {
-      ...
-    }
-  },
-  ...
-
-}
+```yaml
+...
+DATABASE:
+  db01:
+    ...
+  db02:
+    ...
+...
 ```
 
 
@@ -91,81 +81,73 @@ __"SESSION"__ : string value, possible values are [__"filesystem"__, __"memcahed
 
 ### Using filesystem, redis or memcached based sessions
 
-```json
-{
-    ...,
-    "SERVICES": {
-        "redis": {
-            "HOST": "localhost",
-            "PORT": 6379
-        },
-        "filesystem": {
-            "PATH": "sessions"
-        },
-        "memcached": {
-            "HOST": "localhost",
-            "PORT": 11211
-        }
-    }
-}
+```yaml
+...
+SERVICES:
+  redis:
+    HOST: localhost
+    PORT: 6379
+  filesystem:
+    PATH: sessions
+  memcached:
+    HOST: localhost
+    PORT: 11211
 ```
 
 ### Using mongodb or sqlalchemy based sessions
 
 Session based on sqlalchemy will use the default configured database
 
-```json
-{
-    ...,
-    "DATABASES": {
-        "default": "mysql",
-        "mysql": {
-              "driver": "mysql+pymysql",
-              "user": "replace this with your database user",
-              "password": "replace this with your database user's password",
-              "database": "replace this with your database name",
-              "address": "replace this with your hostname",
-              "models": "mysql (python module that require to be put under Models.Persistent module)"
-        },
-        "mongodb": {
-              "driver": "mongodb",
-              "user": "replace this with your database user",
-              "password": "replace this with your database user's password",
-              "database": "replace this with your database name",
-              "address": "replace this with your hostname",
-              "collection": "rreplace this with your collection name for the sessions",
-              "models": "mongodb (python module that require to be put under Models.Persistent module)"
-        }
-  },
-  ...
-}
+```yaml
+...
+DATABASES:
+  default: mysql
+  mysql:
+    driver: mysql+pymysql
+    user: "replace this with your database user"
+    password: "replace this with your database user's password"
+    database: "replace this with your database name"
+    address: "replace this with your hostname"
+    models: "mysql (python module that require to be put under Models.Persistent module)"
+    readonly: false
+  mongodb:
+    driver: mongodb
+    user: "replace this with your database user"
+    password: "replace this with your database user's password"
+    database: "replace this with your database name"
+    address: "replace this with your hostname"
+    collection: "replace this with your collection name for the sessions"
+    models: "mongodb (python module that require to be put under Models.Persistent module)"
+    readonly: false
+...
 ```
 
 ### Adding cors to the server
 
-```json
-{
-  "SERVER_DATA": {
-      ...,
-      "CORS": {
-            "ORIGINS": [
-                    "http://localhost"
-            ],
-            "ALLOW_HEADERS": ["Content-Type", "Authorization"],
-            "ALWAYS_SEND": true,
-            "AUTOMATIC_OPTIONS": true,
-            "EXPOSE_HEADERS": "Authorization",
-            "INTERCEPT_EXCEPTIONS": true,
-            "MAX_AGE": null,
-            "METHODS": ["GET", "HEAD", "POST", "OPTIONS"],
-            "SEND_WILDCARD": false,
-            "SUPPORTS_CREDENTIALS": true,
-            "VARY_HEADER": true
-      },
-      ...
-  },
-  ...
-}
+```yaml
+...
+FLASK:
+  CONFIG:
+    CORS_ORIGINS:
+      - "http://localhost"    
+    CORS_ALLOW_HEADERS: 
+      - Content-Type 
+      - Authorization
+    CORS_ALWAYS_SEND: true
+    CORS_AUTOMATIC_OPTIONS: true
+    CORS_EXPOSE_HEADERS: Authorization
+    CORS_INTERCEPT_EXCEPTIONS: true
+    CORS_MAX_AGE: null
+    CORS_METHODS: 
+      - GET
+      - HEAD
+      - POST
+      - OPTIONS
+    CORS_SEND_WILDCARD: false
+    CORS_SUPPORTS_CREDENTIALS: true
+    CORS_VARY_HEADER: true
+    ...
+...
 ``` 
 
 ## Creating server routes
@@ -292,16 +274,17 @@ docker-compose stop
 
 We assume that your system already had python v3+ and pip v3+ installed.
 
-* pre-installation:
+* installation:
 
 ```bash 
-pip3 install -r requirements.txt
+git clone https://github.com/frederickney/flask-framework.git
+cd flask-framework
+pip3 install
 ```
 
-* post-installation:
-
-```bash 
-pip3 install -r extensions.txt
+or 
+```pip 
+pip install flask_framework
 ```
 
 * First start of the flask server
@@ -317,7 +300,7 @@ export LOG_FILE=log/process.log
 ```
 
 ```bash 
-export CONFIG_FILE=config/config.orig.json
+export CONFIG_FILE=config/config.yml
 ```
 
 * Starting the flask server attached to an ide such as PyCharm
@@ -328,10 +311,12 @@ Setup the configuration as seen bellow in the screenshots
 
 ![Environment variables](variables.png)
 
+### :warning: Issue raised, it is no longer working attached to ide: [link to issue](https://github.com/frederickney/flask-framework/issues/2/)
+
 * Starting the flask server in standalone
 
 ```bash 
-./src/server.py
+python -m flask_framework.server
 ```
 
 * On every startup of the flask server in standalone
@@ -341,13 +326,13 @@ export LOG_DIR=log/
 ```
 
 ```bash 
-export CONFIG_FILE=config/config.orig.json
+export CONFIG_FILE=config/config.yml
 ```
 
-* Starting the flask server with workers
+* Starting the flask server with gunicorn and workers process
 
 ```bash 
-./src/wsgi.py
+python flask_framework.wsgi
 ```
 
 ---
