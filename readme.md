@@ -332,7 +332,7 @@ export CONFIG_FILE=config/config.yml
 * Starting the flask server with gunicorn and workers process
 
 ```bash 
-python flask_framework.wsgi
+python -m flask_framework.wsgi
 ```
 
 ---
