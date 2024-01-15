@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "flask_framework"
+name = "flask-framework"
 authors = [
     {name = "Frédérick NEY", email = "frederick.ney@gmail.com"},
 ]
