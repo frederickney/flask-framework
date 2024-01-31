@@ -15,7 +15,7 @@ classifiers = [
     "Framework :: Flask",
     "Programming Language :: Python :: 3",
 ]
-version="1.0.1"
+version="1.0.2"
 dependencies = [
     "appdirs",
     "certifi",
