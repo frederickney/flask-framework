@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "flask-framework"
+name = "Flask_Framework"
 authors = [
     {name = "Frédérick NEY", email = "frederick.ney@gmail.com"},
 ]
@@ -71,10 +71,10 @@ version = {"attr" =  "1.0.1"}
 
 
 [project.urls]
-Homepage = "https://github.com/frederickney/flask_framework"
-Documentation = "https://github.com/frederickney/flask_framework/blob/master/readme.md"
-Repository = "https://github.com/mfrederickney/flask_framework.git"
-Issues = "https://github.com/frederickney/flask_framework/issues"
+Homepage = "https://github.com/frederickney/flask-framework"
+Documentation = "https://github.com/frederickney/flask-framework/blob/master/readme.md"
+Repository = "https://github.com/mfrederickney/flask-framework.git"
+Issues = "https://github.com/frederickney/flask-framework/issues"
 source = "https://github.com/frederickney/flask-framework"
 
 [project.entry-points."flask_framework"]
