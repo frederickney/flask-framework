@@ -67,7 +67,7 @@ dependencies = [
 
 
 [metadata]
-version = {"attr" =  "1.0.1"}
+version = {"attr" =  "1.0.2"}
 
 
 [project.urls]
