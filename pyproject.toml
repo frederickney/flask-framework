@@ -17,26 +17,20 @@ classifiers = [
 ]
 version="1.0.2"
 dependencies = [
-    "appdirs",
     "certifi",
-    "chardet",
-    "Click",
-    "Flask",
-    "idna",
-    "itsdangerous",
     "Jinja2",
-    "MarkupSafe",
-    "packaging",
-    "pyparsing",
     "requests",
-    "six",
     "urllib3",
     "Werkzeug",
     "gunicorn",
     "gevent",
     "pyyaml",
     "pyopenssl",
+    "WTForms",
+    "PyCrypto",
     "SQLAlchemy",
+    "redis",
+    "Flask",
     "Flask-GeoIP",
     "Flask-LoginManager",
     "flask-monitor",
@@ -48,16 +42,8 @@ dependencies = [
     "Flask-Sessions",
     "Flask-Login",
     "Flask-SocketIO",
-    "PyMySQL",
-    "WTForms",
-    "PyCrypto",
     "Flask-WTF",
-    "Flask-Admin",
     "Flask-Session",
-    "redis",
-    "pymongo",
-    "pymemcache",
-    "memcache-cli",
     "Flask-Script",
     "Flask-Migrate",
     "flask-saml",
@@ -73,7 +59,7 @@ version = {"attr" =  "1.0.2"}
 [project.urls]
 Homepage = "https://github.com/frederickney/flask-framework"
 Documentation = "https://github.com/frederickney/flask-framework/blob/master/readme.md"
-Repository = "https://github.com/mfrederickney/flask-framework.git"
+Repository = "https://github.com/mfrederickney/flask-framework"
 Issues = "https://github.com/frederickney/flask-framework/issues"
 source = "https://github.com/frederickney/flask-framework"
 
