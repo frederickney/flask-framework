@@ -10,6 +10,7 @@
         "SESSION": "filesystem",
         "CAPTURE": false,
         "THREADS_PER_CORE": 16,
+        "WORKERS": "sync",
         "LOG": {
             "DIR": "log",
             "LEVEL": "info"

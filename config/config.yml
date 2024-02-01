@@ -3,7 +3,7 @@ SERVER_ENV:
     APP_KEY : secret
     ENV: dev
     BIND:
-        ADDRESS :  localhost
+        ADDRESS :  0.0.0.0
         PORT: 4200
     WORKERS: sync
     CAPTURE: false
