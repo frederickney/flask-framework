@@ -9,11 +9,14 @@ RUN apt update && \
     chown -R flask:flask /home/flask && \
     mkdir -p /etc/server/ && \
     mkdir -p /var/log/server/ && \
-    chown -R flask:flask /var/log/server/ && \
-    chmod -R 775 /var/log/server/
+    mkdir -p /srv/http/ && \
+    chown -R flask:flask /var/log/server/ /srv/http/ && \
+    chmod -R 775 /var/log/server/ /srv/http/
 
 COPY ./config/* /etc/server/
 
 USER flask
+
+WORKDIR /srv/http
 
 ENTRYPOINT /bin/bash

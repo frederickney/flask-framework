@@ -1,20 +1,19 @@
 version: '3.5'
 services:
   flask:
-    image: python3/flask-framework-mvc:1.0.2
+    image: python3/flask-framework-mvc:1.0.3
     build:
       context: .
-    entrypoint: /bin/bash
-    command: /usr/bin/python3 -m flask_framework.wsgi
+    entrypoint: /usr/bin/python3
+    command: -m flask_framework.wsgi
     working_dir: /srv/http
     shm_size: 512m
     environment:
+      CONFIG_FILE: /etc/server/config.yml
       LOG_DIR: /var/log/server/
       LOG_LEVEL: warning
     ports:
       - 4200:4200
-    volumes:
-      - ./src/:/srv/http/
     depends_on:
       - mysql-server
     links:
