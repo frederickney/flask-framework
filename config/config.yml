@@ -7,8 +7,8 @@ SERVER_ENV:
         PORT: 4200
     WORKERS: sync
     CAPTURE: false
-    STATIC_PATH: src/static
-    TEMPLATE_PATH: src/template
+    STATIC_PATH: src/flask_framework/static
+    TEMPLATE_PATH: src/flask_framework/template
     SESSION: filesystem
     THREADS_PER_CORE: 16
     LOG:
@@ -16,6 +16,9 @@ SERVER_ENV:
         LEVEL: ${LOG_LEVEL}
 
 #DATABASES: {}
+
+FLASK:
+  CONFIG:
 
 SERVICES: 
   filesystem:
