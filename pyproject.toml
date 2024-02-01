@@ -52,9 +52,16 @@ dependencies = [
 ]
 
 
+[tool.poetry]
+include = ["src/flask_framework/template","src/flask_framework/static"]
+
 [metadata]
 version = {"attr" =  "1.0.2"}
 
+
+[tool.setuptools.package-data]
+"flask_framework.template" = ["*", "layout/*"]
+"flask_framework.static" = ["*", "css/*"]
 
 [project.urls]
 Homepage = "https://github.com/frederickney/flask-framework"

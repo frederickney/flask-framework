@@ -1,22 +1,28 @@
 {
     "SERVER_ENV": {
         "APP_NAME": "Flask",
+        "APP_KEY": "secret",
         "ENV": "dev",
         "BIND": {
             "ADDRESS" :  "localhost",
-            "PORT": 5000
+            "PORT": 4200
         },
-        "LOG_LEVEL": "debug",
+        "SESSION": "filesystem",
         "CAPTURE": false,
-        "STATIC_PATH": "src/static",
-        "TEMPLATE_PATH": "src/template",
         "THREADS_PER_CORE": 16,
-        "LOG_DIR": "log/"
+        "LOG": {
+            "DIR": "log",
+            "LEVEL": "info"
+        }
     },
-    "LOGIN_DATA": {
+    "FLASK": {
+        "CONFIG": null
     },
     "DATABASE": {
     },
     "SERVICES": {
+          "filesystem": {
+              "PATH": "sessions"
+          }
     }
 }
