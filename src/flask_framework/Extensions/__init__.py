@@ -20,6 +20,7 @@ class Loader(object):
         loader.routesloader('Extensions', app=Process.get())
         loader.blueprintsloader('Extensions', app=Process.get())
         cls.__loaded__ = True
+        logging.info('Plugins loaded')
         return
 
     @classmethod
