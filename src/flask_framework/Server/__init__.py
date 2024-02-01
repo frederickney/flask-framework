@@ -58,20 +58,9 @@ class Process(object):
         """
         import os.path
         import pathlib
-        import logging
         from flask_socketio import SocketIO
         from flask import Flask
         from flask_framework.Config import Environment
-        logging.info(
-            Environment.SERVER_DATA['STATIC_PATH']
-            if 'STATIC_PATH' in Environment.SERVER_DATA
-            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'static')
-        )
-        logging.info(
-            Environment.SERVER_DATA['TEMPLATE_PATH']
-            if 'TEMPLATE_PATH' in Environment.SERVER_DATA
-            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'template')
-        )
         cls._app = Flask(
             Environment.SERVER_DATA['APP_NAME'],
             static_url_path="/file",
