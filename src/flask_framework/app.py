@@ -71,6 +71,10 @@ def parser():
         Migrate.run(app)
         exit(0)
 
+
+logging.info("Starting server...")
+logging.info("Loading configuration file...")
+Environment.load(os.environ.get('CONFIG_FILE', "/etc/server/config.json"))
 try:
     loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
     logging.basicConfig(
@@ -82,12 +86,6 @@ except KeyError as e:
         level=logging.INFO,
         format='%(asctime)s %(levelname)s %(message)s'
     )
-logging.info("Starting server...")
-logging.info("Loading configuration file...")
-if 'CONFIG_FILE' in os.environ:
-    Environment.load(os.environ['CONFIG_FILE'])
-else:
-    Environment.load("/etc/server/config.json")
 logging.debug("Connecting to default database...")
 Database.register_engines(Environment.SERVER_DATA['LOG']['LEVEL'] == 'debug')
 Database.init()
