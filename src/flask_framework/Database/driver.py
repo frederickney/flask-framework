@@ -194,12 +194,30 @@ class Driver(object):
 
     @classmethod
     def init_default_db(cls):
-        import Models.Persistent
+        try:
+            import models.persistent
+        except ImportError as e:
+            import logging
+            logging.debug("{}: {}".format(__name__, e))
+        try:
+            import Models.Persistent
+        except ImportError as e:
+            import logging
+            logging.debug("{}: {}".format(__name__, e))
         cls.Model.metadata.create_all(bind=cls.engine)
 
     @classmethod
     def init_db(cls, name):
-        import Models.Persistent
+        try:
+            import models.persistent
+        except ImportError as e:
+            import logging
+            logging.debug("{}: {}".format(__name__, e))
+        try:
+            import Models.Persistent
+        except ImportError as e:
+            import logging
+            logging.debug("{}: {}".format(__name__, e))
         cls.models[name].metadata.create_all(bind=cls.engines[name])
 
     @classmethod
