@@ -7,7 +7,7 @@ __author__ = 'Frederick NEY'
 import apscheduler.jobstores.redis
 import functools
 import warnings
-from . import WS, Web, ErrorHandler, Middleware,  RequestHandler, Socket
+from . import WS, Web, ErrorHandler, Middleware,  RequestHandler, Socket, Plugins
 from flask_session import Session
 from datetime import datetime, timedelta
 from flask import Flask
@@ -278,6 +278,15 @@ class Process(object):
         if cls._socket is not None:
             Socket.Handler(cls._socket)
 
+    @classmethod
+    def load_plugins(cls):
+        Plugins.Load(
+            server=cls._app,
+            scheduler=cls._scheduler,
+            session=getattr(cls, "_session", None),
+            csrf=getattr(cls, "_csrf", None),
+            socket=cls._socket
+        )
 
     @classmethod
     def load_routes(cls):

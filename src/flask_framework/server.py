@@ -103,18 +103,18 @@ def main():
         logging.debug("Default database connected...")
     Server.Process.init(tracking_mode=False)
     logging.debug("Server initialized...")
+    Server.Process.load_plugins()
     logging.debug("Loading server routes...")
     Server.Process.load_routes()
     Server.Process.load_middleware()
-    Server.Process.load_socket_events()
     logging.debug("Server routes loaded...")
     logging.debug("Loading websocket events")
     Server.Process.load_socket_events()
     logging.debug("Websocket events loaded...")
     #app.teardown_appcontext(Database.save)
-    logging.info("Server is now starting...")
     import flask_framework.Extensions as Extensions
     Extensions.load()
+    logging.info("Server is now starting...")
     Server.Process.start(args)
 
 
