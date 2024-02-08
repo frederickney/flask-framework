@@ -26,5 +26,7 @@ def _load(file):
             "Expected " + type(str) + ", got " + type(file) + "."
         )
 
+
 def load(file):
     return _load(file)
+

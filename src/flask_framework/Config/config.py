@@ -3,7 +3,6 @@
 
 __author__ = 'Frederick NEY'
 
-
 import logging
 from flask_framework import Exceptions
 
@@ -12,24 +11,19 @@ def _load_yaml_file():
     return
 
 
+def _load(file, loader):
+    return loader.load(file)
+
+
 def load_file(file):
-    import os.path, json
-    if isinstance(file, str):
-        if os.path.exists(file):
-            if os.path.isfile(file):
-                try:
-                    content = open(file, 'r')
-                    return content.read()
-                except Exception:
-                    raise Exceptions.ConfigExceptions.InvalidConfigurationFileError(file + ": File did not exist.")
-            else:
-                raise Exceptions.ConfigExceptions.NotAConfigurationFileError(file + ": Not a valid file.")
-        else:
-            raise Exceptions.ConfigExceptions.NotAConfigurationFileError(file + ": File did not exist.")
-    else:
-        raise Exceptions.ConfigExceptions.NotAConfigurationFileError(
-            "Expected " + type(str) + ", got " + type(file) + "."
-        )
+    try:
+        from . import json
+        conf = _load(file, json)
+    except Exceptions.ConfigExceptions.InvalidConfigurationFileError as e:
+        logging.info(e.message)
+        from . import yaml
+        conf = _load(file, yaml)
+    return conf
 
 
 class Services(object):
@@ -40,7 +34,6 @@ class Services(object):
 
 
 class Environment(object):
-
     Databases = {}
     SERVER_DATA = {}
     Logins = {}
