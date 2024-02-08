@@ -180,7 +180,7 @@ def blueprintsloader(module, app):
 def installer(module):
     import pip
     try:
-        pakages = importlib.import_module('Extensions.%s' % module).Loader.pakages()
+        pakages = importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)).Loader.pakages()
         for package in pakages:
             pip.main(['install', package])
         logging.info('Packages for "%s" installed' % module)
@@ -193,4 +193,4 @@ def installer(module):
 
 
 def module(module):
-    return importlib.import_module('Extensions.%s' % module)
+    return importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module))
