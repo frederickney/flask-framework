@@ -180,10 +180,24 @@ def blueprintsloader(module, app):
 def installer(module):
     import pip
     try:
-        pakages = importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)).Loader.pakages()
+        if 'extensions' in Environment.SERVER_DATA:
+            if 'BaseModule' in Environment.SERVER_DATA['extensions']:
+                    pakages = importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)).Loader.pakages()
+            else:
+                logging.warning("{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(__name__, os.environ.get('CONFIG_FILE', "/etc/server/config.json")))
+        else:
+            pakages = importlib.import_module(module).Loader.pakages()
         for package in pakages:
             pip.main(['install', package])
         logging.info('Packages for "%s" installed' % module)
+    except ImportError as e:
+        logging.warning("{}: {} not found in {}".format(
+            __name__,
+            module if 'extensions' not in Environment.SERVER_DATA
+            else '{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)) if 'BaseModule' in Environment.SERVER_DATA['extensions']
+            else module,
+            os.getcwd()
+        )
     except AttributeError as e:
         logging.debug(e)
         logging.info('No package dependencies for module "%s"' % module)
@@ -193,4 +207,23 @@ def installer(module):
 
 
 def module(module):
-    return importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module))
+    try:
+        if 'extensions' in Environment.SERVER_DATA:
+            if 'BaseModule' in Environment.SERVER_DATA['extensions']:
+                return importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module))
+            else:
+                logging.warning("{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(
+                    __name__,
+                    os.environ.get('CONFIG_FILE', "/etc/server/config.json"))
+                )
+        else:
+            return importlib.import_module(module)
+    except ImportError as e:
+        logging.warning("{}: {} not found in {}".format(
+            __name__,
+            module if 'extensions' not in Environment.SERVER_DATA
+            else '{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)) if 'BaseModule' in Environment.SERVER_DATA['extensions']
+            else module,
+            os.getcwd()
+        )
+        return None
