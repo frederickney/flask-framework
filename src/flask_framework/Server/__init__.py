@@ -151,6 +151,7 @@ class Process(object):
                         dns.append(re.search("([a-z]|[A-Z]|[0-9])+(\.([A-Z])+){2}", name.target.to_text()).group())
                     Environment.FLASK['CONFIG']['LDAP_HOSTS'] = dns
                 from flask_framework.Utils.Auth.ldap import LDAP
+                cls._app.config.update(Environment.FLASK['CONFIG'])
                 cls.ldap = LDAP(cls._app)
         cls._socket = SocketIO()
         cls._socket.init_app(cls._app)
