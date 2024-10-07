@@ -16,7 +16,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 
 
-FIELDS = (
+FIELDS = [
     'sAMAccountName',
     'distinguishedName',
 
@@ -46,7 +46,7 @@ FIELDS = (
     'ipPhone',
     'userPrincipalName',
     'jpegPhoto'
-)
+]
 
 
 def login_required(f):
@@ -76,7 +76,8 @@ class LDAP(object):
             self.init_app(app)
 
     def init_app(self, app):
-        app.config.setdefault('LDAP_HOST', '127.0.0.1')
+        hosts = app.config.get('LDAP_HOSTS', [])
+        app.config.setdefault('LDAP_HOST', hosts[0] if len(hosts) != 0 else '127.0.0.1')
         app.config.setdefault('LDAP_PORT', 389)
         app.config.setdefault('LDAP_SCHEMA', 'ldap')
         app.config.setdefault('LDAP_DOMAIN', 'example.com')
@@ -87,6 +88,7 @@ class LDAP(object):
         app.config.setdefault('LDAP_PROFILE_KEY', 'sAMAccountName')
         app.config.setdefault('LDAP_AVATAR_LOC', None)
         app.config.setdefault('LDAP_FIELDS', FIELDS)
+        app.config.setdefault('LDAP_PROTOCOL_VERSION', 3)
         # Use the newstyle teardown_appcontext if it's available,
         # otherwise fall back to the request context
         self.login_func = app.config['LDAP_LOGIN_VIEW']
@@ -101,8 +103,17 @@ class LDAP(object):
         current_app.config['LDAP_SCHEMA'],
             current_app.config['LDAP_HOST'],
             current_app.config['LDAP_PORT']))
+        conn.protocol_version =  current_app.config.get('LDAP_PROTOCOL_VERSION')
+        conn.set_option(ldap.OPT_REFERRALS, 0)
         return conn
 
+    @staticmethod
+    def connect_host(server):
+        """
+        :return: ldap.ldapobject.SimpleLDAPObject
+        """
+        current_app.config.setdefault('LDAP_HOST', server)
+        return LDAP.connect()
 
     @staticmethod
     def ldap_query(conn, query):
@@ -115,8 +126,8 @@ class LDAP(object):
         :return:
         """
         fields = list(current_app.config['LDAP_FIELDS'])
-        if fields and not 'sAMAccountName' in fields:
-            fields.append('sAMAccountName')
+        if fields and not 'mail' in fields:
+            fields.append('mail')
         records = conn.search_s(current_app.config['LDAP_SEARCH_BASE'], ldap.SCOPE_SUBTREE, query, fields)
         conn.unbind_s()
         res = []
@@ -144,23 +155,23 @@ class LDAP(object):
         :return: bool
         """
         try:
-            conn = LDAP.connect()
-            user = "{0}@{1}".format(username, current_app.config['LDAP_DOMAIN'])
-            conn.set_option(ldap.OPT_REFERRALS, 0)
-            conn.simple_bind_s(user, pwd.encode('utf8'))
-            query = "sAMAccountName=%s" % username
-            result = LDAP.ldap_query(conn, query)
-            user = result[0] if len(result) >= 1 else None
-            if current_app.config['LDAP_REQUIRED_GROUP'] is not None:
-                if current_app.config['LDAP_REQUIRED_GROUP'] not in user['memberOf']:
-                    flash("Login successful but not authorized.")
-                    return False
-            session['username'] = username
-            session['user'] = user
-            return True
-
-        except ldap.LDAPError as e:
-            return LDAP.ldap_err(e)
+            for host in current_app.config.get('LDAP_HOSTS'):
+                try:
+                    conn = LDAP.connect_host(host)
+                    conn.simple_bind_s(username, pwd)
+                    result = LDAP.ldap_query(conn, "(&(objectClass=user)(mail="+username+"))")
+                    if len(result) > 0:
+                        session['mail'] = result[0]['mail']
+                        session['displayName'] = result[0]['displayName']
+                        session['username'] = result[0]['displayName']
+                        session['user'] = result[0]['mail']
+                    conn.unbind_s()
+                    return True
+                except ldap.INVALID_CREDENTIALS as e:
+                    return LDAP.other_err(e)
+                except ldap.LDAPError as e:
+                    LDAP.ldap_err(e)
+            return False
         except Exception as e:
             return LDAP.other_err(e)
 

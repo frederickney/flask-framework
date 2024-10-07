@@ -142,13 +142,14 @@ class Process(object):
                 cls.saml.init_app(cls._app)
             if 'LDAP' in Environment.Logins:
                 if 'LDAP_HOST' not in Environment.Logins['LDAP'] and 'LDAP_DOMAIN' in Environment.Logins['LDAP']:
-                    from activedirectory import Locator
+                    from activedirectory.core.locate import Locator
                     ldap = Locator()
-                    Environment.Logins['LDAP']['LDAP_HOST'] = ldap.locate_many(
-                        Environment.Logins['LDAP']['LDAP_DOMAIN']
-                    )[0]
-                if 'LDAP_REQUIRED_GROUP' not in Environment.Logins['LDAP']:
-                    Environment.Logins['LDAP']['LDAP_REQUIRED_GROUP'] = None
+                    dns_response = ldap._dns_query(Environment.Logins['LDAP']['LDAP_DOMAIN'].upper(), 'ns')
+                    dns = []
+                    import re
+                    for name in list(dns_response.response.answer[0].items.keys()):
+                        dns.append(re.search("([a-z]|[A-Z]|[0-9])+(\.([A-Z])+){2}", name.target.to_text()).group())
+                    Environment.Logins['LDAP']['LDAP_HOSTS'] = dns
                 from flask_framework.Utils.Auth.ldap import LDAP
                 for key, val in Environment.Logins['LDAP'].items():
                     cls._app.config[key] = val
