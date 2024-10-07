@@ -141,18 +141,16 @@ class Process(object):
                 cls._csrf.exempt("flask_saml.metadata")
                 cls.saml.init_app(cls._app)
             if 'LDAP' in Environment.Logins:
-                if 'LDAP_HOST' not in Environment.Logins['LDAP'] and 'LDAP_DOMAIN' in Environment.Logins['LDAP']:
+                if 'LDAP_HOST' not in Environment.FLASK['CONFIG'] and 'LDAP_DOMAIN' in Environment.FLASK['CONFIG']:
                     from activedirectory.core.locate import Locator
                     ldap = Locator()
-                    dns_response = ldap._dns_query(Environment.Logins['LDAP']['LDAP_DOMAIN'].upper(), 'ns')
+                    dns_response = ldap._dns_query(Environment.FLASK['CONFIG']['LDAP_DOMAIN'].upper(), 'ns')
                     dns = []
                     import re
                     for name in list(dns_response.response.answer[0].items.keys()):
                         dns.append(re.search("([a-z]|[A-Z]|[0-9])+(\.([A-Z])+){2}", name.target.to_text()).group())
-                    Environment.Logins['LDAP']['LDAP_HOSTS'] = dns
+                    Environment.FLASK['CONFIG']['LDAP_HOSTS'] = dns
                 from flask_framework.Utils.Auth.ldap import LDAP
-                for key, val in Environment.Logins['LDAP'].items():
-                    cls._app.config[key] = val
                 cls.ldap = LDAP(cls._app)
         cls._socket = SocketIO()
         cls._socket.init_app(cls._app)
