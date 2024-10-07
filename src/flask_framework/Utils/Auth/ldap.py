@@ -129,7 +129,6 @@ class LDAP(object):
         if fields and not 'mail' in fields:
             fields.append('mail')
         records = conn.search_s(current_app.config['LDAP_SEARCH_BASE'], ldap.SCOPE_SUBTREE, query, fields)
-        conn.unbind_s()
         res = []
         for rec in records:
             if rec[0] is None:
