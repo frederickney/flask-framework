@@ -154,7 +154,10 @@ class Process(object):
                 cls._app.config.update(Environment.FLASK['CONFIG'])
                 cls.ldap = LDAP(cls._app)
         cls._socket = SocketIO()
-        cls._socket.init_app(cls._app)
+        if 'SOCKETIO_MESSAGE_QUEUE' in Environment.FLASK['CONFIG']:
+            cls._socket.init_app(cls._app, message_queue=Environment.FLASK['CONFIG']['SOCKETIO_MESSAGE_QUEUE'])
+        else:
+            cls._socket.init_app(cls._app)
         return cls._app
 
     @classmethod
