@@ -74,7 +74,7 @@ class Database(object):
                 try:
                     result = func(*args, **kwargs)
                 except Exception as e:
-                    logging.error(e)
+                    logging.error("{}: {}".format(__name__, e))
                     result = None
                 return result
             return decorator
@@ -92,7 +92,7 @@ class Database(object):
                 try:
                     result = func(*args, **kwargs)
                 except Exception as e:
-                    logging.error(e)
+                    logging.error("{}: {}".format(__name__, e))
                     result = None
                 for name, session in sessions.items():
                     session.close()
