@@ -14,6 +14,18 @@ class Init(object):
         """
         server.before_request(self.before_request)
         server.teardown_request(self.after_request)
+        try:
+            from server.middleware import Middlewares
+            Middlewares.init(server)
+        except Exception as e:
+            import os
+            logging.warning("{}: {} in {}".format(__name__, e, os.getcwd()))
+            try:
+                from Server.Middleware import Middlewares
+                Middlewares.init(server)
+            except Exception as ie:
+                import traceback
+                logging.warning("{}: {} in {}".format(__name__, ie, os.getcwd()))
 
     def before_request(self, *args, **kwargs):
         import logging
