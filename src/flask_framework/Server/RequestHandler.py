@@ -12,6 +12,7 @@ class Init(object):
         :param server:
         :type server: flask.Flask
         """
+        import logging
         server.before_request(self.before_request)
         server.teardown_request(self.after_request)
         try:
