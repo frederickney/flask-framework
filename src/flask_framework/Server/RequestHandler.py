@@ -18,34 +18,36 @@ class Init(object):
     def before_request(self, *args, **kwargs):
         import logging
         from flask import request
-        from flask_framework.Database import Database
-        Database.start_sessions()
-        try:
-            Database.session.begin()
-        except Exception as e:
-            logging.warning(e)
-        try:
-            for name, db in Database.sessions.items():
-                db.begin()
-        except Exception as e:
-            logging.warning(e)
         logging.debug("Starting reply to request %s" % request.path)
+        try:
+            from server.middleware import Middlewares
+            Middlewares.before_request(*args, **kwargs)
+        except Exception as e:
+            import os
+            logging.warning("{}: {} in {}".format(__name__, e, os.getcwd()))
+            try:
+                from Server.Middleware import Middlewares
+                Middlewares.before_request(*args, **kwargs)
+            except Exception as ie:
+                import traceback
+                logging.warning("{}: {} in {}".format(__name__, ie, os.getcwd()))
         return
 
     def after_request(self, *args, **kwargs):
         import logging
-        from flask_framework.Database import Database
         from flask import request
         try:
-            Database.session.commit()
+            from server.middleware import Middlewares
+            Middlewares.after_request(*args, **kwargs)
         except Exception as e:
-            logging.warning(e)
-        try:
-            for name, db in Database.sessions.items():
-                db.commit()
-        except Exception as e:
-            logging.warning(e)
-        Database.close_sessions()
+            import os
+            logging.warning("{}: {} in {}".format(__name__, e, os.getcwd()))
+            try:
+                from Server.Middleware import Middlewares
+                Middlewares.after_request(*args, **kwargs)
+            except Exception as ie:
+                import traceback
+                logging.warning("{}: {} in {}".format(__name__, ie, os.getcwd()))
         logging.debug("Finishing reply to request %s" % request.path)
         return
 

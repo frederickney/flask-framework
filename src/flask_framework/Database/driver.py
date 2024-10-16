@@ -58,7 +58,6 @@ class Driver(object):
         cls.session = scoped_session(cls._sessionmaker)
         cls.Model = declarative_base()
         cls.Model.query = cls.session.query_property()
-        cls.session.close()
 
     @classmethod
     def register_engine(cls, name, driver, user, pwd, host, db, port=None, params=None, dialects=None,  echo=True):
@@ -78,7 +77,6 @@ class Driver(object):
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
         cls.models[name] = declarative_base()
         cls.models[name].query = cls.sessions[name].query_property()
-        cls.sessions[name].close()
 
     @classmethod
     def get_session_by_name(cls, name):

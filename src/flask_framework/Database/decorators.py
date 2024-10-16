@@ -67,6 +67,23 @@ class Database(object):
     def use_db(databases=['default']):
         def using(func):
             def decorator(*args, **kwargs):
+                sessions = dict()
+                for db_name in databases:
+                    sessions[db_name] = Driver.get_session_by_name(db_name)
+                    kwargs.setdefault('sessions', sessions)
+                try:
+                    result = func(*args, **kwargs)
+                except Exception as e:
+                    logging.error(e)
+                    result = None
+                return result
+            return decorator
+        return using
+
+    @staticmethod
+    def safe_use_db(databases=['default']):
+        def using(func):
+            def decorator(*args, **kwargs):
                 logging.info('connecting')
                 sessions = dict()
                 for db_name in databases:
@@ -79,11 +96,7 @@ class Database(object):
                     result = None
                 for name, session in sessions.items():
                     session.close()
-
                 logging.info('disconnecting')
                 return result
-
             return decorator
-
         return using
-
