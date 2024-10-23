@@ -108,7 +108,7 @@ class Process(object):
                 )
             if Environment.SERVER_DATA['SESSION'] == 'mongodb':
                 from pymongo import MongoClient
-                db_conf = Environment.Databases[Environment.SERVER_DATA['SESSION']]
+                db_conf = Environment.Services[Environment.SERVER_DATA['SESSION']]
                 cls._app.config['SESSION_MONGODB'] = MongoClient(
                     "%s://%s:%s@%s:%d" % (
                         db_conf['driver'],
