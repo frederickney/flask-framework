@@ -92,6 +92,13 @@ SERVICES:
   memcached:
     HOST: localhost
     PORT: 11211
+  mongodb:
+    driver: mongodb
+    user: "replace this with your database user"
+    password: "replace this with your database user's password"
+    database: "replace this with your database name"
+    address: "replace this with your hostname"
+    collection: "replace this with your collection name for the sessions"
 ```
 
 ### Using mongodb or sqlalchemy based sessions
@@ -109,15 +116,6 @@ DATABASES:
     database: "replace this with your database name"
     address: "replace this with your hostname"
     models: "mysql (python module that require to be put under Models.Persistent module)"
-    readonly: false
-  mongodb:
-    driver: mongodb
-    user: "replace this with your database user"
-    password: "replace this with your database user's password"
-    database: "replace this with your database name"
-    address: "replace this with your hostname"
-    collection: "replace this with your collection name for the sessions"
-    models: "mongodb (python module that require to be put under Models.Persistent module)"
     readonly: false
 ...
 ```
