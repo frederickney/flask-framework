@@ -1,0 +1,242 @@
+/* ************************************************ ALL ************************************************ */
+
+body {
+    background: white;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    box-sizing: border-box;
+    font-weight: 100;
+}
+
+a {
+    color: #0062DC;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {font-size:1rem}
+/* ************************************************ HEADER BAR ************************************************ */
+
+header{
+    font-size: 25px;
+    color: white;
+    padding: 15px 0px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+    margin: 0px auto 0px auto;
+    background: #5C7EAB;
+    border-radius: 10px 10px 0px 0px;
+}
+
+header .userPhoto img{
+    width: 100%;
+}
+
+header .userPhoto {
+    margin: 0px 0px 0px 10px;
+
+}
+
+header .title {
+    margin: auto 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    font-family: Helvetica;
+}
+
+i{
+    font-size: 20px;
+    color: rgb(229, 229, 234);
+    font-family: Helvetica, sans-serif;
+}
+
+/* ************************************************ SECTION ************************************************ */
+
+section {
+    height: 600px;
+    background: white;
+    padding: 0px;
+    margin: 0px auto 0px auto;
+}
+
+.chatlogs {
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+/* Styling the scrolllbar */
+
+.chatlogs::-webkit-scrollbar{
+    width: 10px;
+}
+
+.chatlogs::-webkit-scrollbar-thumb{
+    border-radius: 5px;
+    background: rgba(0, 0, 0, .1);
+}
+
+.chat {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.userPhoto img{
+    background-color: white;
+    padding: 8px;
+    width: 100%;
+}
+
+.chat .chatMessage {
+    padding: 5px;
+    margin: 5px 10px 0;
+    font-size: 18px;
+
+}
+
+.userPhoto {
+    width: 60px;
+    height: 60px;
+    background: #ccc;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.friend .chatMessage {
+    color: rgb(68,68,68);
+    width: auto;
+    max-width: 100%;
+    background: rgb(229, 229, 234);
+    border-radius: 20px 20px 20px 20px;
+    font-size:0.9rem
+}
+
+.self .chatMessage {
+    color: white;
+    max-width: 80%;
+    width: auto;
+    margin: 5px 0 5px auto;
+    border-radius: 20px 20px 20px 20px;
+    background: #5C7EAB;
+    overflow-wrap: break-word;
+    font-size:0.9rem
+}
+
+.gif img {
+    margin: 10px;
+    border-radius: 20px;
+}
+
+.enSavoirPlus {
+  background-color:white;
+  -moz-border-radius:42px;
+  -webkit-border-radius:42px;
+  border-radius:20px;
+  border:1px solid #3f5f78;
+  display:inline-block;
+  cursor:pointer;
+  font-family:Arial;
+  font-size:15px;
+  padding:10px 15px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #3f5f78;
+  width: 100%;
+  text-align: left;
+  border-color: black;
+}
+
+
+
+#carouselExampleControls{
+  text-align: center;
+}
+
+
+/* ************************************************ FOOTER ************************************************ */
+
+footer {
+
+    margin: 0px auto 0px auto;
+    display: flex;
+    align-items: flex-start;
+    overflow: auto;
+    background: rgb(244, 243, 244);
+border-top: 1px solid #eceff1;
+border-bottom: 1px solid #eceff1;
+}
+
+footer textarea {
+height:25px;
+    font-size:0.9rem;
+    background: rgb(243,242,243);
+    width: 100%;
+    min-height: 5px;
+    border: 2px solid rgb(63, 95, 120);
+    border-radius: 5px;
+    resize: none;
+    color: rgb(68,68,68);
+    margin: 15px 0px 15px 10px;
+    display:block;
+    overflow:hidden;
+    box-shadow: none;
+    outline: none;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    border-bottom: 0px;
+
+}
+
+footer textarea:focus {
+    background: rgb(243,242,243);
+}
+
+
+/* ************************************************ POP UP ************************************************ */
+
+/* Button used to open the chat form - fixed at the bottom of the page */
+.open-button {
+  color: white;
+  border: none;
+  cursor: pointer;
+  opacity: 1;
+  position: fixed;
+  bottom: 23px;
+  right: 28px;
+    width: 60px;
+}
+
+.close-button{
+     position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 30px;
+
+}
+
+
+/* The popup chat - hidden by default */
+.chat-popup {
+    background-color: white;
+  display: none;
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  z-index: 5;
+}
+
+/* Add some hover effects to buttons */
+.btn:hover, .open-button:hover {
+  opacity: 0.8;
+}
+
+
+
+
