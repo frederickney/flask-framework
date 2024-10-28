@@ -1,10 +1,18 @@
 # TODO:
 
-- Add OpenID based authentication settable within the configuration file
+- ~~Local logins~~
 
-- Add AD based authentication settable within the configuration file
+- ~~supporting cors~~
 
-- Add SSO based authentication settable within the configuration file
+- ~~Add task scheduler flask based module and have it configurable within the config file~~ 
+
+- ~~Add OpenID based authentication settable within the configuration file~~
+
+- ~~Add SAML2 based authentication settable within the configuration file~~
+
+- ~~Add AD based authentication settable within the configuration file~~
+
+- ~~Add SSO based authentication settable within the configuration file~~
 
 - ~~Simplify the database models load and creation~~
 
