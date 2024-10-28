@@ -16,7 +16,7 @@ SERVER_ENV:
 DATABASES:
 
 FLASK:
-  CONFIG:
+  CONFIG: {}
 
 SERVICES: 
   filesystem:
