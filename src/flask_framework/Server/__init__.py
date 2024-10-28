@@ -128,13 +128,12 @@ class Process(object):
                 cls.sso = SSO()
                 cls.sso.init_app(cls._app)
             if 'OpenID' in Environment.Logins:
-                from Utils.Auth.openid import OpenIDConnect
-                from flask_openid import OpenID
+                from flask_oidc import OpenIDConnect
                 cls.openid = OpenIDConnect()
                 cls.openid.init_app(cls._app)
             if 'SAML2' in Environment.Logins:
-                import flask_saml
-                cls.saml = flask_saml.FlaskSAML()
+                from flask_framework.Utils.Auth.saml2 import FlaskSAML
+                cls.saml = FlaskSAML()
                 cls._csrf.exempt("flask_saml.login_acs")
                 cls._csrf.exempt("flask_saml.login")
                 cls._csrf.exempt("flask_saml.logout")
