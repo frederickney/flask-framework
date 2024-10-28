@@ -1,6 +1,6 @@
 SERVER_ENV:
     APP_NAME: Flask
-    APP_KEY : 954ccef834147193f429a00097880dce15072c47f6a4e1ce8285fe18bb003bfa2c0e10de01018738e3b898b20a2e8625af19f1d742a1f4037f36603e57c3d468
+    APP_KEY : secret-key
     ENV: production
     BIND:
         ADDRESS :  0.0.0.0
