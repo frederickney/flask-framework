@@ -54,8 +54,6 @@ dependencies = [
     "Flask-Session",
     "Flask-Script",
     "Flask-Migrate",
-    "flask-saml",
-    "python-ldap",
     'importlib-metadata; python_version>"3.7"'
 ]
 
