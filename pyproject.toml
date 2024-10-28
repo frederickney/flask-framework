@@ -74,7 +74,7 @@ version = {"attr" =  "1.0.11"}
 [project.urls]
 Homepage = "https://github.com/frederickney/flask-framework"
 Documentation = "https://github.com/frederickney/flask-framework/blob/master/readme.md"
-Repository = "https://github.com/mfrederickney/flask-framework"
+Repository = "https://github.com/frederickney/flask-framework"
 Issues = "https://github.com/frederickney/flask-framework/issues"
 source = "https://github.com/frederickney/flask-framework"
 
