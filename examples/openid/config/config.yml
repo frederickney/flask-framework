@@ -1,0 +1,42 @@
+SERVER_ENV:
+    APP_NAME: Flask
+    APP_KEY : secret-key
+    ENV: production
+    BIND:
+        ADDRESS :  0.0.0.0
+        PORT: 4200
+    WORKERS: sync
+    CAPTURE: false
+    STATIC_PATH: static
+    TEMPLATE_PATH: template
+    SESSION: redis
+    THREADS_PER_CORE: 16
+    LOG:
+        DIR: ${LOG_DIR}
+        LEVEL: ${LOG_LEVEL}
+
+DATABASE: {}
+
+LOGINS:
+    OpenID
+
+FLASK:
+    CONFIG:
+        OIDC_CLIENT_SECRETS: config/secret.json
+        OIDC_OPENID_REALM: OPENID
+        OIDC-SCOPES:
+            - openid
+            - email
+        OIDC_INTROSPECTION_AUTH_METHOD: client_secret_post
+        OIDC_USER_INFO_ENABLED: true
+
+SERVICES:
+    redis:
+        HOST: localhost
+        PORT: 6379
+    filesystem:
+        PATH: sessions
+    memcached:
+        HOST: localhost
+        PORT: 11211
+
