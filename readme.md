@@ -37,29 +37,28 @@ DATABASE:
 ```yaml
 ...
 DATABASE:
-  default: informix
   informix:
     driver: informix
-      user: "replace this with your database user"
-      password: "replace this with your database user's password"
-      database: "replace this with your database name"
-      address: "replace this with your hostname"
-      models: "informix (python module that require to be put under Models.Persistent module)"
-      params:
-        SERVER: "replace with your server name"
-        CLIENT_LOCALE: "replace with your client locale"
-        DB_LOCALE: "replace with your server locale"
-      dialects:
-        informix: 
-          module: IfxAlchemy.IfxPy
-          class: IfxDialect_IfxPy
-        informix.IfxPy: 
-          module: IfxAlchemy.IfxPy
-          class: IfxDialect_IfxPy
-        informix.pyodbc: 
-          module: IfxAlchemy.pyodbc
-          class: IfxDialect_pyodbc
-      readonly: false
+    user: "replace this with your database user"
+    password: "replace this with your database user's password"
+    database: "replace this with your database name"
+    address: "replace this with your hostname"
+    models: "informix (python module that require to be put under Models.Persistent module)"
+    params:
+      SERVER: "replace with your server name"
+      CLIENT_LOCALE: "replace with your client locale"
+      DB_LOCALE: "replace with your server locale"
+    dialects:
+      informix: 
+        module: IfxAlchemy.IfxPy
+        class: IfxDialect_IfxPy
+      informix.IfxPy: 
+        module: IfxAlchemy.IfxPy
+        class: IfxDialect_IfxPy
+      informix.pyodbc: 
+        module: IfxAlchemy.pyodbc
+        class: IfxDialect_pyodbc
+    readonly: false
 ...
 ```
 __"params"__ are parameters that need to be send within the connection to the database.
