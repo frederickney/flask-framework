@@ -80,6 +80,8 @@ if __name__ == '__main__':
     if os.environ.get("LOG_DIR", None):
         os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
         os.environ.setdefault("log_file", os.path.join(os.environ.get("log_dir"), 'process.log'))
+        if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
+            os.mkdir(os.path.dirname(os.environ.get('log_file')), 0o755)
     if os.environ.get("log_file", None):
         logging.basicConfig(
             level=loglevel.upper(),

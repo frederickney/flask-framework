@@ -18,6 +18,23 @@ class Route(object):
         return
 """
 
+
+HTTP_DEFAULT_ENTRY = """class Route(object):
+    \"\"\"
+    Class that will configure all {} services based routes for the server
+    \"\"\"
+    def __init__(self, server):
+        \"\"\"
+        Constructor
+        :param server: Flask server
+        :type server: flask.Flask
+        :return: Route object
+        \"\"\"
+        import controllers
+        server.add_url_rule('/', 'home', controllers.web.home.index, methods=["GET"])
+        return
+"""
+
 HTTP_ERROR_HANDLER_ENTRY = """# coding: utf-8
 
 
@@ -68,6 +85,14 @@ class Controller(object):
     @staticmethod
     def index():
         return
+"""
+
+BASE_HOME_CONTROLLER = """
+class Controller(object):
+
+    @staticmethod
+    def index():
+        return template("welcome.html")
 """
 
 BASE_MIDDLEWARE = """# coding: utf-8

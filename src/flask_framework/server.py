@@ -43,6 +43,8 @@ def main():
     from flask_framework.Config import Environment
     args = args_parser()
     os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "/var/log/server/process.log"))
+    if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
+        os.mkdir(os.path.dirname(os.environ.get('log_file')), 0o755)
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO,
         format='%(asctime)s %(levelname)s %(message)s',
@@ -50,8 +52,10 @@ def main():
     )
     if os.environ.get("LOG_FILE", None) or os.environ.get("LOG_DIR", None):
         os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
-        os.environ.setdefault("log_file",
-                              os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log')))
+        os.environ.setdefault(
+            "log_file",
+            os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log'))
+        )
     if os.environ.get("log_file", None):
         logging.basicConfig(
             level=logging.DEBUG if args.debug else logging.INFO,

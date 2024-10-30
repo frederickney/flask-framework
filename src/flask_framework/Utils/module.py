@@ -123,7 +123,29 @@ def try_create_entry(path, entry):
 
 @deniedwebcall
 def try_create_web_entry(path):
-    try_create_entry(path, 'web')
+    if os.path.exists(os.path.join(path, 'server')):
+        if not os.path.exists(os.path.join(os.path.join(path, 'server'), '{}.py'.format('web'))):
+            generate(path, 'controllers/web/home')
+            fp = open(os.path.join(path, '{}.py'.format('controllers/web/home')), 'w')
+            fp.write(templates.PYTHON_FILE_HEAD)
+            fp.write(templates.FLASK_RENDERING_IMPORT)
+            fp.write(templates.BASE_HOME_CONTROLLER.format('welcome'))
+            fp.close()
+            fp = open(
+                os.path.join(
+                    os.path.dirname(os.path.join(path, '{}.py'.format('controllers/web/home'))),
+                    "__init__.py"
+                ),
+                'a'
+            )
+            fp.write(templates.IMPORT_CONTROLLER.format('home', 'home'))
+            fp.close()
+            fp = open(os.path.join(os.path.join(path, 'server'), '{}.py'.format('web')), 'w')
+            fp.write(templates.HTTP_DEFAULT_ENTRY.format('web'))
+            fp.close()
+            fp = open(os.path.join(os.path.join(path, 'server'), '__init__.py'), 'a')
+            fp.write(templates.IMPORTS.format('web'))
+            fp.close()
 
 
 @deniedwebcall
