@@ -9,7 +9,7 @@ import multiprocessing
 import gunicorn.app.base
 from six import iteritems
 
-from Database import Database
+from flask_framework.Database import Database
 
 
 class Server(gunicorn.app.base.Application):
