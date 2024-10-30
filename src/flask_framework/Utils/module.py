@@ -184,6 +184,15 @@ def try_create_ws_entry(path):
     try_create_entry(path, 'ws')
 
 
+def try_create_default_conf(path):
+    if not os.path.exists(os.path.join(path, 'config')):
+        os.mkdir(os.path.join(path, 'config'), 0o755)
+    if not os.path.exists(os.path.join(os.path.join(path, 'config'), 'config.yml')):
+        fp = open(os.path.join(os.path.join(path, 'config'), 'config.yml'), 'w')
+        fp.write(templates.FLASK_FRAMEWORK_BASE_CONF)
+        fp.close()
+
+
 @deniedwebcall
 def try_create_socket_entry(path):
     if os.path.exists(os.path.join(path, 'server')):
@@ -212,3 +221,4 @@ def create_server(path, _inst_dir):
     try_create_web_entry(path)
     try_copy_statics(_inst_dir, path)
     try_copy_templates(_inst_dir, path)
+    try_create_default_conf(path)

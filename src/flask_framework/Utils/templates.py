@@ -128,3 +128,31 @@ HTTP_ERRORS = {
 }
 
 FLASK_RENDERING_IMPORT = "from flask import render_template as template\n\n"
+
+
+FLASK_FRAMEWORK_BASE_CONF = """SERVER_ENV:
+    APP_NAME: Flask
+    APP_KEY : secret
+    ENV: dev
+    BIND:
+        ADDRESS :  localhost
+        PORT: 4200
+    STATIC_PATH: static
+    TEMPLATE_PATH: template
+    WORKERS: sync
+    CAPTURE: true
+    SESSION: filesystem
+    THREADS_PER_CORE: 16
+    LOG:
+        DIR: log
+        LEVEL: debug
+
+DATABASES: {}
+
+FLASK:
+  CONFIG: {}
+
+SERVICES: 
+  filesystem:
+    PATH: sessions
+"""
