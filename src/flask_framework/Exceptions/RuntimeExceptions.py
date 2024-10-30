@@ -5,7 +5,6 @@ __author__ = 'Frederick NEY'
 
 
 class RuntimeException(Exception):
-
     message = None
 
     def __init__(self, msg):

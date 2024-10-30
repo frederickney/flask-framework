@@ -5,7 +5,6 @@ __author__ = 'Frederick NEY'
 
 
 class Loader(object):
-
     __loaded__ = False
 
     @classmethod
@@ -42,7 +41,6 @@ class Loader(object):
 
 def all():
     import re
-    import sys
     import os
     import importlib
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)

@@ -4,18 +4,15 @@
 
 __author__ = 'Frederick NEY'
 
-
 import logging
 import os
 
 import flask_framework.Extensions as Extensions
 import flask_framework.Server as Server
+import gevent.monkey
 from flask_framework.Config import Environment
 from flask_framework.Database import Database
-from flask_framework.Utils import make_auth, make_controller, make_middleware
-from logging.handlers import TimedRotatingFileHandler
-import gevent.monkey
-
+from flask_framework.Utils import make_controller, make_middleware, make_project
 
 gevent.monkey.patch_all()
 
@@ -51,12 +48,20 @@ def parser():
         help='Create middleware',
         required=False
     )
+    parser.add_argument(
+        '-cp', '--create-project',
+        help='Create project',
+        required=False
+    )
     args = parser.parse_args()
-    if args.create_controller:
-        make_controller(os.path.dirname(os.path.realpath(__file__)), args.create_controller)
+    if args.create_project:
+        make_project(os.getcwd(), args.create_project, os.path.dirname(os.path.realpath(__file__)))
+        exit(0)
+    elif args.create_controller:
+        make_controller(os.getcwd(), args.create_controller)
         exit(0)
     elif args.create_middleware:
-        make_middleware(os.path.dirname(os.path.realpath(__file__)), args.create_middleware)
+        make_middleware(os.getcwd(), args.create_middleware)
         exit(0)
     elif args.database or args.shell or args.run:
         import sys
@@ -78,12 +83,12 @@ Environment.load(os.environ.get('CONFIG_FILE', "/etc/server/config.json"))
 try:
     loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
     logging.basicConfig(
-        level=logging.getLevelName(loglevel.upper()),
+        level=loglevel.upper(),
         format='%(asctime)s %(levelname)s %(message)s'
     )
 except KeyError as e:
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.getLevelName(logging.INFO),
         format='%(asctime)s %(levelname)s %(message)s'
     )
 logging.debug("Connecting to default database...")
@@ -91,7 +96,7 @@ Database.register_engines(Environment.SERVER_DATA['LOG']['LEVEL'] == 'debug')
 Database.init()
 logging.debug("Default database connected...")
 Server.Process.init(tracking_mode=False)
-#Server.Process.init_sheduler()
+# Server.Process.init_sheduler()
 logging.debug("Server initialized...")
 Server.Process.load_plugins()
 logging.debug("Loading server routes...")

@@ -5,7 +5,6 @@ __author__ = 'Frederick NEY'
 
 
 class ConfException(Exception):
-
     message = None
 
     def __init__(self, msg):
@@ -17,7 +16,6 @@ class ConfException(Exception):
 
 
 class InvalidConfigurationFileError(ConfException):
-
     message = None
 
     def __init__(self, msg):
@@ -29,7 +27,6 @@ class InvalidConfigurationFileError(ConfException):
 
 
 class NotAConfigurationFileError(ConfException):
-
     message = None
 
     def __init__(self, msg):
@@ -38,4 +35,3 @@ class NotAConfigurationFileError(ConfException):
 
     def __str__(self):
         return self.message
-

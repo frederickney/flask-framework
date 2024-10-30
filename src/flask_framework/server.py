@@ -6,7 +6,6 @@ __author__ = 'Frederick NEY'
 
 import gevent.monkey
 
-
 gevent.monkey.patch_all()
 
 
@@ -51,7 +50,8 @@ def main():
     )
     if os.environ.get("LOG_FILE", None) or os.environ.get("LOG_DIR", None):
         os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
-        os.environ.setdefault("log_file", os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log')))
+        os.environ.setdefault("log_file",
+                              os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log')))
     if os.environ.get("log_file", None):
         logging.basicConfig(
             level=logging.DEBUG if args.debug else logging.INFO,
@@ -111,7 +111,7 @@ def main():
     logging.debug("Loading websocket events")
     Server.Process.load_socket_events()
     logging.debug("Websocket events loaded...")
-    #app.teardown_appcontext(Database.save)
+    # app.teardown_appcontext(Database.save)
     import flask_framework.Extensions as Extensions
     Extensions.load()
     logging.info("Server is now starting...")
@@ -120,4 +120,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

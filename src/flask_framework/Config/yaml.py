@@ -3,11 +3,10 @@
 
 __author__ = 'Frederick NEY'
 
+import os
+import re
 
 import flask_framework.Exceptions as Exceptions
-import re
-import os
-
 
 __env_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
@@ -45,7 +44,9 @@ def _load(file):
         else:
             raise Exceptions.ConfigExceptions.NotAConfigurationFileError(file + ": File did not exist.")
     else:
-        raise Exceptions.ConfigExceptions.NotAConfigurationFileError("Expected " + type(str) + ", got " + type(file) + ".")
+        raise Exceptions.ConfigExceptions.NotAConfigurationFileError(
+            "Expected " + type(str) + ", got " + type(file) + "."
+        )
     return
 
 

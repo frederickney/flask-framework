@@ -3,13 +3,11 @@
 
 __author__ = 'Frederick NEY'
 
-
-from flask_framework.Deprecation import deprecated
 from flask_framework.Config import Environment
+from flask_framework.Deprecation import deprecated
 
 
 class Driver(object):
-
     engine = None
     session = None
     Model = None
@@ -27,7 +25,7 @@ class Driver(object):
         for i in range(0, len(array_args)):
             params += \
                 '{}={};'.format(array_args[i][0], array_args[i][1]) if i < len(array_args) - 1 else \
-                '{}={}'.format(array_args[i][0], array_args[i][1])
+                    '{}={}'.format(array_args[i][0], array_args[i][1])
         return params
 
     @classmethod
@@ -49,10 +47,13 @@ class Driver(object):
             from sqlalchemy.dialects import registry
             for name, values in dialects.items():
                 registry.register(name, values['module'], values['class'])
-        database_uri =  ("{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db) \
-                       + (';{}'.format(cls._params(params)) if params is not None else '')) if port else \
-                       ("{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
-                       + ('?{}'.format(cls._params(params)) if params is not None else ''))
+        database_uri = (
+                "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
+                + (';{}'.format(cls._params(params)) if params is not None else '')
+        ) if port else (
+                "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
+                + ('?{}'.format(cls._params(params)) if params is not None else '')
+        )
         cls.engine = create_engine(database_uri, echo=echo)
         cls._sessionmaker = sessionmaker(bind=cls.engine, autoflush=True)
         cls.session = scoped_session(cls._sessionmaker)
@@ -60,7 +61,7 @@ class Driver(object):
         cls.Model.query = cls.session.query_property()
 
     @classmethod
-    def register_engine(cls, name, driver, user, pwd, host, db, port=None, params=None, dialects=None,  echo=True):
+    def register_engine(cls, name, driver, user, pwd, host, db, port=None, params=None, dialects=None, echo=True):
         from sqlalchemy import create_engine
         from sqlalchemy.orm import scoped_session, sessionmaker
         from sqlalchemy.ext.declarative import declarative_base
@@ -68,10 +69,13 @@ class Driver(object):
             from sqlalchemy.dialects import registry
             for registry_name, values in dialects.items():
                 registry.register(registry_name, values['module'], values['class'])
-        database_uri = ("{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db) \
-                       + (';{}'.format(cls._params(params)) if params is not None else '')) if port else \
-                       ("{}://{}:{}@{}/{}".format(driver, user, pwd, host, db) \
-                       + (';{}'.format(cls._params(params)) if params is not None else ''))
+        database_uri = (
+                "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
+                + (';{}'.format(cls._params(params)) if params is not None else '')
+        ) if port else (
+                "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
+                + (';{}'.format(cls._params(params)) if params is not None else '')
+        )
         cls.engines[name] = create_engine(database_uri, echo=echo)
         cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name], autoflush=False)
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
@@ -140,7 +144,7 @@ class Driver(object):
     def start_session(cls, name):
         from sqlalchemy.orm import scoped_session
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
-    
+
     @classmethod
     def start_default_session(cls):
         from sqlalchemy.orm import scoped_session
@@ -158,7 +162,7 @@ class Driver(object):
         cls.sessions[name].close()
 
     @classmethod
-    def close_default_session(cls): 
+    def close_default_session(cls):
         cls.session.close()
 
     @classmethod
@@ -178,7 +182,7 @@ class Driver(object):
         :param task_name: The name of the task
         :return:
         """
-        from sqlalchemy.orm import scoped_session, sessionmaker
+        from sqlalchemy.orm import scoped_session
         if db == 'default':
             session = scoped_session(cls._sessionmaker)
             setattr(Driver, task_name, session)
@@ -266,4 +270,3 @@ class Driver(object):
                 logging.warning("Unable to properly stop thread '%s'" % manager.getName())
         Driver.session.remove()
         logging.info("Server is now shut down...")
-

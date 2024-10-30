@@ -3,7 +3,6 @@
 
 __author__ = 'Frederick NEY'
 
-
 from flask import render_template as template
 
 

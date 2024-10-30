@@ -5,7 +5,6 @@ __author__ = 'Frederick NEY'
 
 
 class BaseException(Exception):
-
     message = None
 
     def __init__(self, msg):
@@ -17,7 +16,6 @@ class BaseException(Exception):
 
 
 class PrimaryKeyChangeException(BaseException):
-
     message = None
 
     def __init__(self, msg):

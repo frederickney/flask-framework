@@ -4,12 +4,12 @@
 
 __author__ = 'Frederick NEY'
 
-
 import multiprocessing
 
-import gevent.monkey
 import gunicorn.app.base
 from six import iteritems
+
+from Database import Database
 
 
 class Server(gunicorn.app.base.Application):
@@ -27,7 +27,6 @@ class Server(gunicorn.app.base.Application):
     def application():
         import logging
         from flask_framework.Server import Process
-        import flask_framework.Task as Task
         import flask_framework.Extensions as Extensions
         logging.info("Initializing the server...")
         Process.init(tracking_mode=False)
@@ -69,14 +68,13 @@ class Server(gunicorn.app.base.Application):
         return self.application
 
 
-
-
 if __name__ == '__main__':
     import os
     import flask_framework.Server as Process
     import logging
     from logging.handlers import TimedRotatingFileHandler
     from flask_framework.Config import Environment
+
     loglevel = 'warning'
     logging_dir_exist = False
     if os.environ.get("LOG_DIR", None):
@@ -147,7 +145,6 @@ if __name__ == '__main__':
     logging.info("Options loaded...")
     if 'default' in Environment.Databases:
         logging.debug("Connecting to default database...")
-        from flask_framework.Database import Database
         Database.register_engines()
         Database.init()
         logging.debug("Default database connected...")

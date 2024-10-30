@@ -3,12 +3,10 @@
 
 __author__ = "Frederick NEY"
 
-
 import importlib
 import logging
 import os
 import re
-import sys
 
 import flask_framework.Exceptions as Exceptions
 from flask_framework.Config import Environment
@@ -23,10 +21,11 @@ def moduleloader(module):
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']), module)))
+            mods_dir = filter(research.search, os.listdir(
+                os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']), module)))
         else:
             mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
-        form_module = lambda fp : '.' + os.path.splitext(fp)[0]
+        form_module = lambda fp: '.' + os.path.splitext(fp)[0]
         mods = map(form_module, mods_dir)
         importlib.import_module(module)
         for mod in mods:
@@ -44,10 +43,11 @@ def modulereloader(module):
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']), module)))
+            mods_dir = filter(research.search, os.listdir(
+                os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']), module)))
         else:
             mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
-        form_module = lambda fp : '.' + os.path.splitext(fp)[0]
+        form_module = lambda fp: '.' + os.path.splitext(fp)[0]
         mods = map(form_module, mods_dir)
         imported_mod = importlib.import_module(module)
         imported_mod = importlib.reload(imported_mod)
@@ -79,7 +79,17 @@ def initmodule(module, db):
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']), module)))
+            mods_dir = filter(
+                research.search,
+                os.listdir(
+                    os.path.join(
+                        os.path.join(
+                            os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']
+                        ),
+                        module
+                    )
+                )
+            )
         else:
             mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
         form_module = lambda fp: '.' + os.path.splitext(fp)[0]
@@ -115,7 +125,18 @@ def routesloader(module, app):
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']), module)))
+            mods_dir = filter(
+                research.search,
+                os.listdir(
+                    os.path.join(
+                        os.path.join(
+                            os.curdir,
+                            Environment.SERVER_DATA['extensions']['GlobalPath']
+                        ),
+                        module
+                    )
+                )
+            )
         else:
             mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
         form_module = lambda fp: '.' + os.path.splitext(fp)[0]
@@ -151,7 +172,18 @@ def blueprintsloader(module, app):
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']), module)))
+            mods_dir = filter(
+                research.search,
+                os.listdir(
+                    os.path.join(
+                        os.path.join(
+                            os.curdir,
+                            Environment.SERVER_DATA['extensions']['GlobalPath']
+                        ),
+                        module
+                    )
+                )
+            )
         else:
             mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, module)))
         form_module = lambda fp: '.' + os.path.splitext(fp)[0]
@@ -182,21 +214,40 @@ def installer(module):
     try:
         if 'extensions' in Environment.SERVER_DATA:
             if 'BaseModule' in Environment.SERVER_DATA['extensions']:
-                    pakages = importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)).Loader.pakages()
+                pakages = importlib.import_module(
+                    '{}.{}'.format(
+                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        module
+                    )
+                ).Loader.pakages()
             else:
-                logging.warning("{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(__name__, os.environ.get('CONFIG_FILE', "/etc/server/config.json")))
+                logging.warning(
+                    "{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(
+                        __name__,
+                        os.environ.get('CONFIG_FILE', "/etc/server/config.json")
+                    )
+                )
         else:
             pakages = importlib.import_module(module).Loader.pakages()
         for package in pakages:
             pip.main(['install', package])
         logging.info('Packages for "%s" installed' % module)
     except ImportError as e:
-        logging.warning("{}: {} not found in {}".format(
-            __name__,
-            module if 'extensions' not in Environment.SERVER_DATA
-            else '{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)) if 'BaseModule' in Environment.SERVER_DATA['extensions']
-            else module,
-            os.getcwd()
+        logging.warning(
+            "{}: {} not found in {}".format(
+                __name__,
+                (
+                    module if 'extensions' not in Environment.SERVER_DATA
+                    else
+                    '{}.{}'.format(
+                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        module
+                    ) if 'BaseModule' in Environment.SERVER_DATA['extensions']
+                    else
+                    module
+                ),
+                os.getcwd()
+            )
         )
     except AttributeError as e:
         logging.debug(e)
@@ -210,7 +261,9 @@ def module(module):
     try:
         if 'extensions' in Environment.SERVER_DATA:
             if 'BaseModule' in Environment.SERVER_DATA['extensions']:
-                return importlib.import_module('{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module))
+                return importlib.import_module(
+                    '{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)
+                )
             else:
                 logging.warning("{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(
                     __name__,
@@ -219,11 +272,21 @@ def module(module):
         else:
             return importlib.import_module(module)
     except ImportError as e:
-        logging.warning("{}: {} not found in {}".format(
-            __name__,
-            module if 'extensions' not in Environment.SERVER_DATA
-            else '{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)) if 'BaseModule' in Environment.SERVER_DATA['extensions']
-            else module,
-            os.getcwd()
+        logging.warning(
+            "{}: {} not found in {}".format(
+                __name__,
+                (
+                    module if 'extensions' not in Environment.SERVER_DATA
+                    else
+                    '{}.{}'.format(
+                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        module
+                    )
+                    if 'BaseModule' in Environment.SERVER_DATA['extensions']
+                    else
+                    module
+                ),
+                os.getcwd()
+            )
         )
         return None

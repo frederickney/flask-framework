@@ -2,14 +2,11 @@
 
 __author__ = "Frederick NEY"
 
-
 from flask_migrate import Migrate as Migration
 
 
 class Migrate(object):
-
     __migrate: Migration = None
-
 
     @classmethod
     def run(cls, server):

@@ -3,6 +3,5 @@
 
 __author__ = 'Frederick NEY'
 
-
-from .driver import Driver as Database
 from . import migration
+from .driver import Driver as Database

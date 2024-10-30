@@ -3,7 +3,6 @@
 
 __author__ = 'Frederick NEY'
 
-
 import flask_framework.Exceptions as Exceptions
 
 
@@ -16,7 +15,9 @@ def _load(file):
                 try:
                     return json.load(open(file))
                 except JSONDecodeError as e:
-                    raise Exceptions.ConfigExceptions.InvalidConfigurationFileError(file + ": Expected json file format.")
+                    raise Exceptions.ConfigExceptions.InvalidConfigurationFileError(
+                        file + ": Expected json file format."
+                    )
             else:
                 raise Exceptions.ConfigExceptions.NotAConfigurationFileError(file + ": Not a valid file.")
         else:
@@ -29,4 +30,3 @@ def _load(file):
 
 def load(file):
     return _load(file)
-

@@ -3,7 +3,9 @@
 __author__ = "Frédérick NEY"
 
 from flask_saml import FlaskSAML as SAML
-from flask_saml import login, logout, login_acs, metadata, saml_authenticated, saml_log_out, _session_login, _session_logout
+from flask_saml import _session_login, _session_logout
+from flask_saml import login, logout, login_acs, metadata, saml_authenticated, saml_log_out
+
 
 def _get_metadata(metadata_url):  # pragma: no cover
     """
@@ -22,7 +24,6 @@ def _get_metadata(metadata_url):  # pragma: no cover
             raise exc
         return response.text
     else:
-        import os
         file = open(metadata_url, 'r')
         text = file.read()
         file.close()
@@ -68,4 +69,3 @@ class FlaskSAML(SAML):
         if app.config['SAML_USE_SESSIONS']:
             saml_authenticated.connect(_session_login, app)
             saml_log_out.connect(_session_logout, app)
-

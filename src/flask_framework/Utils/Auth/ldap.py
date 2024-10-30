@@ -3,46 +3,41 @@
 
 __author__ = "Frederick NEY"
 
-
-import os
-import ldap
-
 from functools import wraps
+
+import ldap
 from flask import current_app, flash, render_template, session, redirect, url_for
 from flask_wtf import FlaskForm
-from functools import wraps
-from string import capwords
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
-
 
 FIELDS = [
     'sAMAccountName',
     'distinguishedName',
 
-    'givenName', # 'first_name'
-    'sn', # 'last_name',
-    'middleName', # 'middle_name',
-    'description', # 'full_name',
+    'givenName',  # 'first_name'
+    'sn',  # 'last_name',
+    'middleName',  # 'middle_name',
+    'description',  # 'full_name',
     'memberOf',
 
-    'company', # 'company',
-    'department', # 'department',
-    'title', # 'title',
-    'manager', # 'manager',
+    'company',  # 'company',
+    'department',  # 'department',
+    'title',  # 'title',
+    'manager',  # 'manager',
 
-    'cn', # 'name_lat',
-    'name', # 'name_lat',
-    'displayName', # 'display_name',
+    'cn',  # 'name_lat',
+    'name',  # 'name_lat',
+    'displayName',  # 'display_name',
     'displayNamePrintable',
 
-    'comment',            # 'gender',
-    'primaryTelexNumber', # 'birth_date',
+    'comment',  # 'gender',
+    'primaryTelexNumber',  # 'birth_date',
 
-    'employeeID', # 'employee_id',
-    'mail', # 'mail',
-    'mobile', # 'mobile',
-    'streetAddress', # 'location',
+    'employeeID',  # 'employee_id',
+    'mail',  # 'mail',
+    'mobile',  # 'mobile',
+    'streetAddress',  # 'location',
     'ipPhone',
     'userPrincipalName',
     'jpegPhoto'
@@ -53,16 +48,17 @@ def login_required(f):
     """
     Decorator for views that require login.
     """
+
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'username' in session:
             return f(*args, **kwargs)
         return redirect(url_for(current_app.config['LDAP_LOGIN_VIEW']))
+
     return decorated
 
 
 class LDAPForm(FlaskForm):
-
     username = StringField('username', validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired()])
     submit = SubmitField()
@@ -100,10 +96,10 @@ class LDAP(object):
         :return: ldap.ldapobject.SimpleLDAPObject
         """
         conn = ldap.initialize('{0}://{1}:{2}'.format(
-        current_app.config['LDAP_SCHEMA'],
+            current_app.config['LDAP_SCHEMA'],
             current_app.config['LDAP_HOST'],
             current_app.config['LDAP_PORT']))
-        conn.protocol_version =  current_app.config.get('LDAP_PROTOCOL_VERSION')
+        conn.protocol_version = current_app.config.get('LDAP_PROTOCOL_VERSION')
         conn.set_option(ldap.OPT_REFERRALS, 0)
         return conn
 
@@ -136,7 +132,11 @@ class LDAP(object):
             newrec = {}
             for field in rec[1].keys():
                 try:
-                    newrec[field] = rec[1][field][0].decode('utf8') if len(rec[1][field]) == 1 else [value.decode('utf8') for value in rec[1][field]]
+                    newrec[field] = (
+                        rec[1][field][0].decode('utf8') if len(rec[1][field]) == 1
+                        else
+                        value.decode('utf8') for value in rec[1][field]
+                    )
                 except Exception as e:
                     newrec[field] = None
             res.append(newrec)
@@ -158,7 +158,7 @@ class LDAP(object):
                 try:
                     conn = LDAP.connect_host(host)
                     conn.simple_bind_s(username, pwd)
-                    result = LDAP.ldap_query(conn, "(&(objectClass=user)(mail="+username+"))")
+                    result = LDAP.ldap_query(conn, "(&(objectClass=user)(mail=" + username + "))")
                     if len(result) > 0:
                         session['mail'] = result[0]['mail']
                         session['displayName'] = result[0]['displayName']

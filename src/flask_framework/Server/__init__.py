@@ -3,15 +3,16 @@
 
 __author__ = 'Frederick NEY'
 
-
-import apscheduler.jobstores.redis
 import functools
 import warnings
-from . import WS, Web, ErrorHandler, Middleware,  RequestHandler, Socket, Plugins
-from flask_session import Session
 from datetime import datetime, timedelta
+
+import apscheduler.jobstores.redis
 from flask import Flask
 from flask_apscheduler import APScheduler
+from flask_session import Session
+
+from . import WS, Web, ErrorHandler, Middleware, RequestHandler, Socket, Plugins
 
 
 def configure_logs(name, format, output_file, debug='info'):
@@ -38,7 +39,6 @@ def configure_logs(name, format, output_file, debug='info'):
 
 
 class Process(object):
-
     _app: Flask = None
     _scheduler: APScheduler = None
     _pidfile = "/run/flask.pid"
@@ -61,6 +61,7 @@ class Process(object):
         from flask_socketio import SocketIO
         from flask import Flask
         from flask_framework.Config import Environment
+        print()
         cls._app = Flask(
             Environment.SERVER_DATA['APP_NAME'],
             static_url_path="/file",
@@ -79,8 +80,8 @@ class Process(object):
         if 'APP_KEY' in Environment.SERVER_DATA:
             from flask_wtf.csrf import CSRFProtect
             cls._session = Session()
-            #cls._app.config['TESTING'] = True
-            #cls._app.config['TEMPLATES_AUTO_RELOAD'] = True
+            # cls._app.config['TESTING'] = True
+            # cls._app.config['TEMPLATES_AUTO_RELOAD'] = True
             cls._app.config['SECRET_KEY'] = Environment.SERVER_DATA['APP_KEY']
             cls._app.config['SESSION_TYPE'] = Environment.SERVER_DATA['SESSION']
             if Environment.SERVER_DATA['SESSION'] == 'filesystem':
@@ -96,11 +97,11 @@ class Process(object):
             if Environment.SERVER_DATA['SESSION'] == 'redis':
                 import redis
                 cls._app.config['SESSION_REDIS'] = redis.from_url("%s://%s:%d/redis" % (
-                        Environment.SERVER_DATA['SESSION'],
-                        Environment.Services[Environment.SERVER_DATA['SESSION']]['HOST'],
-                        Environment.Services[Environment.SERVER_DATA['SESSION']]['PORT']
-                    )
+                    Environment.SERVER_DATA['SESSION'],
+                    Environment.Services[Environment.SERVER_DATA['SESSION']]['HOST'],
+                    Environment.Services[Environment.SERVER_DATA['SESSION']]['PORT']
                 )
+                                                                  )
             if Environment.SERVER_DATA['SESSION'] == 'sqlalchemy':
                 from flask_framework.Database import Database
                 cls._app = Database.setup_sessions(
@@ -166,11 +167,7 @@ class Process(object):
             args:
             :return:
         """
-        import logging
-        from  flask_framework.Config import Environment
         from flask_apscheduler import APScheduler
-        from werkzeug.serving import make_server, make_ssl_devcert
-        from gevent.pywsgi import WSGIServer
         cls._scheduler = APScheduler()
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
@@ -178,7 +175,7 @@ class Process(object):
             cls._app.config['SCHEDULER_API_ENABLED'] = False
             cls._scheduler.init_app(cls._app)
             cls._scheduler.start()
-            #logger.info("Starting listening on " + args.listening_address + " on port " + args.listening_port)
+            # logger.info("Starting listening on " + args.listening_address + " on port " + args.listening_port)
         return cls._app
 
     @classmethod
@@ -190,7 +187,6 @@ class Process(object):
         """
         cls._args = args
         from flask_apscheduler import APScheduler
-        from werkzeug.serving import make_server, make_ssl_devcert
         from gevent.pywsgi import WSGIServer
         from flask_framework.Config import Environment
         cls._scheduler = APScheduler()
@@ -201,16 +197,20 @@ class Process(object):
         if args.listening_address is not None:
             cls._scheduler.init_app(cls._app)
             cls._scheduler.start()
-            #logger.info("Starting listening on " + args.listening_address + " on port " + args.listening_port)
+            # logger.info("Starting listening on " + args.listening_address + " on port " + args.listening_port)
             print("Starting listening on %s on port %d" % (args.listening_address, int(args.listening_port)))
             if 'SSL' in Environment.SERVER_DATA:
                 if args.debug:
-                    cls._app.run(host=args.listening_address, port=int(args.listening_port), debug=args.debug, ssl_context=(Environment.SERVER_DATA['SSL']['Certificate'], Environment.SERVER_DATA['SSL']['PrivateKey']))
+                    cls._app.run(host=args.listening_address, port=int(args.listening_port), debug=args.debug,
+                                 ssl_context=(Environment.SERVER_DATA['SSL']['Certificate'],
+                                              Environment.SERVER_DATA['SSL']['PrivateKey']))
                 else:
                     try:
                         if args.pid:
                             cls.pid()
-                        cls._server = WSGIServer((args.listening_address, int(args.listening_port)), cls._app,  keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'], certfile=Environment.SERVER_DATA['SSL']['Certificate'])
+                        cls._server = WSGIServer((args.listening_address, int(args.listening_port)), cls._app,
+                                                 keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'],
+                                                 certfile=Environment.SERVER_DATA['SSL']['Certificate'])
                         cls._server.serve_forever()
                     finally:
                         if args.pid:
@@ -230,16 +230,19 @@ class Process(object):
         else:
             cls._scheduler.init_app(cls._app)
             cls._scheduler.start()
-            #logger.info("Starting listening on 0.0.0.0 on port " + args.listening_port)
+            # logger.info("Starting listening on 0.0.0.0 on port " + args.listening_port)
             print("Starting listening on 0.0.0.0 on port %d" % int(args.listening_port))
             if 'SSL' in Environment.SERVER_DATA:
                 if args.debug:
-                    cls._app.run(host="0.0.0.0", port=int(args.listening_port), debug=args.debug, ssl_context=(Environment.SERVER_DATA['SSL']['Certificate'], Environment.SERVER_DATA['SSL']['PrivateKey']))
+                    cls._app.run(host="0.0.0.0", port=int(args.listening_port), debug=args.debug, ssl_context=(
+                        Environment.SERVER_DATA['SSL']['Certificate'], Environment.SERVER_DATA['SSL']['PrivateKey']))
                 else:
                     try:
                         if args.pid:
                             cls.pid()
-                        cls._server = WSGIServer(("0.0.0.0", int(args.listening_port)), cls._app,  keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'], certfile=Environment.SERVER_DATA['SSL']['Certificate'])
+                        cls._server = WSGIServer(("0.0.0.0", int(args.listening_port)), cls._app,
+                                                 keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'],
+                                                 certfile=Environment.SERVER_DATA['SSL']['Certificate'])
                         cls._server.serve_forever()
                     finally:
                         if args.pid:
@@ -256,7 +259,7 @@ class Process(object):
                     finally:
                         if args.pid:
                             cls.shutdown()
-            #logger.info("Server is running")
+            # logger.info("Server is running")
 
     @classmethod
     def wsgi_setup(cls):
@@ -361,10 +364,10 @@ class Process(object):
         jobs.append(task)
         cls._app.config['JOBS'] = jobs
         if 'SCHEDULER_API_ENABLED' not in cls._app.config:
-            cls._app.config['SCHEDULER_JOBSTORES']= {
+            cls._app.config['SCHEDULER_JOBSTORES'] = {
                 'default': apscheduler.jobstores.redis.RedisJobStore(
-                    port = Environment.Services['redis']['PORT'],
-                    host = Environment.Services['redis']['HOST'],
+                    port=Environment.Services['redis']['PORT'],
+                    host=Environment.Services['redis']['HOST'],
                     db=10
                 )
             }
@@ -394,10 +397,10 @@ class Process(object):
         :type weeks: int
         :return:
         """
-        from flask_framework.Config import Environment
         if seconds == 0 and minutes == 0 and hours == 0 and days == 0 and weeks == 0:
             seconds = 1
-        cls._scheduler.add_job(id=id if id is not None else function, func=function.replace('.', ':', 1), args=args, trigger=trigger, hours=hours, minutes=minutes, seconds=seconds, days=days)
+        cls._scheduler.add_job(id=id if id is not None else function, func=function.replace('.', ':', 1), args=args,
+                               trigger=trigger, hours=hours, minutes=minutes, seconds=seconds, days=days)
         if 'SCHEDULER_API_ENABLED' not in cls._app.config:
             cls._app.config['SCHEDULER_API_ENABLED'] = True
 
@@ -417,7 +420,8 @@ class Process(object):
         :type date: datetime.datetime
         :return:
         """
-        cls._scheduler.add_job(id=function, func=function.replace('.', ':', 1), args=args, trigger=trigger, run_date=date)
+        cls._scheduler.add_job(id=function, func=function.replace('.', ':', 1), args=args, trigger=trigger,
+                               run_date=date)
         cls._scheduler.run_job(id=id if id is not None else function)
         if 'SCHEDULER_API_ENABLED' not in cls._app.config:
             cls._app.config['SCHEDULER_API_ENABLED'] = True
@@ -485,15 +489,15 @@ class Process(object):
 
 
 class WebDenyFunctionCall(DeprecationWarning):
-
     """
     Base class for disabling call of function.
     """
-    def __init__(self, *args, **kwargs): # real signature unknown
+
+    def __init__(self, *args, **kwargs):  # real signature unknown
         super(WebDenyFunctionCall, self).__init__(*args, **kwargs)
 
-    @staticmethod # known case of __new__
-    def __new__(*args, **kwargs): # real signature unknown
+    @staticmethod  # known case of __new__
+    def __new__(*args, **kwargs):  # real signature unknown
         """ Create and return a new object.  See help(type) for accurate signature. """
         return args[1]
 
@@ -502,9 +506,9 @@ def deniedwebcall(func):
     """Deprecation decorator which can be used to mark functions / classes
     as deprecated. It will result in a warning being emitted
     when the function is used."""
+
     @functools.wraps(func)
     def deny(*args, **kwargs):
-        import logging
         from flask import redirect
         from flask import request
         from flask import url_for

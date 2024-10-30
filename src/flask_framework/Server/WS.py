@@ -8,6 +8,7 @@ class Route(object):
     """
     Class that will configure all web services based routes for the server
     """
+
     def __init__(self, srv):
         """
         Constructor

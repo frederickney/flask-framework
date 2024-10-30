@@ -16,10 +16,13 @@ a {
     color: #0062DC;
 }
 
-.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {font-size:1rem}
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-size: 1rem
+}
+
 /* ************************************************ HEADER BAR ************************************************ */
 
-header{
+header {
     font-size: 25px;
     color: white;
     padding: 15px 0px;
@@ -31,7 +34,7 @@ header{
     border-radius: 10px 10px 0px 0px;
 }
 
-header .userPhoto img{
+header .userPhoto img {
     width: 100%;
 }
 
@@ -47,7 +50,7 @@ header .title {
     font-family: Helvetica;
 }
 
-i{
+i {
     font-size: 20px;
     color: rgb(229, 229, 234);
     font-family: Helvetica, sans-serif;
@@ -72,11 +75,11 @@ section {
 
 /* Styling the scrolllbar */
 
-.chatlogs::-webkit-scrollbar{
+.chatlogs::-webkit-scrollbar {
     width: 10px;
 }
 
-.chatlogs::-webkit-scrollbar-thumb{
+.chatlogs::-webkit-scrollbar-thumb {
     border-radius: 5px;
     background: rgba(0, 0, 0, .1);
 }
@@ -88,7 +91,7 @@ section {
     margin-bottom: 10px;
 }
 
-.userPhoto img{
+.userPhoto img {
     background-color: white;
     padding: 8px;
     width: 100%;
@@ -110,12 +113,12 @@ section {
 }
 
 .friend .chatMessage {
-    color: rgb(68,68,68);
+    color: rgb(68, 68, 68);
     width: auto;
     max-width: 100%;
     background: rgb(229, 229, 234);
     border-radius: 20px 20px 20px 20px;
-    font-size:0.9rem
+    font-size: 0.9rem
 }
 
 .self .chatMessage {
@@ -126,7 +129,7 @@ section {
     border-radius: 20px 20px 20px 20px;
     background: #5C7EAB;
     overflow-wrap: break-word;
-    font-size:0.9rem
+    font-size: 0.9rem
 }
 
 .gif img {
@@ -135,27 +138,26 @@ section {
 }
 
 .enSavoirPlus {
-  background-color:white;
-  -moz-border-radius:42px;
-  -webkit-border-radius:42px;
-  border-radius:20px;
-  border:1px solid #3f5f78;
-  display:inline-block;
-  cursor:pointer;
-  font-family:Arial;
-  font-size:15px;
-  padding:10px 15px;
-  text-decoration:none;
-  text-shadow:0px 1px 0px #3f5f78;
-  width: 100%;
-  text-align: left;
-  border-color: black;
+    background-color: white;
+    -moz-border-radius: 42px;
+    -webkit-border-radius: 42px;
+    border-radius: 20px;
+    border: 1px solid #3f5f78;
+    display: inline-block;
+    cursor: pointer;
+    font-family: Arial;
+    font-size: 15px;
+    padding: 10px 15px;
+    text-decoration: none;
+    text-shadow: 0px 1px 0px #3f5f78;
+    width: 100%;
+    text-align: left;
+    border-color: black;
 }
 
 
-
-#carouselExampleControls{
-  text-align: center;
+#carouselExampleControls {
+    text-align: center;
 }
 
 
@@ -168,23 +170,23 @@ footer {
     align-items: flex-start;
     overflow: auto;
     background: rgb(244, 243, 244);
-border-top: 1px solid #eceff1;
-border-bottom: 1px solid #eceff1;
+    border-top: 1px solid #eceff1;
+    border-bottom: 1px solid #eceff1;
 }
 
 footer textarea {
-height:25px;
-    font-size:0.9rem;
-    background: rgb(243,242,243);
+    height: 25px;
+    font-size: 0.9rem;
+    background: rgb(243, 242, 243);
     width: 100%;
     min-height: 5px;
     border: 2px solid rgb(63, 95, 120);
     border-radius: 5px;
     resize: none;
-    color: rgb(68,68,68);
+    color: rgb(68, 68, 68);
     margin: 15px 0px 15px 10px;
-    display:block;
-    overflow:hidden;
+    display: block;
+    overflow: hidden;
     box-shadow: none;
     outline: none;
     border-top: 0px;
@@ -195,7 +197,7 @@ height:25px;
 }
 
 footer textarea:focus {
-    background: rgb(243,242,243);
+    background: rgb(243, 242, 243);
 }
 
 
@@ -203,18 +205,18 @@ footer textarea:focus {
 
 /* Button used to open the chat form - fixed at the bottom of the page */
 .open-button {
-  color: white;
-  border: none;
-  cursor: pointer;
-  opacity: 1;
-  position: fixed;
-  bottom: 23px;
-  right: 28px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    opacity: 1;
+    position: fixed;
+    bottom: 23px;
+    right: 28px;
     width: 60px;
 }
 
-.close-button{
-     position: absolute;
+.close-button {
+    position: absolute;
     right: -10px;
     top: -10px;
     width: 30px;
@@ -225,16 +227,16 @@ footer textarea:focus {
 /* The popup chat - hidden by default */
 .chat-popup {
     background-color: white;
-  display: none;
-  position: fixed;
-  bottom: 15px;
-  right: 15px;
-  z-index: 5;
+    display: none;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    z-index: 5;
 }
 
 /* Add some hover effects to buttons */
 .btn:hover, .open-button:hover {
-  opacity: 0.8;
+    opacity: 0.8;
 }
 
 

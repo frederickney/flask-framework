@@ -4,9 +4,6 @@
 __author__ = 'Frederick NEY'
 
 
-import logging
-
-
 def request(api, uri, method='GET'):
     """
     Execute the http request to the given api
@@ -22,6 +19,7 @@ def request(api, uri, method='GET'):
         :param func:
         :return:
         """
+
         def run(*args, **kwargs):
             """
             Run the referenced function
@@ -46,4 +44,3 @@ def request(api, uri, method='GET'):
         return run
 
     return inject
-

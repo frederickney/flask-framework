@@ -3,8 +3,8 @@
 
 __author__ = 'Frederick NEY'
 
-
 import logging
+
 from .driver import Driver
 
 
@@ -13,16 +13,23 @@ def secured(prop):
         def decorator(*args, **kwargs):
             object = obj(*args, **kwargs)
             logging.warning('Loading secure function')
+
             def set_id(object, value):
                 property()
                 from flask_framework.Exceptions.QueryExceptions import PrimaryKeyChangeException
                 raise PrimaryKeyChangeException(
-                    "Trying to change read only primary key id of {}[{}] by {}".format(object.__class__.__name__, object.get_id, value))
+                    "Trying to change read only primary key id of {}[{}] by {}".format(
+                        object.__class__.__name__,
+                        object.get_id, value)
+                )
+
             logging.warning('Defining secured property')
-                # = object.__getattribute__(property)
+            # = object.__getattribute__(property)
             object.__setattr__(object, property(prop.get_id, set_id))
             return object
+
         return decorator
+
     return load
 
 
@@ -77,7 +84,9 @@ class Database(object):
                     logging.error("{}: {}".format(__name__, e))
                     result = None
                 return result
+
             return decorator
+
         return using
 
     @staticmethod
@@ -98,5 +107,7 @@ class Database(object):
                     session.close()
                 logging.info('disconnecting')
                 return result
+
             return decorator
+
         return using
