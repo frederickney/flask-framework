@@ -3,6 +3,15 @@
 ## Configuration
 
 The base configuration file is located on the config dir.
+### SSL Encryption
+
+For enabling ssl encryption within the application, you will need to add in the __"SERVER_ENV"__ key entry in the config file
+
+```yaml
+  SSL:
+    Certificate: "path to the cer file (public key)"
+    PrivateKey: "path to the pki file (private key)"
+```
 
 You can add default database using only the configuration file.
 
