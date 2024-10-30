@@ -61,18 +61,17 @@ class Process(object):
         from flask_socketio import SocketIO
         from flask import Flask
         from flask_framework.Config import Environment
-        print()
         cls._app = Flask(
             Environment.SERVER_DATA['APP_NAME'],
             static_url_path="/file",
             static_folder=
-            Environment.SERVER_DATA['STATIC_PATH']
-            if 'STATIC_PATH' in Environment.SERVER_DATA
-            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'static'),
+            os.path.abspath(Environment.SERVER_DATA['STATIC_PATH']
+                            if 'STATIC_PATH' in Environment.SERVER_DATA
+                            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'static')),
             template_folder=
-            Environment.SERVER_DATA['TEMPLATE_PATH']
-            if 'TEMPLATE_PATH' in Environment.SERVER_DATA
-            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'template')
+            os.path.abspath(Environment.SERVER_DATA['TEMPLATE_PATH']
+                            if 'TEMPLATE_PATH' in Environment.SERVER_DATA
+                            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'template'))
         )
         if 'CONFIG' in Environment.FLASK:
             if Environment.FLASK['CONFIG'] is not None:

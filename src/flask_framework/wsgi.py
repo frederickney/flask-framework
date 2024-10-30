@@ -112,6 +112,8 @@ if __name__ == '__main__':
         pass
     logging_dir_exist = False
     try:
+        if not os.path.exists(Environment.SERVER_DATA["LOG"]["DIR"]):
+            os.mkdir(Environment.SERVER_DATA["LOG"]["DIR"], 0o755)
         RotatingLogs = TimedRotatingFileHandler(
             filename=os.path.join(Environment.SERVER_DATA["LOG"]["DIR"], 'process.log'),
             when='midnight',
@@ -127,6 +129,8 @@ if __name__ == '__main__':
     except KeyError as e:
         pass
     except FileNotFoundError as e:
+        pass
+    except PermissionError as e:
         pass
     logging.info("Loading options...")
     options = {

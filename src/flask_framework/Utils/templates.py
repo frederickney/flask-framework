@@ -130,10 +130,10 @@ FLASK_RENDERING_IMPORT = "from flask import render_template as template\n\n"
 
 FLASK_FRAMEWORK_BASE_CONF = """SERVER_ENV:
     APP_NAME: {}
-    APP_KEY : {}
+    APP_KEY: {}
     ENV: dev
     BIND:
-        ADDRESS :  localhost
+        ADDRESS: localhost
         PORT: 4200
     STATIC_PATH: static
     TEMPLATE_PATH: template
