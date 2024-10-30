@@ -46,4 +46,4 @@ def make_controller(basepath, controller):
 @deniedwebcall
 def make_project(basepath, project, inst_dir):
     create_project(basepath, project)
-    create_server(os.path.join(basepath, project), inst_dir)
+    create_server(project, os.path.join(basepath, project), inst_dir)

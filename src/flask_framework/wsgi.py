@@ -7,9 +7,8 @@ __author__ = 'Frederick NEY'
 import multiprocessing
 
 import gunicorn.app.base
-from six import iteritems
-
 from flask_framework.Database import Database
+from six import iteritems
 
 
 class Server(gunicorn.app.base.Application):

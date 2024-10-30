@@ -18,7 +18,6 @@ class Route(object):
         return
 """
 
-
 HTTP_DEFAULT_ENTRY = """class Route(object):
     \"\"\"
     Class that will configure all {} services based routes for the server
@@ -129,10 +128,9 @@ HTTP_ERRORS = {
 
 FLASK_RENDERING_IMPORT = "from flask import render_template as template\n\n"
 
-
 FLASK_FRAMEWORK_BASE_CONF = """SERVER_ENV:
-    APP_NAME: Flask
-    APP_KEY : secret
+    APP_NAME: {}
+    APP_KEY : {}
     ENV: dev
     BIND:
         ADDRESS :  localhost
@@ -147,10 +145,10 @@ FLASK_FRAMEWORK_BASE_CONF = """SERVER_ENV:
         DIR: log
         LEVEL: debug
 
-DATABASES: {}
+DATABASES: {{}}
 
 FLASK:
-  CONFIG: {}
+  CONFIG: {{}}
 
 SERVICES: 
   filesystem:
