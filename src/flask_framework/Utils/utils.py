@@ -18,7 +18,11 @@ def make_auth():
 
 @deniedwebcall
 def make_middleware(basepath, middleware):
-    fp = open(os.path.join(os.path.join(basepath, 'server'), 'middleware.py'), "a")
+    if not os.path.exists(os.path.join(os.path.join(basepath, 'server'), 'middleware.py')):
+        fp = open(os.path.join(os.path.join(basepath, 'server'), 'middleware.py'), "w")
+        fp.write(templates.PYTHON_FILE_HEAD)
+    else:
+        fp = open(os.path.join(os.path.join(basepath, 'server'), 'middleware.py'), "a")
     fp.write(templates.BASE_MIDDLEWARE.format(middleware))
     fp.close()
     pass

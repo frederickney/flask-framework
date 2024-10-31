@@ -94,7 +94,7 @@ class Controller(object):
         return template("welcome.html")
 """
 
-BASE_MIDDLEWARE = """# coding: utf-8
+BASE_MIDDLEWARE = """
 class {}(object):
 
     @classmethod
