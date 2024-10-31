@@ -326,11 +326,13 @@ Setup the configuration as seen bellow in the screenshots
 
 ![Configurations](configuration.png)
 
-### :info: __"LOG_DIR"__ and __"LOG_FILE"__ env are no longer mandatory for starting the process
+> [!NOTE]
+> __"LOG_DIR"__ and __"LOG_FILE"__ env are no longer mandatory for starting the process
 
 ![Environment variables](variables.png)
 
-### :warning: Issue raised, it is no longer working attached to ide using flask module: [link to issue](https://github.com/frederickney/flask-framework/issues/2/)
+> [!WARNING] 
+> Issue raised, it is no longer working attached to ide using flask module: [link to issue](https://github.com/frederickney/flask-framework/issues/2/)
 
 * On every startup
 
