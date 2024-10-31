@@ -24,7 +24,7 @@ def parser():
     )
     parser.add_argument(
         '-cp', '--create-project',
-        help='Create project',
+        help='Create project\nexample:\npython -m flask_framework.cli --create-project webapp',
         required=False
     )
     args = parser.parse_args()
