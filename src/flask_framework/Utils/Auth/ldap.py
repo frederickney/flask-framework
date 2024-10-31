@@ -7,6 +7,7 @@ from functools import wraps
 
 import ldap
 from flask import current_app, flash, render_template, session, redirect, url_for
+from flask import g
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
@@ -51,7 +52,8 @@ def login_required(f):
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if 'username' in session:
+        del g.user
+        if 'user' in session:
             return f(*args, **kwargs)
         return redirect(url_for(current_app.config['LDAP_LOGIN_VIEW']))
 
@@ -62,6 +64,37 @@ class LDAPForm(FlaskForm):
     username = StringField('username', validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired()])
     submit = SubmitField()
+
+
+class User(object):
+    def __init__(self, attrs):
+        for key, attr in attrs.items():
+            setattr(self, key, str(attr))
+
+    def __repr__(self):
+        _str = '{'
+        attr = []
+        for key in dir(self):
+            if not key.startswith('__') and not key.startswith('_') and not key.startswith('set_'):
+                attr.append(key)
+        for i in range(len(attr)):
+            _str += (
+                '"{}": "{}"' .format(
+                    attr[i],
+                    getattr(self, attr[i])
+                ) if i == len(attr) - 1
+                else  '"{}": "{}", '.format(
+                    attr[i],
+                    getattr(self, attr[i])
+                )
+            )
+        _str += '}'
+        return _str
+
+
+    @property
+    def get_id(self):
+        return self.mail
 
 
 class LDAP(object):
@@ -129,17 +162,14 @@ class LDAP(object):
         for rec in records:
             if rec[0] is None:
                 continue
-            newrec = {}
-            for field in rec[1].keys():
-                try:
-                    newrec[field] = (
-                        rec[1][field][0].decode('utf8') if len(rec[1][field]) == 1
-                        else
-                        value.decode('utf8') for value in rec[1][field]
-                    )
-                except Exception as e:
-                    newrec[field] = None
-            res.append(newrec)
+        newrec = {}
+        for field in rec[1].keys():
+            newrec[field] = (
+                rec[1][field][0].decode('utf8') if len(rec[1][field]) == 1
+                else
+                [value.decode('utf8') for value in rec[1][field]]
+            )
+        res.append(newrec)
         return res
 
     @staticmethod
@@ -160,10 +190,9 @@ class LDAP(object):
                     conn.simple_bind_s(username, pwd)
                     result = LDAP.ldap_query(conn, "(&(objectClass=user)(mail=" + username + "))")
                     if len(result) > 0:
-                        session['mail'] = result[0]['mail']
-                        session['displayName'] = result[0]['displayName']
-                        session['username'] = result[0]['displayName']
-                        session['user'] = result[0]['mail']
+                        user = User(result[0])
+                        g.user = user
+                        session['user'] = user.__dict__
                     conn.unbind_s()
                     return True
                 except ldap.INVALID_CREDENTIALS as e:
@@ -198,7 +227,6 @@ class LDAP(object):
         :return:
         """
         del session['user']
-        del session['username']
         return redirect(url_for(current_app.config['LDAP_LOGIN_VIEW']))
 
     @staticmethod
@@ -208,5 +236,5 @@ class LDAP(object):
 
     @staticmethod
     def other_err(exc):
-        flash(message=exc.message, category='error')
+        flash(message=exc, category='error')
         return False
