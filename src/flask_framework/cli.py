@@ -14,12 +14,12 @@ def parser():
     parser = argparse.ArgumentParser(description='Python FLASK server')
     parser.add_argument(
         '-cc', '--create-controller',
-        help='Create controller',
+        help='Create controller\nexample:\npython -m flask_framework.cli --create-controller controllers/web/login',
         required=False
     )
     parser.add_argument(
         '-cm', '--create-middleware',
-        help='Create middleware',
+        help='Create middleware\nexample:\npython -m flask_framework.cli --create-middleware test',
         required=False
     )
     parser.add_argument(
