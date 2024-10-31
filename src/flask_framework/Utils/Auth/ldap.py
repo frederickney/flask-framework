@@ -91,6 +91,9 @@ class User(object):
         _str += '}'
         return _str
 
+    @property
+    def is_active(self):
+        return True
 
     @property
     def get_id(self):
@@ -98,6 +101,7 @@ class User(object):
 
 
 class LDAP(object):
+
     def __init__(self, app=None):
         self.app = app
         self.login_required = login_required
