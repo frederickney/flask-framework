@@ -312,6 +312,14 @@ or
 python -m flask_framework.cli --create-project <your project>
 ```
 
+When the project is created, more command can be used when the env __"CONFIG_FILE"__ is set and can be run through
+
+```bash
+python -m flask_framework.app
+```
+
+see -h for usages
+
 * Starting the flask server attached to an ide such as PyCharm
 
 Setup the configuration as seen bellow in the screenshots
