@@ -290,23 +290,26 @@ pip3 install
 
 or 
 ```pip 
-pip install flask_framework
+pip install flask-framework-mvc
 ```
 
-* First start of the flask server
+* CLI interface
 
 ```bash
-mkdir log
+python -m flask_framework.cli -h
 ```
 
-* On every startup of the flask server in standalone
 
-```bash 
-export LOG_FILE=log/process.log
+* Create a new project
+
+```bash
+python -m flask_framework.cli -cp <your project>
 ```
 
-```bash 
-export CONFIG_FILE=config/config.yml
+or
+
+```bash
+python -m flask_framework.cli --create-project <your project>
 ```
 
 * Starting the flask server attached to an ide such as PyCharm
@@ -315,24 +318,22 @@ Setup the configuration as seen bellow in the screenshots
 
 ![Configurations](configuration.png)
 
+### :info: __"LOG_DIR"__ and __"LOG_FILE"__ env are no longer mandatory for starting the process
+
 ![Environment variables](variables.png)
 
-### :warning: Issue raised, it is no longer working attached to ide: [link to issue](https://github.com/frederickney/flask-framework/issues/2/)
+### :warning: Issue raised, it is no longer working attached to ide using flask module: [link to issue](https://github.com/frederickney/flask-framework/issues/2/)
+
+* On every startup
+
+```bash 
+export CONFIG_FILE=config/config.yml
+```
 
 * Starting the flask server in standalone
 
 ```bash 
 python -m flask_framework.server
-```
-
-* On every startup of the flask server in standalone
-
-```bash 
-export LOG_DIR=log/
-```
-
-```bash 
-export CONFIG_FILE=config/config.yml
 ```
 
 * Starting the flask server with gunicorn and workers process
