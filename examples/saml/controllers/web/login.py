@@ -3,14 +3,14 @@
 __author__ = 'Frédérick NEY'
 
 
-from flask_saml import saml_authenticated
 from flask import render_template as template
-from flask import current_app
-from flask_framework.Server import Process
+from flask_login import login_required, current_user
+
 
 class Controller(object):
 
     @staticmethod
+    @login_required
     def test():
         from flask import session
-        return template('login/success.html', user=session["saml"].get('subject'))
+        return template('login/success.html', user=current_user.subject)

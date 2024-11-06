@@ -4,4 +4,4 @@
 __author__ = "Frederick NEY"
 
 
-from . import HTTP40XController, HTTP50XController, login
+from . import HTTP40XController, HTTP50XController, login, saml

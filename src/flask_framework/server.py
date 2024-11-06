@@ -4,9 +4,28 @@
 
 __author__ = 'Frederick NEY'
 
-import gevent.monkey
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
-gevent.monkey.patch_all()
+import flask_framework.Server as Server
+from flask_framework.Config import Environment
+from flask_framework.Database import Database
+
+try:
+    import gevent.monkey
+
+    gevent.monkey.patch_all()
+except ImportError as e:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s %(levelname)s %(message)s'
+    )
+    logging.error('{}: gevent not found in python packages'.format(__file__))
+    logging.info(
+        '{}: gevent is not required if running wsgi as it depends on your worker class you put into the configuration file'
+        .format(__file__)
+    )
+    exit(-1)
 
 
 def args_parser():
@@ -36,11 +55,6 @@ def args_parser():
 
 
 def main():
-    import os, logging
-    from logging.handlers import TimedRotatingFileHandler
-    import flask_framework.Server as Server
-    from flask_framework.Database import Database
-    from flask_framework.Config import Environment
     args = args_parser()
     os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "log/process.log"))
     if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
@@ -102,7 +116,7 @@ def main():
     logging.debug("Configuration file loaded...")
     if 'default' in Environment.Databases:
         logging.debug("Connecting to default database...")
-        Database.register_engines(args.debug)
+        Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
         Database.init()
         logging.debug("Default database connected...")
     Server.Process.init(tracking_mode=False)

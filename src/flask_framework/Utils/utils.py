@@ -6,7 +6,6 @@ __author__ = "Frederick NEY"
 import os
 
 from flask_framework.Server import deniedwebcall
-
 from . import templates
 from .module import generate, create_project, create_server
 

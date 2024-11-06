@@ -2,3 +2,5 @@
 
 
 __author__ = "Frederick NEY"
+
+from .decorators import admin_login_required

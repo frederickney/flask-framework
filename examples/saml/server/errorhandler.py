@@ -16,7 +16,7 @@ class Route(object):
         :type server: flask.Flask
         :return: Route object
         """
-        import Controllers
-        server.register_error_handler(404, Controllers.Web.HTTP40XController.page_or_error404)
-        server.register_error_handler(500, Controllers.Web.HTTP50XController.error500)
+        import controllers
+        server.register_error_handler(404, controllers.web.HTTP40XController.page_or_error404)
+        server.register_error_handler(500, controllers.web.HTTP50XController.error500)
         return

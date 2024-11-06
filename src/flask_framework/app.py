@@ -9,12 +9,9 @@ import os
 
 import flask_framework.Extensions as Extensions
 import flask_framework.Server as Server
-import gevent.monkey
 from flask_framework.Config import Environment
 from flask_framework.Database import Database
 from flask_framework.Utils import make_controller, make_middleware, make_project
-
-gevent.monkey.patch_all()
 
 
 def parser():
@@ -37,21 +34,9 @@ def parser():
     )
     parser.add_argument(
         '-db', '--database',
-        help="Run database operations",
+        help="Run database operations see Flask-Migrate for usages",
         required=False,
         nargs="+"
-    )
-    parser.add_argument(
-        '-s', '--shell',
-        help="Run interactive shell",
-        required=False,
-        action="store_true"
-    )
-    parser.add_argument(
-        '-r', '--run',
-        help="Run server",
-        required=False,
-        action="store_true"
     )
     args = parser.parse_args()
     if args.create_project:
@@ -63,17 +48,9 @@ def parser():
     elif args.create_middleware:
         make_middleware(os.getcwd(), args.create_middleware)
         exit(0)
-    elif args.database or args.shell or args.run:
-        import sys
-        for i in range(0, len(sys.argv)):
-            if sys.argv[i] == '-db' or sys.argv[i] == '--database':
-                sys.argv[i] = 'database'
-            elif sys.argv[i] == '-s' or sys.argv[i] == '--shell':
-                sys.argv[i] = 'shell'
-            elif sys.argv[i] == '-r' or sys.argv[i] == '--run':
-                sys.argv[i] = 'runserver'
-        from Database.migration import Migrate
-        Migrate.run(app)
+    elif args.database:
+        from flask_framework.Database.migration import Migrate
+        Migrate.run(app, args.database)
         exit(0)
 
 
@@ -92,7 +69,7 @@ except KeyError as e:
         format='%(asctime)s %(levelname)s %(message)s'
     )
 logging.debug("Connecting to default database...")
-Database.register_engines(Environment.SERVER_DATA['LOG']['LEVEL'] == 'debug')
+Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
 Database.init()
 logging.debug("Default database connected...")
 Server.Process.init(tracking_mode=False)

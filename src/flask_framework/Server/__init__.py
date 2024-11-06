@@ -46,6 +46,7 @@ class Process(object):
     sso = None
     openid = None
     ldap = None
+    saml = None
 
     @classmethod
     def init(cls, tracking_mode=False):
@@ -129,15 +130,12 @@ class Process(object):
                 cls.sso.init_app(cls._app)
             if 'OpenID' in Environment.Logins:
                 from flask_oidc import OpenIDConnect
-                cls.openid = OpenIDConnect()
-                cls.openid.init_app(cls._app)
+                prefix = cls._app.config.get('OIDC_BASE_URL', None)
+                cls.openid = OpenIDConnect(prefix=prefix)
+                cls.openid.init_app(cls._app, prefix=prefix)
             if 'SAML2' in Environment.Logins:
-                from flask_framework.Utils.Auth.saml2 import FlaskSAML
+                from flask_login_saml.client import FlaskSAML
                 cls.saml = FlaskSAML()
-                cls._csrf.exempt("flask_saml.login_acs")
-                cls._csrf.exempt("flask_saml.login")
-                cls._csrf.exempt("flask_saml.logout")
-                cls._csrf.exempt("flask_saml.metadata")
                 cls.saml.init_app(cls._app)
             if 'LDAP' in Environment.Logins:
                 if 'LDAP_HOST' not in Environment.FLASK['CONFIG'] and 'LDAP_DOMAIN' in Environment.FLASK['CONFIG']:
@@ -153,10 +151,12 @@ class Process(object):
                 cls._app.config.update(Environment.FLASK['CONFIG'])
                 cls.ldap = LDAP(cls._app)
         cls._socket = SocketIO()
-        if 'SOCKETIO_MESSAGE_QUEUE' in Environment.FLASK['CONFIG']:
-            cls._socket.init_app(cls._app, message_queue=Environment.FLASK['CONFIG']['SOCKETIO_MESSAGE_QUEUE'])
-        else:
-            cls._socket.init_app(cls._app)
+        if 'SOCKETIO_ENGINE' in Environment.FLASK['CONFIG']:
+            if Environment.FLASK['CONFIG']['SOCKETIO_ENGINE']:
+                if 'SOCKETIO_MESSAGE_QUEUE' in Environment.FLASK['CONFIG']:
+                    cls._socket.init_app(cls._app, message_queue=Environment.FLASK['CONFIG']['SOCKETIO_MESSAGE_QUEUE'])
+                else:
+                    cls._socket.init_app(cls._app)
         return cls._app
 
     @classmethod

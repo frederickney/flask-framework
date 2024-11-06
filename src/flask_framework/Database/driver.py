@@ -3,6 +3,8 @@
 
 __author__ = 'Frederick NEY'
 
+import logging
+
 from flask_framework.Config import Environment
 from flask_framework.Deprecation import deprecated
 
@@ -54,14 +56,15 @@ class Driver(object):
                 "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
                 + ('?{}'.format(cls._params(params)) if params is not None else '')
         )
-        cls.engine = create_engine(database_uri, echo=echo)
+        cls.engine = create_engine(database_uri, echo=echo, **kwargs)
         cls._sessionmaker = sessionmaker(bind=cls.engine, autoflush=True)
         cls.session = scoped_session(cls._sessionmaker)
         cls.Model = declarative_base()
         cls.Model.query = cls.session.query_property()
 
     @classmethod
-    def register_engine(cls, name, driver, user, pwd, host, db, port=None, params=None, dialects=None, echo=True):
+    def register_engine(cls, name, driver, user, pwd, host, db, port=None, params=None, dialects=None, echo=True,
+                        **kwargs):
         from sqlalchemy import create_engine
         from sqlalchemy.orm import scoped_session, sessionmaker
         from sqlalchemy.ext.declarative import declarative_base
@@ -76,7 +79,7 @@ class Driver(object):
                 "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
                 + (';{}'.format(cls._params(params)) if params is not None else '')
         )
-        cls.engines[name] = create_engine(database_uri, echo=echo)
+        cls.engines[name] = create_engine(database_uri, echo=echo, **kwargs)
         cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name], autoflush=False)
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
         cls.models[name] = declarative_base()
@@ -108,6 +111,10 @@ class Driver(object):
     @classmethod
     def register_engines(cls, echo=False):
         for driver, config in Environment.Databases.items():
+            logging.info("{}: setting database {}".format(__name__, driver))
+            engines_params = {}
+            if 'engine' in config:
+                engines_params.update(config['engine'])
             cls.register_engine(
                 driver,
                 config['driver'],
@@ -118,7 +125,8 @@ class Driver(object):
                 port=(config['port'] if 'port' in config else None),
                 params=(config['params'] if 'params' in config else None),
                 dialects=(config['dialects'] if 'dialects' in config else None),
-                echo=echo
+                echo=echo,
+                **engines_params
             )
             if driver == "default":
                 cls.setup(
@@ -130,7 +138,8 @@ class Driver(object):
                     port=(config['port'] if 'port' in config else None),
                     params=(config['params'] if 'params' in config else None),
                     dialects=(config['dialects'] if 'dialects' in config else None),
-                    echo=echo
+                    echo=echo,
+                    **engines_params
                 )
 
     @classmethod
@@ -206,6 +215,9 @@ class Driver(object):
         except ImportError as e:
             import logging
             logging.debug("{}: {}".format(__name__, e))
+        logging.info("{}: creating models for default database".format(
+            __name__
+        ))
         cls.Model.metadata.create_all(bind=cls.engine)
 
     @classmethod
@@ -220,6 +232,10 @@ class Driver(object):
         except ImportError as e:
             import logging
             logging.debug("{}: {}".format(__name__, e))
+        logging.info("{}: creating models for {} database".format(
+            __name__,
+            name
+        ))
         cls.models[name].metadata.create_all(bind=cls.engines[name])
 
     @classmethod
@@ -229,6 +245,11 @@ class Driver(object):
         :return: N/A
         """
         for driver, conf in Environment.Databases.items():
+            logging.info("{}: looking for models into {} for database {}".format(
+                __name__,
+                conf['models'],
+                driver)
+            )
             if driver == 'default':
                 if not conf['readonly']:
                     cls.init_default_db()

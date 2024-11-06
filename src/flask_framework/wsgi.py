@@ -4,11 +4,25 @@
 
 __author__ = 'Frederick NEY'
 
+try:
+    import gevent.monkey
+
+    gevent.monkey.patch_all()
+except ImportError as e:
+    pass
+try:
+    import eventlet
+
+    eventlet.monkey_patch(all=True)
+except ImportError as e:
+    pass
+
 import multiprocessing
 
 import gunicorn.app.base
-from flask_framework.Database import Database
 from six import iteritems
+
+from flask_framework.Database import Database
 
 
 class Server(gunicorn.app.base.Application):
@@ -44,7 +58,7 @@ class Server(gunicorn.app.base.Application):
         return Process.wsgi_setup()
 
     def __init__(self, options=None):
-        self.options = options or {}
+        Server.options = (options or {}) if not hasattr(Server, 'options') else Server.options
         self.application = Server.application()
         super(Server, self).__init__()
 
@@ -54,17 +68,53 @@ class Server(gunicorn.app.base.Application):
         :return:
         """
         logging.info('reloading')
-        self.prog = Server.application()
+        try:
+            import gevent.monkey
+            gevent.monkey.patch_all()
+        except ImportError as e:
+            pass
+        Environment.reload(os.environ['CONFIG_FILE'])
+        self.application = Server.application()
+        Server.load_options()
         super(Server, self).reload()
 
     def load_config(self):
-        config = dict([(key, value) for key, value in iteritems(self.options)
+        logging.info(Server.options)
+        config = dict([(key, value) for key, value in iteritems(Server.options)
                        if key in self.cfg.settings and value is not None])
         for key, value in iteritems(config):
             self.cfg.set(key.lower(), value)
 
     def load(self):
+        try:
+            import eventlet
+            eventlet.monkey_patch(all=True)
+        except ImportError as e:
+            pass
+        try:
+            import eventlet
+            eventlet.monkey_patch(all=True)
+        except ImportError as e:
+            pass
         return self.application
+
+    @classmethod
+    def load_options(cls):
+        cls.options = {
+            'bind': '%s:%i' % (Environment.SERVER_DATA['BIND']['ADDRESS'], Environment.SERVER_DATA['BIND']['PORT']),
+            'workers': Server.number_of_workers(),
+            'threads': Environment.SERVER_DATA['THREADS_PER_CORE'],
+            'capture_output': Environment.SERVER_DATA['CAPTURE'],
+            "loglevel": loglevel,
+            "worker_class": Environment.SERVER_DATA['WORKERS'],
+            "reload_engine": 'poll'
+        }
+        if logging_dir_exist:
+            cls.options["errorlog"] = os.path.join(os.environ.get("log_dir"), 'flask-error.log')
+            cls.options["accesslog"] = os.path.join(os.environ.get("log_dir"), 'flask-access.log')
+        if 'SSL' in Environment.SERVER_DATA:
+            cls.options["certfile"] = Environment.SERVER_DATA['SSL']['Certificate']
+            cls.options["keyfile"] = Environment.SERVER_DATA['SSL']['PrivateKey']
 
 
 if __name__ == '__main__':
@@ -104,6 +154,7 @@ if __name__ == '__main__':
         Environment.load(os.environ['CONFIG_FILE'])
     else:
         Environment.load("/etc/server/config.json")
+        os.environ.setdefault('CONFIG_FILE', "/etc/server/config.json")
     logging.info("Configuration file loaded...")
     try:
         loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
@@ -133,26 +184,12 @@ if __name__ == '__main__':
     except PermissionError as e:
         pass
     logging.info("Loading options...")
-    options = {
-        'bind': '%s:%i' % (Environment.SERVER_DATA['BIND']['ADDRESS'], Environment.SERVER_DATA['BIND']['PORT']),
-        'workers': Server.number_of_workers(),
-        'threads': Environment.SERVER_DATA['THREADS_PER_CORE'],
-        'capture_output': Environment.SERVER_DATA['CAPTURE'],
-        "loglevel": loglevel,
-        "worker_class": Environment.SERVER_DATA['WORKERS'],
-    }
-    if logging_dir_exist:
-        options["errorlog"] = os.path.join(os.environ.get("log_dir"), 'flask-error.log')
-        options["accesslog"] = os.path.join(os.environ.get("log_dir"), 'flask-access.log')
-    if 'SSL' in Environment.SERVER_DATA:
-        options["certfile"] = Environment.SERVER_DATA['SSL']['Certificate']
-        options["keyfile"] = Environment.SERVER_DATA['SSL']['PrivateKey']
+    Server.load_options()
     logging.info("Options loaded...")
     if 'default' in Environment.Databases:
         logging.debug("Connecting to default database...")
-        Database.register_engines()
+        Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
         Database.init()
         logging.debug("Default database connected...")
-
     logging.info("Starting the server...")
-    Server(options).run()
+    Server().run()

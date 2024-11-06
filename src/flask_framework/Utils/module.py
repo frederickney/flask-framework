@@ -8,7 +8,6 @@ import shutil
 from uuid import uuid5, uuid4, NAMESPACE_URL
 
 from flask_framework.Server import deniedwebcall
-
 from . import templates
 
 
