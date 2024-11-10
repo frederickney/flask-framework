@@ -129,10 +129,9 @@ class Process(object):
                 cls.sso = SSO()
                 cls.sso.init_app(cls._app)
             if 'OpenID' in Environment.Logins:
-                from flask_oidc import OpenIDConnect
-                prefix = cls._app.config.get('OIDC_BASE_URL', None)
-                cls.openid = OpenIDConnect(prefix=prefix)
-                cls.openid.init_app(cls._app, prefix=prefix)
+                from flask_login_oidc import FlaskOIDC
+                cls.openid = FlaskOIDC()
+                cls.openid.init_app(cls._app)
             if 'SAML2' in Environment.Logins:
                 from flask_login_saml.client import FlaskSAML
                 cls.saml = FlaskSAML()
