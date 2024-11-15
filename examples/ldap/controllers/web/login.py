@@ -4,7 +4,8 @@ __author__ = 'Frédérick NEY'
 
 
 from flask_framework.Server import Process
-from flask_framework.Utils.Auth.ldap import login_required, LDAP
+from flask_framework.Utils.Auth.ldap import LDAP
+from flask_login import login_required, current_user
 from flask import render_template as template
 
 
@@ -22,4 +23,4 @@ class Controller(object):
     @login_required
     def test():
         from flask import session
-        return template('login/success.html', user=session.get('username'))
+        return template('login/success.html', user=current_user.mail)
