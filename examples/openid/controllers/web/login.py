@@ -5,12 +5,12 @@ __author__ = 'Frédérick NEY'
 
 from flask_framework.Server import Process
 from flask import render_template as template
+from flask_login import login_required, current_user
 
 
 class Controller(object):
 
     @staticmethod
-    @Process.openid.require_login
+    @login_required
     def test():
-        from flask import session
-        return template('login/success.html', user=session["oidc_auth_profile"].get('email'))
+        return template('login/success.html', user=current_user.email)

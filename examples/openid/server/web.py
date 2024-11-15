@@ -18,4 +18,5 @@ class Route(object):
         """
         import controllers
         server.add_url_rule("/test", 'test', controllers.web.login.Controller.test, methods=["GET"])
+        controllers.web.openid.Controller.setup(server)
         return
