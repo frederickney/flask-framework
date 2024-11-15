@@ -24,7 +24,7 @@ classifiers = [
 'Programming Language :: Python :: 3.11',
 'Programming Language :: Python :: 3.12',
 ]
-version="1.0.11"
+version="1.0.12"
 dependencies = [
     "certifi",
     "Jinja2",
@@ -32,7 +32,6 @@ dependencies = [
     "urllib3",
     "Werkzeug",
     "gunicorn",
-    "gevent",
     "pyyaml",
     "pyopenssl",
     "WTForms",
@@ -62,7 +61,7 @@ dependencies = [
 include = ["src/flask_framework/template","src/flask_framework/static"]
 
 [metadata]
-version = {"attr" =  "1.0.11"}
+version = {"attr" =  "1.0.12"}
 
 
 [tool.setuptools.package-data]
