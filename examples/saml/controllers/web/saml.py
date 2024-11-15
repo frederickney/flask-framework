@@ -33,9 +33,7 @@ class Controller(object):
         app.add_url_rule('/saml/authorize/', 'saml.authorize', cls.authorize, methods=['POST'])
         app.add_url_rule('/saml/logout/', 'saml.logout', cls.logout, methods=['POST'])
         Process._csrf.exempt("{}.authorize".format(__name__))
-        Process._csrf.exempt("{}.login".format(__name__))
         Process._csrf.exempt("{}.logout".format(__name__))
-        Process._csrf.exempt("{}.metadata".format(__name__))
         try:
             app.add_url_rule('/logout/', 'logout', cls.logout, methods=['POST'])
             app.add_url_rule('/login/', 'login', cls.index, methods=['GET'])
