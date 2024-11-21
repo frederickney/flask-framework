@@ -29,9 +29,9 @@ class Controller(object):
         cls._lm.unauthorized_handler(cls.redirect_login)
         cls._lm.user_loader(Process.openid.user)
         cls._openid = Process.openid
-        app.add_url_rule('/openid/login/', 'oidc.login', cls.index, methods=['GET'])
-        app.add_url_rule('/openid/authorize/', 'oidc.authorize', cls.authorize, methods=['GET'])
-        app.add_url_rule('/openid/logout/', 'oidc.logout', cls.logout, methods=['GET'])
+        app.add_url_rule('/openid/login/', 'openid.login', cls.index, methods=['GET'])
+        app.add_url_rule('/openid/authorize/', 'openid.authorize', cls.authorize, methods=['GET'])
+        app.add_url_rule('/openid/logout/', 'openid.logout', cls.logout, methods=['GET'])
         try:
             app.add_url_rule('/logout/', 'logout', cls.logout, methods=['GET'])
             app.add_url_rule('/login/', 'login', cls.index, methods=['GET'])
@@ -41,7 +41,7 @@ class Controller(object):
 
     @classmethod
     def redirect_login(cls):
-        return redirect(url_for('oidc.login'))
+        return redirect(url_for('openid.login'))
 
     @classmethod
     def authorize(cls):
