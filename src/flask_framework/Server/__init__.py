@@ -130,11 +130,11 @@ class Process(object):
                 cls.sso.init_app(cls._app)
             if 'OpenID' in Environment.Logins:
                 from flask_login_oidc import FlaskOIDC
-                cls.openid = FlaskOIDC()
+                cls.openid = FlaskOIDC(prefix='OpenID')
                 cls.openid.init_app(cls._app)
             if 'SAML2' in Environment.Logins:
                 from flask_login_saml.client import FlaskSAML
-                cls.saml = FlaskSAML()
+                cls.saml = FlaskSAML(prefix='SAML2')
                 cls.saml.init_app(cls._app)
             if 'LDAP' in Environment.Logins:
                 if 'LDAP_HOST' not in Environment.FLASK['CONFIG'] and 'LDAP_DOMAIN' in Environment.FLASK['CONFIG']:

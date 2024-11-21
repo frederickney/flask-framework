@@ -15,9 +15,9 @@ class Loader(object):
         import logging
         logging.info('Loading plugins')
         loader.moduleloader('Extensions')
-        loader.initmodule('Extensions', db=Database)
-        loader.routesloader('Extensions', app=Process.get())
-        loader.blueprintsloader('Extensions', app=Process.get())
+        loader.initmodule('extensions', db=Database)
+        loader.routesloader('extensions', app=Process.get())
+        loader.blueprintsloader('extensions', app=Process.get())
         cls.__loaded__ = True
         logging.info('Plugins loaded')
         return
@@ -29,10 +29,10 @@ class Loader(object):
         from flask_framework.Server import Process
         import logging
         logging.info('Reloading plugins')
-        loader.modulereloader('Extensions')
-        loader.initmodule('Extensions', db=Database)
-        loader.routesloader('Extensions', app=Process.get())
-        loader.blueprintsloader('Extensions', app=Process.get())
+        loader.modulereloader('extensions')
+        loader.initmodule('extensions', db=Database)
+        loader.routesloader('extensions', app=Process.get())
+        loader.blueprintsloader('extensions', app=Process.get())
 
     @classmethod
     def loaded(cls):
@@ -43,11 +43,15 @@ def all():
     import re
     import os
     import importlib
+    from flask_framework.Config import Environment
     research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
-    mods_dir = filter(research.search, os.listdir(os.path.join(os.path.join(os.curdir, 'src'), 'Extensions')))
+    mods_dir = filter(
+        research.search,
+        os.listdir(os.path.join(Environment.SERVER_DATA['extensions']['GlobalPath'], 'extensions'))
+    )
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
-    importlib.import_module('Extensions')
+    importlib.import_module('extensions')
     modules = []
     for mod in mods:
         if not mod.startswith('__'):
