@@ -23,8 +23,8 @@ classifiers = [
 'Programming Language :: Python :: 3.10',
 'Programming Language :: Python :: 3.11',
 'Programming Language :: Python :: 3.12',
+'Programming Language :: Python :: 3.13',
 ]
-version="1.0.12"
 dependencies = [
     "certifi",
     "Jinja2",
@@ -55,13 +55,14 @@ dependencies = [
     "Flask-Migrate",
     'importlib-metadata; python_version>"3.7"'
 ]
+version="1.0.13"
 
 
 [tool.poetry]
 include = ["src/flask_framework/template","src/flask_framework/static"]
 
 [metadata]
-version = {"attr" =  "1.0.12"}
+version = {"attr" =  "1.0.13"}
 
 
 [tool.setuptools.package-data]
