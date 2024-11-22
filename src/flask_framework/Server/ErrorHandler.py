@@ -17,6 +17,9 @@ class Route(object):
         :return: Route object
         """
         import logging
+        import flask_framework.Controllers as Controllers
+        srv.register_error_handler(404, Controllers.Web.HTTP40XController.page_or_error404)
+        srv.register_error_handler(500, Controllers.Web.HTTP50XController.error500)
         try:
             import server
             server.errorhandler.Route(srv)
@@ -28,7 +31,4 @@ class Route(object):
                 Server.ErrorHandler.Route(srv)
             except Exception as e:
                 logging.warning("{}: Fallback to default error handler as : {} in {}".format(__name__, e, os.getcwd()))
-                import flask_framework.Controllers as Controllers
-                srv.register_error_handler(404, Controllers.Web.HTTP40XController.page_or_error404)
-                srv.register_error_handler(500, Controllers.Web.HTTP50XController.error500)
         return

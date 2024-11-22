@@ -6,6 +6,7 @@ __author__ = 'Frederick NEY'
 import functools
 import warnings
 from datetime import datetime, timedelta
+import inspect
 
 import apscheduler.jobstores.redis
 from flask import Flask
@@ -43,6 +44,7 @@ class Process(object):
     _scheduler: APScheduler = None
     _pidfile = "/run/flask.pid"
     _socket = None
+    _login_manager = None
     sso = None
     openid = None
     ldap = None
@@ -484,6 +486,25 @@ class Process(object):
             )
         }
         return
+
+    @classmethod
+    def login_manager(cls, login_manager=None):
+        """
+
+        :param login_manager:
+        :type login_manager: flask_login.LoginManager
+        :return:
+        :rtype: flask_login.LoginManager
+        """
+        if login_manager:
+            try:
+                from flask_login import LoginManager
+                if not callable(login_manager) and isinstance(login_manager, object) and type(
+                        login_manager) is LoginManager:
+                    cls._login_manager = login_manager
+            except ImportError:
+                pass
+        return cls._login_manager
 
 
 class WebDenyFunctionCall(DeprecationWarning):

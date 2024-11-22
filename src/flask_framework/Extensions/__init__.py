@@ -14,7 +14,7 @@ class Loader(object):
         from flask_framework.Server import Process
         import logging
         logging.info('Loading plugins')
-        loader.moduleloader('Extensions')
+        loader.moduleloader('extensions')
         loader.initmodule('extensions', db=Database)
         loader.routesloader('extensions', app=Process.get())
         loader.blueprintsloader('extensions', app=Process.get())
