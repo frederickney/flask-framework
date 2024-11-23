@@ -6,7 +6,6 @@ __author__ = 'Frederick NEY'
 import functools
 import warnings
 from datetime import datetime, timedelta
-import inspect
 
 import apscheduler.jobstores.redis
 from flask import Flask
