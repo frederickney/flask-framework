@@ -5,20 +5,25 @@ __author__ = 'Frederick NEY'
 
 import logging
 
+from sqlalchemy import create_engine, Engine
+from sqlalchemy.dialects import registry
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
 from flask_framework.Config import Environment
 from flask_framework.Deprecation import deprecated
 
 
 class Driver(object):
-    engine = None
-    session = None
-    Model = None
-    _sessionmaker = None
+    engine: Engine = None
+    session: scoped_session = None
+    Model: registry = None
+    _sessionmaker: sessionmaker = None
     Managers = []
-    engines = {}
-    sessions = {}
-    models = {}
-    _sessionmakers = {}
+    engines: dict[str, Engine] = {}
+    sessions: dict[str, scoped_session] = {}
+    models: dict[str, registry] = {}
+    _sessionmakers: dict[str, sessionmaker] = {}
 
     @staticmethod
     def _params(args={}):
@@ -31,7 +36,10 @@ class Driver(object):
         return params
 
     @classmethod
-    def setup(cls, driver, user, pwd, host, db, port=None, echo=False, params=None, dialects=None, **kwargs):
+    def setup(
+            cls,
+            driver, user, pwd, host, db, port=None, echo=False, params=None, dialects=None, **kwargs
+    ):
         """
         Setup function that will configure all the required resources for communicating with the database
         :param driver: Database driver that will be used when the server need to store persistent data
@@ -42,11 +50,7 @@ class Driver(object):
         :param echo: Boolean for printing sql request default: false
         :return: N/A
         """
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import scoped_session, sessionmaker
-        from sqlalchemy.ext.declarative import declarative_base
         if dialects is not None:
-            from sqlalchemy.dialects import registry
             for name, values in dialects.items():
                 registry.register(name, values['module'], values['class'])
         database_uri = (
@@ -63,13 +67,11 @@ class Driver(object):
         cls.Model.query = cls.session.query_property()
 
     @classmethod
-    def register_engine(cls, name, driver, user, pwd, host, db, port=None, params=None, dialects=None, echo=True,
-                        **kwargs):
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import scoped_session, sessionmaker
-        from sqlalchemy.ext.declarative import declarative_base
+    def register_engine(
+            cls,
+            name, driver, user, pwd, host, db, port=None, params=None, dialects=None, echo=True, **kwargs
+    ):
         if dialects is not None:
-            from sqlalchemy.dialects import registry
             for registry_name, values in dialects.items():
                 registry.register(registry_name, values['module'], values['class'])
         database_uri = (
@@ -93,7 +95,6 @@ class Driver(object):
 
     @classmethod
     def start_session_by_name(cls, name):
-        from sqlalchemy.orm import scoped_session
         return scoped_session(cls._sessionmakers[name])
 
     @classmethod
@@ -151,12 +152,10 @@ class Driver(object):
 
     @classmethod
     def start_session(cls, name):
-        from sqlalchemy.orm import scoped_session
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
 
     @classmethod
     def start_default_session(cls):
-        from sqlalchemy.orm import scoped_session
         cls.session = scoped_session(cls._sessionmaker)
 
     @classmethod
@@ -191,7 +190,6 @@ class Driver(object):
         :param task_name: The name of the task
         :return:
         """
-        from sqlalchemy.orm import scoped_session
         if db == 'default':
             session = scoped_session(cls._sessionmaker)
             setattr(Driver, task_name, session)
@@ -208,12 +206,10 @@ class Driver(object):
         try:
             import models.persistent
         except ImportError as e:
-            import logging
             logging.debug("{}: {}".format(__name__, e))
         try:
             import Models.Persistent
         except ImportError as e:
-            import logging
             logging.debug("{}: {}".format(__name__, e))
         logging.info("{}: creating models for default database".format(
             __name__
@@ -225,12 +221,10 @@ class Driver(object):
         try:
             import models.persistent
         except ImportError as e:
-            import logging
             logging.debug("{}: {}".format(__name__, e))
         try:
             import Models.Persistent
         except ImportError as e:
-            import logging
             logging.debug("{}: {}".format(__name__, e))
         logging.info("{}: creating models for {} database".format(
             __name__,
@@ -282,7 +276,6 @@ class Driver(object):
         :param exception:
         :return: N/A
         """
-        import logging
         logging.info("Shutting down server...")
         for manager in Driver.Managers:
             manager.teardown = True

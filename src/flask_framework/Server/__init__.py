@@ -4,6 +4,7 @@
 __author__ = 'Frederick NEY'
 
 import functools
+import logging
 import warnings
 from datetime import datetime, timedelta
 
@@ -498,8 +499,11 @@ class Process(object):
         if login_manager:
             try:
                 from flask_login import LoginManager
-                if not callable(login_manager) and isinstance(login_manager, object) and type(
-                        login_manager) is LoginManager:
+                if (
+                        not callable(login_manager)
+                        and isinstance(login_manager, object)
+                        and type(login_manager) is LoginManager
+                ):
                     cls._login_manager = login_manager
             except ImportError:
                 pass

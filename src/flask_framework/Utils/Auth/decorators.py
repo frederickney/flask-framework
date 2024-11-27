@@ -19,7 +19,6 @@ def admin_login_required(func):
                 getattr(current_user, 'email', None),
                 getattr(current_user, 'is_admin', False)
             ))
-            logging.info("{}: user {}".format(__name__, current_user))
         except AttributeError as e:
             logging.info("{}: annonymous".format(__name__))
 
