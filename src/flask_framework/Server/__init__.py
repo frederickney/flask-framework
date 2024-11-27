@@ -4,7 +4,6 @@
 __author__ = 'Frederick NEY'
 
 import functools
-import logging
 import warnings
 from datetime import datetime, timedelta
 

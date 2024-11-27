@@ -7,8 +7,8 @@ import logging
 
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.dialects import registry
-from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 from flask_framework.Config import Environment
 from flask_framework.Deprecation import deprecated
