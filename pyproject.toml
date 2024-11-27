@@ -55,7 +55,7 @@ dependencies = [
     "Flask-Migrate",
     'importlib-metadata; python_version>"3.7"'
 ]
-version="1.0.13"
+version="1.0.14"
 
 
 [tool.poetry]
