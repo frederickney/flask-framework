@@ -20,10 +20,10 @@ class Driver(object):
     Model: registry = None
     _sessionmaker: sessionmaker = None
     Managers = []
-    engines: dict[str, Engine] = {}
-    sessions: dict[str, scoped_session] = {}
-    models: dict[str, registry] = {}
-    _sessionmakers: dict[str, sessionmaker] = {}
+    engines: dict = {}
+    sessions: dict = {}
+    models: dict = {}
+    _sessionmakers: dict = {}
 
     @staticmethod
     def _params(args={}):
