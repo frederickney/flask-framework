@@ -37,6 +37,9 @@ dependencies = [
     "WTForms",
     "SQLAlchemy",
     "redis",
+    "tornado",
+    "python-ldap",
+    "activedirectory",
     "Flask",
     "Flask-GeoIP",
     "Flask-LoginManager",
@@ -48,6 +51,8 @@ dependencies = [
     "flask-sqlalchemy",
     "Flask-Sessions",
     "Flask-Login",
+    "flask-login-saml",
+    "flask-login-oidc",
     "Flask-SocketIO",
     "Flask-WTF",
     "Flask-Session",
@@ -55,14 +60,14 @@ dependencies = [
     "Flask-Migrate",
     'importlib-metadata; python_version>"3.7"'
 ]
-version="1.0.14"
+version="1.1.0"
 
 
 [tool.poetry]
 include = ["src/flask_framework/template","src/flask_framework/static"]
 
 [metadata]
-version = {"attr" =  "1.0.14"}
+version = {"attr" =  "1.1.0"}
 
 
 [tool.setuptools.package-data]
