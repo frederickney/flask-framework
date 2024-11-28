@@ -44,6 +44,7 @@ class Process(object):
     _pidfile = "/run/flask.pid"
     _socket = None
     _login_manager = None
+    _csrf = None
     sso = None
     openid = None
     ldap = None
@@ -507,6 +508,28 @@ class Process(object):
             except ImportError:
                 pass
         return cls._login_manager
+
+    @classmethod
+    def csrf(cls, csrf=None):
+        """
+
+        :param csrf:
+        :type csrf: flask_wtf.CSRFProtect
+        :return:
+        :rtype: flask_wtf.CSRFProtect | None
+        """
+        if csrf:
+            try:
+                from flask_wtf import CSRFProtect
+                if (
+                        not callable(csrf)
+                        and isinstance(csrf, object)
+                        and type(csrf) is CSRFProtect
+                ):
+                    cls._csrf = csrf
+            except ImportError:
+                pass
+        return cls._csrf
 
 
 class WebDenyFunctionCall(DeprecationWarning):
