@@ -44,7 +44,10 @@ def all():
     import os
     import importlib
     from flask_framework.Config import Environment
-    research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
+    research = re.compile(
+        '^([^.pyc]|[^__pycache__]|[^.py]|[[a-zA-Z]*-+[a-zA-Z]*.py]|[[a-zA-Z]*-+[a-zA-Z]*.pyc])*$',
+        re.IGNORECASE
+    )
     mods_dir = filter(
         research.search,
         os.listdir(os.path.join(Environment.SERVER_DATA['extensions']['GlobalPath'], 'extensions'))

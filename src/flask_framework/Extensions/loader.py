@@ -11,6 +11,8 @@ import re
 import flask_framework.Exceptions as Exceptions
 from flask_framework.Config import Environment
 
+_pattern = '^([^.pyc]|[^__pycache__]|[^.py]|[[a-zA-Z]*-+[a-zA-Z]*.py]|[[a-zA-Z]*-+[a-zA-Z]*.pyc])*$'
+
 
 def moduleloader(module):
     """
@@ -18,7 +20,7 @@ def moduleloader(module):
     :param str module:
     :return:
     """
-    research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
+    research = re.compile(_pattern, re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
             mods_dir = filter(research.search, os.listdir(
@@ -40,7 +42,7 @@ def modulereloader(module):
     :param str module:
     :return:
     """
-    research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
+    research = re.compile(_pattern, re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
             mods_dir = filter(research.search, os.listdir(
@@ -76,7 +78,7 @@ def initmodule(module, db):
     :param Database.driver.Driver db:
     :return:
     """
-    research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
+    research = re.compile(_pattern, re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
             mods_dir = filter(
@@ -122,7 +124,7 @@ def routesloader(module, app):
     :param flask.Flask app:
     :return :
     """
-    research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
+    research = re.compile(_pattern, re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
             mods_dir = filter(
@@ -169,7 +171,7 @@ def blueprintsloader(module, app):
     :param flask.Flask app:
     :return:
     """
-    research = re.compile('^([^.pyc]|[^__pycache__]|[^.py])*$', re.IGNORECASE)
+    research = re.compile(_pattern, re.IGNORECASE)
     if 'extensions' in Environment.SERVER_DATA:
         if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
             mods_dir = filter(
