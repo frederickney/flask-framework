@@ -4,6 +4,7 @@
 __author__ = 'Frederick NEY'
 
 import logging
+import sqlalchemy
 
 from .driver import Driver
 
@@ -31,6 +32,37 @@ def secured(prop):
         return decorator
 
     return load
+
+
+def __rollback():
+    for session in Driver.sessions:
+        try:
+            session.rollback()
+        except Exception as e:
+            logging.error(e)
+    try:
+        Driver.session.rollback()
+        return func(*args, **kwargs)
+    except Exception as e:
+        logging.error(e)
+        raise e
+
+
+def safe(func):
+
+    def decorated(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except sqlalchemy.exc.PendingRollbackError as e:
+            logging.warning(e)
+            _rollback() 
+            return func(*args, **kwargs)
+        except sqlalchemy.exc.OperationalError as e:
+            logging.warning(e)
+            Driver.reconnect_all()
+            return func(*args, **kwargs)
+
+    return decorated
 
 
 class Database(object):

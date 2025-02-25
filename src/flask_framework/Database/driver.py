@@ -251,14 +251,20 @@ class Driver(object):
                 cls.init_db(name=driver)
 
     @classmethod
-    def disconnect(cls, engine):
+    def disconnect(cls, engine, session):
+        session.close()
         engine.dispose()
 
     @classmethod
     def disconnect_all(cls):
-        cls.disconnect(cls.engine)
         for name, engine in cls.engines.items():
-            cls.disconnect(engine)
+            cls.disconnect(engine, cls.sessions[name])
+        cls.disconnect(cls.engine, cls.session)
+
+    @classmethod
+    def reconnect_all(cls):
+        cls.disconnect_all()
+        cls.register_engines()
 
     @classmethod
     def save(cls):
