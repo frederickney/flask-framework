@@ -34,7 +34,7 @@ def secured(prop):
     return load
 
 
-def __rollback():
+def _rollback():
     for session in Driver.sessions:
         try:
             session.rollback()
