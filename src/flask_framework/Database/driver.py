@@ -207,10 +207,10 @@ class Driver(object):
             import models.persistent
         except ImportError as e:
             logging.debug("{}: {}".format(__name__, e))
-        try:
-            import Models.Persistent
-        except ImportError as e:
-            logging.debug("{}: {}".format(__name__, e))
+            try:
+                import Models.Persistent
+            except ImportError as e:
+                logging.debug("{}: {}".format(__name__, e))
         logging.info("{}: creating models for default database".format(
             __name__
         ))
@@ -222,10 +222,10 @@ class Driver(object):
             import models.persistent
         except ImportError as e:
             logging.debug("{}: {}".format(__name__, e))
-        try:
-            import Models.Persistent
-        except ImportError as e:
-            logging.debug("{}: {}".format(__name__, e))
+            try:
+                import Models.Persistent
+            except ImportError as e:
+                logging.debug("{}: {}".format(__name__, e))
         logging.info("{}: creating models for {} database".format(
             __name__,
             name
@@ -247,7 +247,7 @@ class Driver(object):
             if driver == 'default':
                 if not conf['readonly']:
                     cls.init_default_db()
-            if not conf['readonly']:
+            elif not conf['readonly']:
                 cls.init_db(name=driver)
 
     @classmethod
