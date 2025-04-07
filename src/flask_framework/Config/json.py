@@ -12,12 +12,16 @@ def _load(file):
     if isinstance(file, str):
         if os.path.exists(file):
             if os.path.isfile(file):
+                fd = open(file)
                 try:
-                    return json.load(open(file))
+                    content = json.load(fd)
+                    fd.close()
+                    return content
                 except JSONDecodeError as e:
                     raise Exceptions.ConfigExceptions.InvalidConfigurationFileError(
                         file + ": Expected json file format."
                     )
+                    fd.close()
             else:
                 raise Exceptions.ConfigExceptions.NotAConfigurationFileError(file + ": Not a valid file.")
         else:

@@ -32,10 +32,13 @@ def _load(file):
         if os.path.exists(file):
             if os.path.isfile(file):
                 try:
-                    content = open(file, 'r')
+                    fd = open(file, 'r')
                     try:
-                        return yaml.load(content, yaml.FullLoader)
+                        content = yaml.load(fd, yaml.FullLoader)
+                        fd.close()
+                        return content
                     except yaml.YAMLError as e:
+                        fd.close()
                         raise Exceptions.ConfigExceptions.InvalidConfigurationFileError(file + ": Invalid YAML format.")
                 except Exception as e:
                     raise Exceptions.ConfigExceptions.InvalidConfigurationFileError(file + ": File did not exist.")

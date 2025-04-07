@@ -7,7 +7,7 @@ import logging
 
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.dialects import registry
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from flask_framework.Config import Environment
@@ -26,12 +26,12 @@ class Driver(object):
     _sessionmakers: dict = {}
 
     @staticmethod
-    def _params(args={}):
+    def _params(args={}, separator=';'):
         array_args = list(args.items())
         params = str()
         for i in range(0, len(array_args)):
             params += \
-                '{}={};'.format(array_args[i][0], array_args[i][1]) if i < len(array_args) - 1 else \
+                '{}={}{}'.format(array_args[i][0], array_args[i][1], separator) if i < len(array_args) - 1 else \
                     '{}={}'.format(array_args[i][0], array_args[i][1])
         return params
 
@@ -53,12 +53,14 @@ class Driver(object):
         if dialects is not None:
             for name, values in dialects.items():
                 registry.register(name, values['module'], values['class'])
+        _url_param_separator = '?' if kwargs is None else kwargs.pop('url_param_separator', '?')
+        _params_separator = ';' if kwargs is None else kwargs.pop('params_separator', ';')
         database_uri = (
                 "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
-                + (';{}'.format(cls._params(params)) if params is not None else '')
+                + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         ) if port else (
                 "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
-                + ('?{}'.format(cls._params(params)) if params is not None else '')
+                + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         )
         cls.engine = create_engine(database_uri, echo=echo, **kwargs)
         cls._sessionmaker = sessionmaker(bind=cls.engine, autoflush=True)
@@ -74,12 +76,14 @@ class Driver(object):
         if dialects is not None:
             for registry_name, values in dialects.items():
                 registry.register(registry_name, values['module'], values['class'])
+        _url_param_separator = '?' if kwargs is None else kwargs.pop('url_param_separator', '?')
+        _params_separator = ';' if kwargs is None else kwargs.pop('params_separator', ';')
         database_uri = (
                 "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
-                + (';{}'.format(cls._params(params)) if params is not None else '')
+                + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         ) if port else (
                 "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
-                + (';{}'.format(cls._params(params)) if params is not None else '')
+                + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         )
         cls.engines[name] = create_engine(database_uri, echo=echo, **kwargs)
         cls._sessionmakers[name] = sessionmaker(bind=cls.engines[name], autoflush=False)
