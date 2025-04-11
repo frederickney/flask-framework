@@ -45,7 +45,7 @@ def all():
     import importlib
     from flask_framework.Config import Environment
     research = re.compile(
-        '^([^.pyc]|[^__pycache__]|[^.py]|[[a-zA-Z]*-+[a-zA-Z]*.py]|[[a-zA-Z]*-+[a-zA-Z]*.pyc])*$',
+        '^([a-zA-Z]+(_[a-zA-Z]+)*)$',
         re.IGNORECASE
     )
     mods_dir = filter(
