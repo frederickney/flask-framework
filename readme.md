@@ -87,7 +87,6 @@ DATABASE:
 ...
 ```
 
-
 ### Adding users session
 
 To enable sessions in the server you need to add __"APP_KEY"__ and __"SESSION"__ into the __"SERVER_DATA"__ section in the configuration file
@@ -198,6 +197,9 @@ server.add_url_rule('/api/', 'api', Controllers.WS.ApiController.index, methods=
 ```
 
 ## Creating controllers:
+
+Pro tip, when using database, make sure to use decorator __@safe__ from __flask_framework_mvc.Database.decorators__ over your controllers functions that requires database(s) access.
+This ensure database is available after a long period on inactivity on the  database session. 
 
 * Web based http file controllers:
 
