@@ -66,6 +66,15 @@ In that example using informix database __"SERVER"__, __"CLIENT_LOCALE"__ and __
 
 __"dialects"__ are the python modules configuration to translate models into sql statements to query the database
 
+By default escape char between url and first param is __?__ and escape char between parameters is __&__ but they can be changed by adding within your database params section:
+
+```yaml
+...
+      url_param_separator: '?' #Change it with yours
+      params_separator: '&' #Change it with yours
+...
+```
+
 ### Multiple databases
 
 ```yaml
