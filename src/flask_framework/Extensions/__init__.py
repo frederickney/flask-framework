@@ -14,10 +14,10 @@ class Loader(object):
         from flask_framework.Server import Process
         import logging
         logging.info('Loading plugins')
-        loader.moduleloader('extensions')
-        loader.initmodule('extensions', db=Database)
-        loader.routesloader('extensions', app=Process.get())
-        loader.blueprintsloader('extensions', app=Process.get())
+        loader.modules_loader('extensions')
+        loader.init_modules('extensions', db=Database)
+        loader.routes_loader('extensions', app=Process.get())
+        loader.blueprints_loader('extensions', app=Process.get())
         cls.__loaded__ = True
         logging.info('Plugins loaded')
         return
@@ -29,10 +29,10 @@ class Loader(object):
         from flask_framework.Server import Process
         import logging
         logging.info('Reloading plugins')
-        loader.modulereloader('extensions')
-        loader.initmodule('extensions', db=Database)
-        loader.routesloader('extensions', app=Process.get())
-        loader.blueprintsloader('extensions', app=Process.get())
+        loader.modules_reloader('extensions')
+        loader.init_modules('extensions', db=Database)
+        loader.routes_loader('extensions', app=Process.get())
+        loader.blueprints_loader('extensions', app=Process.get())
 
     @classmethod
     def loaded(cls):
