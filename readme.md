@@ -284,9 +284,9 @@ docker-compose restart
 ```bash
 docker-compose stop 
 ```
+---
 
 # Running on Azure Function App:
----
 
 ```python title="function_app.py"
 # coding: utf-8
