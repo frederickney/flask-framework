@@ -114,7 +114,7 @@ def main():
     except FileNotFoundError as e:
         pass
     logging.debug("Configuration file loaded...")
-    if len(Environment.Database) > 0:
+    if len(Environment.Databases) > 0:
         logging.debug("Connecting to database(s)...")
         Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
         Database.init()
