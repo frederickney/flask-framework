@@ -70,6 +70,11 @@ def AzureFunctionsApp():
     except PermissionError as e:
         pass
     logging.info("Loading options...")
+    if len(Environment.Database) > 0:
+        logging.debug("Connecting to database(s)...")
+        Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
+        Database.init()
+        logging.debug("Database(s) connected...")
     logging.info("Initializing the server...")
     Process.init(tracking_mode=False)
     logging.info("Server initialized...")
@@ -82,10 +87,5 @@ def AzureFunctionsApp():
     Process.load_socket_events()
     logging.debug("Websocket events loaded...")
     logging.info("Options loaded...")
-    if 'default' in Environment.Databases:
-        logging.debug("Connecting to default database...")
-        Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
-        Database.init()
-        logging.debug("Default database connected...")
     logging.info("Starting the server...")
     return Process.wsgi_setup()

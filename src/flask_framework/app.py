@@ -68,10 +68,10 @@ except KeyError as e:
         level=logging.getLevelName(logging.INFO),
         format='%(asctime)s %(levelname)s %(message)s'
     )
-logging.debug("Connecting to default database...")
+logging.debug("Connecting to database(s)...")
 Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
 Database.init()
-logging.debug("Default database connected...")
+logging.debug("Database(s) connected...")
 Server.Process.init(tracking_mode=False)
 # Server.Process.init_sheduler()
 logging.debug("Server initialized...")
