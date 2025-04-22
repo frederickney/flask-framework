@@ -300,6 +300,16 @@ os.environ.setdefault('CONFIG_FILE', './config/config.yml')
 app = functions.WsgiFunctionApp(flask_framework.azure.AzureFunctionsApp(), http_auth_level=functions.AuthLevel.ANONYMOUS)
 ```
 
+* make sure to have in your __host.json__
+
+```json
+...
+  "extensions": {
+    "http": { "routePrefix": ""}
+  },
+...
+```
+
 # Running on local desktop:
 
 We assume that your system already had python v3+ and pip v3+ installed.
