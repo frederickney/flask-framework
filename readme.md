@@ -285,7 +285,20 @@ docker-compose restart
 docker-compose stop 
 ```
 
+# Running on Azure Function App:
 ---
+
+```python title="function_app.py"
+# coding: utf-8
+import azure.functions as functions
+import flask_framework.azure 
+import logging
+import os
+
+
+os.environ.setdefault('CONFIG_FILE', './config/config.yml')
+app = functions.WsgiFunctionApp(flask_framework.azure.AzureFunctionsApp(), http_auth_level=functions.AuthLevel.ANONYMOUS)
+```
 
 # Running on local desktop:
 
