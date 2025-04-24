@@ -54,7 +54,7 @@ class Driver(object):
             for name, values in dialects.items():
                 registry.register(name, values['module'], values['class'])
         _url_param_separator = '?' if kwargs is None else kwargs.pop('url_param_separator', '?')
-        _params_separator = ';' if kwargs is None else kwargs.pop('params_separator', ';')
+        _params_separator = '&' if kwargs is None else kwargs.pop('params_separator', '&')
         database_uri = (
                 "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
                 + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
@@ -77,7 +77,7 @@ class Driver(object):
             for registry_name, values in dialects.items():
                 registry.register(registry_name, values['module'], values['class'])
         _url_param_separator = '?' if kwargs is None else kwargs.pop('url_param_separator', '?')
-        _params_separator = ';' if kwargs is None else kwargs.pop('params_separator', ';')
+        _params_separator = '&' if kwargs is None else kwargs.pop('params_separator', '&')
         database_uri = (
                 "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
                 + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
