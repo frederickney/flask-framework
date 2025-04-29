@@ -11,7 +11,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from flask_framework.Config import Environment
-from flask_framework.Deprecation import deprecated
+from flask_framework.Deprecation import deprecated, outdated, Future
 
 
 class Driver(object):
@@ -148,6 +148,7 @@ class Driver(object):
                 )
 
     @classmethod
+    @Future.remove
     def start_sessions(cls):
         for driver, config in Environment.Databases.items():
             cls.start_session(driver)
@@ -155,10 +156,12 @@ class Driver(object):
                 cls.start_default_session()
 
     @classmethod
+    @Future.remove
     def start_session(cls, name):
         cls.sessions[name] = scoped_session(cls._sessionmakers[name])
 
     @classmethod
+    @Future.remove
     def start_default_session(cls):
         cls.session = scoped_session(cls._sessionmaker)
 
@@ -188,22 +191,14 @@ class Driver(object):
         return app
 
     @classmethod
+    @outdated
     def add_task_db_session(cls, task_name, db='default'):
-        """
-        Function that setup a different session for scheduling task
-        :param task_name: The name of the task
-        :return:
-        """
-        if db == 'default':
-            session = scoped_session(cls._sessionmaker)
-            setattr(Driver, task_name, session)
-        else:
-            session = scoped_session(cls._sessionmakers[db])
-            setattr(Driver, task_name, session)
+        pass
 
     @classmethod
+    @outdated
     def get_task_session(cls, task_name):
-        return getattr(Driver, task_name, None)
+        pass
 
     @classmethod
     def init_default_db(cls):
@@ -271,26 +266,21 @@ class Driver(object):
         cls.register_engines()
 
     @classmethod
+    @outdated
     def save(cls):
         pass
 
     @staticmethod
+    @outdated
     def update():
-        Driver.session.remove()
+        pass
 
     @staticmethod
-    @deprecated
+    @deprecated('Use close_sessions')
     def shutdown_session(exception=None):
         """
         Function that means to be used for ending database session before the server will be shut down
         :param exception:
         :return: N/A
         """
-        logging.info("Shutting down server...")
-        for manager in Driver.Managers:
-            manager.teardown = True
-            manager.join(10)
-            if manager.is_alive():
-                logging.warning("Unable to properly stop thread '%s'" % manager.getName())
-        Driver.session.remove()
-        logging.info("Server is now shut down...")
+        Driver.close_sessions()
