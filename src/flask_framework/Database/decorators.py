@@ -66,8 +66,8 @@ class Database(object):
 
         return using
 
-    @deprecated(f'Use {__package__}.{os.path.basename(__file__).removesuffix(".py")}.safe')
     @staticmethod
+    @deprecated(f'Use {__package__}.{os.path.basename(__file__).removesuffix(".py")}.safe')
     def use_db(databases=['default']):
 
         def using(func):
@@ -75,8 +75,8 @@ class Database(object):
 
         return using
 
-    @deprecated(f'Use {__package__}.{os.path.basename(__file__).removesuffix(".py")}.safe')
     @staticmethod
+    @deprecated(f'Use {__package__}.{os.path.basename(__file__).removesuffix(".py")}.safe')
     def safe_use_db(databases=['default']):
         def using(func):
             return safe(func)
