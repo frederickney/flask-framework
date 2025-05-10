@@ -61,7 +61,7 @@ dependencies = [
     "Flask-Migrate",
     'importlib-metadata; python_version>"3.7"'
 ]
-version="1.1.11"
+version="1.1.12"
 
 
 [tool.poetry]
@@ -83,3 +83,9 @@ source = "https://github.com/frederickney/flask-framework"
 wsgi = "flask_framework:wsgi"
 server =  "flask_framework:server"
 app =  "flask_framework:app"
+
+[project.scripts]
+flask_framework="flask_framework:app"
+flask_framework_wsgi="flask_framework:wsgi"
+
+
