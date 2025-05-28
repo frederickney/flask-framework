@@ -83,11 +83,11 @@ class Environment(object):
     @web_denied
     def load_databases(cls, conf):
         try:
-            for type in conf["DATABASE"]:
+            for type in conf["DATABASES"]:
                 if type != 'default':
-                    cls.add_database(type, conf["DATABASE"][type])
+                    cls.add_database(type, conf["DATABASES"][type])
                 else:
-                    cls.set_default_database(conf["DATABASE"][conf["DATABASE"][type]])
+                    cls.set_default_database(conf["DATABASES"][conf["DATABASES"][type]])
         except KeyError:
             cls.Databases = {}
 
