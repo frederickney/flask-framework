@@ -4,6 +4,12 @@
 __author__ = 'Frederick NEY'
 
 import logging
+import sqlalchemy.orm.query
+
+try:
+    import pandas
+except ImportError:
+    pass
 
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.dialects import registry
