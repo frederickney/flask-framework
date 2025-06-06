@@ -5,6 +5,7 @@ __author__ = 'Frederick NEY'
 
 import logging
 import sqlalchemy.orm.query
+import sqlalchemy.sql.selectable
 
 try:
     import pandas
@@ -292,12 +293,12 @@ class Driver(object):
         Driver.close_sessions()
     
     @classmethod
-    def to_pandas(cls, query: sqlalchemy.orm.query.Query, engine: str = None):
+    def to_pandas(cls, query: sqlalchemy.orm.query.Query | sqlalchemy.sql.selectable.Select, engine: str = None):
         """
         Convert SQLAlchemy query object into pandas Dataframe
         Experimental use at your own risk.
-        :param query: SQLAlchemy query
-        :type query: sqlalchemy.orm.query.Query
+        :param query: SQLAlchemy query or select
+        :type query: sqlalchemy.orm.query.Query | sqlalchemy.sql.selectable.Select
         :param engine: Database connection to use
         :type engine: str | None
         :return:
@@ -306,12 +307,16 @@ class Driver(object):
         try:
             if engine is None:
                 return pandas.read_sql(
-                    str(query.statement.compile(compile_kwargs={"literal_binds": True})),
+                    str(query.statement.compile(compile_kwargs={"literal_binds": True})) if type(query) is
+                        sqlalchemy.orm.query.Query else
+                    str(query.compile(compile_kwargs={"literal_binds": True})),
                     cls.engine
                 )
             else:
                 return pandas.read_sql(
-                    str(query.statement.compile(compile_kwargs={"literal_binds": True})),
+                    str(query.statement.compile(compile_kwargs={"literal_binds": True})) if type(query) is
+                        sqlalchemy.orm.query.Query else
+                    str(query.compile(compile_kwargs={"literal_binds": True})),
                     cls.engines[engine]
                 )
         except NameError as e:
