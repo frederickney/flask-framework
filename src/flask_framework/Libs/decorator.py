@@ -32,7 +32,10 @@ def request(api, uri, method='GET'):
             params = kwargs.get('uri_parameters', None)
             kwargs = func(*args, **kwargs)
             kwargs.setdefault('method', method)
-            kwargs.setdefault('url', "{}/{}".format(api.base_url, uri.format(*params) if params else uri))
+            try:
+                kwargs.setdefault('url', "{}/{}".format(api.base_url, uri.format(*params) if params else uri))
+            except KeyError:
+                kwargs.setdefault('url', "{}/{}".format(api.base_url, uri.format(**params) if params else uri))
             logging.debug(kwargs)
             rsp = requests.request(**kwargs)
             try:
