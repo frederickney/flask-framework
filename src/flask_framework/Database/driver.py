@@ -63,10 +63,10 @@ class Driver(object):
         _url_param_separator = '?' if kwargs is None else kwargs.pop('url_param_separator', '?')
         _params_separator = '&' if kwargs is None else kwargs.pop('params_separator', '&')
         database_uri = (
-                "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
+                "{}://{}{}:{}/{}".format(driver, "{}:{}@".format(user, pwd) if user is not None else "", host, port, db)
                 + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         ) if port else (
-                "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
+                "{}://{}{}/{}".format(driver, "{}:{}@".format(user, pwd) if user is not None else "", host, db)
                 + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         )
         cls.engine = create_engine(database_uri, echo=echo, **kwargs)
@@ -86,10 +86,10 @@ class Driver(object):
         _url_param_separator = '?' if kwargs is None else kwargs.pop('url_param_separator', '?')
         _params_separator = '&' if kwargs is None else kwargs.pop('params_separator', '&')
         database_uri = (
-                "{}://{}:{}@{}:{}/{}".format(driver, user, pwd, host, port, db)
+                "{}://{}{}:{}/{}".format(driver, "{}:{}@".format(user, pwd) if user is not None else "", host, port, db)
                 + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         ) if port else (
-                "{}://{}:{}@{}/{}".format(driver, user, pwd, host, db)
+                "{}://{}{}/{}".format(driver, "{}:{}@".format(user, pwd) if user is not None else "", host, db)
                 + ('{}{}'.format(_url_param_separator, cls._params(params, _params_separator)) if params is not None else '')
         )
         cls.engines[name] = create_engine(database_uri, echo=echo, **kwargs)
