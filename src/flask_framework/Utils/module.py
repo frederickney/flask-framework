@@ -9,6 +9,8 @@ from uuid import uuid5, uuid4, NAMESPACE_URL
 
 from flask_framework.Server import deniedwebcall
 from . import templates
+from flask_framework.Deprecation import module_deprecation
+module_deprecation(__name__, __name__.lower(), '1.3.0')
 
 
 @deniedwebcall

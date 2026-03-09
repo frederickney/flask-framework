@@ -4,12 +4,17 @@
 
 __author__ = 'Frederick NEY'
 
+import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
 import flask_framework.Server as Server
 from flask_framework.Config import Environment
 from flask_framework.Database import Database
+# temporary rewrite python modules to enable compatibility to version 1.3.0
+from . import set_upper_version_module
+set_upper_version_module()
+
 
 try:
     import gevent.monkey
@@ -94,13 +99,13 @@ def main():
     else:
         Environment.load("/etc/server/config.json")
     try:
-        loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
+        loglevel = Environment.SERVER['LOG']['LEVEL']
         logging.getLogger().setLevel(loglevel.upper())
     except KeyError as e:
         pass
     try:
         RotatingLogs = TimedRotatingFileHandler(
-            filename=os.path.join(Environment.SERVER_DATA["LOG"]["DIR"], 'process.log'),
+            filename=os.path.join(Environment.SERVER["LOG"]["DIR"], 'process.log'),
             when='midnight',
             backupCount=30
         )
@@ -116,7 +121,7 @@ def main():
     logging.debug("Configuration file loaded...")
     if len(Environment.Databases) > 0:
         logging.debug("Connecting to database(s)...")
-        Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
+        Database.register_engines(echo=Environment.SERVER['CAPTURE'])
         Database.init()
         logging.debug("Database(s) connected...")
     Server.Process.init(tracking_mode=False)

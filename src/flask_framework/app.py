@@ -12,6 +12,9 @@ import flask_framework.Server as Server
 from flask_framework.Config import Environment
 from flask_framework.Database import Database
 from flask_framework.Utils import make_controller, make_middleware, make_project
+# temporary rewrite python modules to enable compatibility to version 1.3.0
+from . import set_upper_version_module
+set_upper_version_module()
 
 
 def parser():
@@ -32,12 +35,6 @@ def parser():
         help='Create middleware\nexample:\npython -m flask_framework.cli --create-middleware test',
         required=False
     )
-    parser.add_argument(
-        '-db', '--database',
-        help="Run database operations see Flask-Migrate for usages",
-        required=False,
-        nargs="+"
-    )
     args = parser.parse_args()
     if args.create_project:
         make_project(os.getcwd(), args.create_project, os.path.dirname(os.path.realpath(__file__)))
@@ -48,17 +45,13 @@ def parser():
     elif args.create_middleware:
         make_middleware(os.getcwd(), args.create_middleware)
         exit(0)
-    elif args.database:
-        from flask_framework.Database.migration import Migrate
-        Migrate.run(app, args.database)
-        exit(0)
 
 
 logging.info("Starting server...")
 logging.info("Loading configuration file...")
 Environment.load(os.environ.get('CONFIG_FILE', "/etc/server/config.json"))
 try:
-    loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
+    loglevel = Environment.SERVER['LOG']['LEVEL']
     logging.basicConfig(
         level=loglevel.upper(),
         format='%(asctime)s %(levelname)s %(message)s'
@@ -69,7 +62,7 @@ except KeyError as e:
         format='%(asctime)s %(levelname)s %(message)s'
     )
 logging.debug("Connecting to database(s)...")
-Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
+Database.register_engines(echo=Environment.SERVER['CAPTURE'])
 Database.init()
 logging.debug("Database(s) connected...")
 Server.Process.init(tracking_mode=False)
@@ -90,4 +83,4 @@ app = Server.Process.get()
 
 if __name__ == '__main__':
     parser()
-    app.run(host=Environment.SERVER_DATA['BIND']['ADDRESS'], port=Environment.SERVER_DATA['BIND']['PORT'])
+    app.run(host=Environment.SERVER['BIND']['ADDRESS'], port=Environment.SERVER['BIND']['PORT'])

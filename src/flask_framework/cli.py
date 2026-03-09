@@ -7,6 +7,9 @@ __author__ = 'Frederick NEY'
 import os
 
 from flask_framework.Utils import make_controller, make_middleware, make_project
+# temporary rewrite python modules to enable compatibility to version 1.3.0
+from . import set_upper_version_module
+set_upper_version_module()
 
 
 def parser():

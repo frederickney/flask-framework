@@ -1,4 +1,4 @@
-SERVER_ENV:
+SERVER:
     APP_NAME: Flask
     APP_KEY : secret
     ENV: dev

@@ -2,7 +2,8 @@
 
 
 __author__ = 'Frederick NEY'
-
+from flask_framework.Deprecation import module_deprecation
+module_deprecation(__name__, __name__.lower(), '1.3.0')
 
 class Loader(object):
     __loaded__ = False
@@ -50,7 +51,7 @@ def all():
     )
     mods_dir = filter(
         research.search,
-        os.listdir(os.path.join(Environment.SERVER_DATA['extensions']['GlobalPath'], 'extensions'))
+        os.listdir(os.path.join(Environment.SERVER['extensions']['GlobalPath'], 'extensions'))
     )
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)

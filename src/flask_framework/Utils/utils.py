@@ -8,6 +8,8 @@ import os
 from flask_framework.Server import deniedwebcall
 from . import templates
 from .module import generate, create_project, create_server
+from flask_framework.Deprecation import module_deprecation
+module_deprecation(__name__, __name__.lower(), '1.3.0')
 
 
 @deniedwebcall

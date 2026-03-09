@@ -12,6 +12,8 @@ import re
 
 import flask_framework.Exceptions as Exceptions
 from flask_framework.Config import Environment
+from flask_framework.Deprecation import module_deprecation
+module_deprecation(__name__, __name__.lower(), '1.3.0')
 
 _pattern = '^([a-zA-Z]+(_[a-zA-Z]+)*)$'
 
@@ -106,15 +108,15 @@ def routes_loader(package, app):
     :return :
     """
     research = re.compile(_pattern, re.IGNORECASE)
-    if 'extensions' in Environment.SERVER_DATA:
-        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
+    if 'extensions' in Environment.SERVER:
+        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER['extensions']['GlobalPath']))):
             mods_dir = filter(
                 research.search,
                 os.listdir(
                     os.path.join(
                         os.path.join(
                             os.curdir,
-                            Environment.SERVER_DATA['extensions']['GlobalPath']
+                            Environment.SERVER['extensions']['GlobalPath']
                         ),
                         package
                     )
@@ -172,15 +174,15 @@ def blueprints_loader(package, app):
     :return :
     """
     research = re.compile(_pattern, re.IGNORECASE)
-    if 'extensions' in Environment.SERVER_DATA:
-        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
+    if 'extensions' in Environment.SERVER:
+        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER['extensions']['GlobalPath']))):
             mods_dir = filter(
                 research.search,
                 os.listdir(
                     os.path.join(
                         os.path.join(
                             os.curdir,
-                            Environment.SERVER_DATA['extensions']['GlobalPath']
+                            Environment.SERVER['extensions']['GlobalPath']
                         ),
                         package
                     )
@@ -240,14 +242,14 @@ def init_modules(package, db):
     :return:
     """
     research = re.compile(_pattern, re.IGNORECASE)
-    if 'extensions' in Environment.SERVER_DATA:
-        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']))):
+    if 'extensions' in Environment.SERVER:
+        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER['extensions']['GlobalPath']))):
             mods_dir = filter(
                 research.search,
                 os.listdir(
                     os.path.join(
                         os.path.join(
-                            os.curdir, Environment.SERVER_DATA['extensions']['GlobalPath']
+                            os.curdir, Environment.SERVER['extensions']['GlobalPath']
                         ),
                         package
                     )
@@ -304,11 +306,11 @@ def init_module(package, ext, db):
 def installer(module):
     import pip
     try:
-        if 'extensions' in Environment.SERVER_DATA:
-            if 'BaseModule' in Environment.SERVER_DATA['extensions']:
+        if 'extensions' in Environment.SERVER:
+            if 'BaseModule' in Environment.SERVER['extensions']:
                 packages = importlib.import_module(
                     '{}.{}'.format(
-                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        Environment.SERVER['extensions']['BaseModule'],
                         module
                     )
                 ).Loader.packages()
@@ -329,12 +331,12 @@ def installer(module):
             "{}: {} not found in {}".format(
                 __name__,
                 (
-                    module if 'extensions' not in Environment.SERVER_DATA
+                    module if 'extensions' not in Environment.SERVER
                     else
                     '{}.{}'.format(
-                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        Environment.SERVER['extensions']['BaseModule'],
                         module
-                    ) if 'BaseModule' in Environment.SERVER_DATA['extensions']
+                    ) if 'BaseModule' in Environment.SERVER['extensions']
                     else
                     module
                 ),
@@ -353,11 +355,11 @@ def installer(module):
     import pip
     try:
         packages = []
-        if 'extensions' in Environment.SERVER_DATA:
-            if 'BaseModule' in Environment.SERVER_DATA['extensions']:
+        if 'extensions' in Environment.SERVER:
+            if 'BaseModule' in Environment.SERVER['extensions']:
                 packages = importlib.import_module(
                     '{}.{}.{}'.format(
-                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        Environment.SERVER['extensions']['BaseModule'],
                         module,
                         'Loader'
                     )
@@ -379,12 +381,12 @@ def installer(module):
             "{}: {} not found in {}".format(
                 __name__,
                 (
-                    module if 'extensions' not in Environment.SERVER_DATA
+                    module if 'extensions' not in Environment.SERVER
                     else
                     '{}.{}'.format(
-                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        Environment.SERVER['extensions']['BaseModule'],
                         module
-                    ) if 'BaseModule' in Environment.SERVER_DATA['extensions']
+                    ) if 'BaseModule' in Environment.SERVER['extensions']
                     else
                     module
                 ),
@@ -401,10 +403,10 @@ def installer(module):
 
 def module(module):
     try:
-        if 'extensions' in Environment.SERVER_DATA:
-            if 'BaseModule' in Environment.SERVER_DATA['extensions']:
+        if 'extensions' in Environment.SERVER:
+            if 'BaseModule' in Environment.SERVER['extensions']:
                 return importlib.import_module(
-                    '{}.{}'.format(Environment.SERVER_DATA['extensions']['BaseModule'], module)
+                    '{}.{}'.format(Environment.SERVER['extensions']['BaseModule'], module)
                 )
             else:
                 logging.warning("{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(
@@ -418,13 +420,13 @@ def module(module):
             "{}: {} not found in {}".format(
                 __name__,
                 (
-                    module if 'extensions' not in Environment.SERVER_DATA
+                    module if 'extensions' not in Environment.SERVER
                     else
                     '{}.{}'.format(
-                        Environment.SERVER_DATA['extensions']['BaseModule'],
+                        Environment.SERVER['extensions']['BaseModule'],
                         module
                     )
-                    if 'BaseModule' in Environment.SERVER_DATA['extensions']
+                    if 'BaseModule' in Environment.SERVER['extensions']
                     else
                     module
                 ),
