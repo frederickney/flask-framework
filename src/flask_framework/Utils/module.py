@@ -7,13 +7,13 @@ import os
 import shutil
 from uuid import uuid5, uuid4, NAMESPACE_URL
 
-from flask_framework.Server import deniedwebcall
+from flask_framework.Exceptions.RuntimeExceptions import web_denied
 from . import templates
 from flask_framework.Deprecation import module_deprecation
 module_deprecation(__name__, __name__.lower(), '1.3.0')
 
 
-@deniedwebcall
+@web_denied
 def create_dir(basepath, dir):
     if not os.path.exists(os.path.join(basepath, dir)):
         os.mkdir(os.path.join(basepath, dir), 0o755)
@@ -21,7 +21,7 @@ def create_dir(basepath, dir):
             ("Waiting for path creation")
 
 
-@deniedwebcall
+@web_denied
 def create_project(basepath, project):
     if not os.path.exists(os.path.join(basepath, project)):
         create_dir(basepath, project)
@@ -32,7 +32,7 @@ def create_project(basepath, project):
     generate(os.path.join(basepath, project), "{}/{}".format('server', 'web'))
 
 
-@deniedwebcall
+@web_denied
 def generate(basepath, module, sub_module=None):
     if not os.path.exists(os.path.join(basepath, os.path.dirname(module))):
         generate(
@@ -72,7 +72,7 @@ def generate(basepath, module, sub_module=None):
             fp.close()
 
 
-@deniedwebcall
+@web_denied
 def try_copy(src, dst):
     """
 
@@ -84,7 +84,7 @@ def try_copy(src, dst):
         shutil.copytree(src, dst)
 
 
-@deniedwebcall
+@web_denied
 def try_copy_templates(_inst_dir, path):
     """
 
@@ -95,7 +95,7 @@ def try_copy_templates(_inst_dir, path):
     try_copy(os.path.join(_inst_dir, 'template'), os.path.join(path, 'template'))
 
 
-@deniedwebcall
+@web_denied
 def try_copy_statics(_inst_dir, path):
     """
 
@@ -106,12 +106,12 @@ def try_copy_statics(_inst_dir, path):
     try_copy(os.path.join(_inst_dir, 'static'), os.path.join(path, 'static'))
 
 
-@deniedwebcall
+@web_denied
 def try_create_errors(path):
     pass
 
 
-@deniedwebcall
+@web_denied
 def try_create_entry(path, entry):
     if os.path.exists(os.path.join(path, 'server')):
         if not os.path.exists(os.path.join(os.path.join(path, 'server'), '{}.py'.format(entry))):
@@ -123,7 +123,7 @@ def try_create_entry(path, entry):
             fp.close()
 
 
-@deniedwebcall
+@web_denied
 def try_create_web_entry(path):
     if os.path.exists(os.path.join(path, 'server')):
         if not os.path.exists(os.path.join(os.path.join(path, 'server'), '{}.py'.format('web'))):
@@ -150,7 +150,7 @@ def try_create_web_entry(path):
             fp.close()
 
 
-@deniedwebcall
+@web_denied
 def try_create_error_controller(path):
     if os.path.exists(os.path.join(path, 'server')):
         if not os.path.exists(os.path.join(os.path.join(path, 'server'), '{}.py'.format('errorhandler'))):
@@ -181,7 +181,7 @@ def try_create_error_controller(path):
     pass
 
 
-@deniedwebcall
+@web_denied
 def try_create_ws_entry(path):
     try_create_entry(path, 'ws')
 
@@ -195,7 +195,7 @@ def try_create_default_conf(path, project):
         fp.close()
 
 
-@deniedwebcall
+@web_denied
 def try_create_socket_entry(path):
     if os.path.exists(os.path.join(path, 'server')):
         if not os.path.exists(os.path.join(os.path.join(path, 'server'), '{}.py'.format('socket'))):
@@ -207,7 +207,7 @@ def try_create_socket_entry(path):
             fp.close()
 
 
-@deniedwebcall
+@web_denied
 def create_server(project, path, _inst_dir):
     if not os.path.exists(os.path.join(path, 'server')):
         create_dir(path, 'server')

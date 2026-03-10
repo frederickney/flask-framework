@@ -5,19 +5,15 @@ __author__ = "Frederick NEY"
 
 import os
 
-from flask_framework.Server import deniedwebcall
+from flask_framework.Exceptions.RuntimeExceptions import web_denied
 from . import templates
 from .module import generate, create_project, create_server
 from flask_framework.Deprecation import module_deprecation
 module_deprecation(__name__, __name__.lower(), '1.3.0')
 
 
-@deniedwebcall
-def make_auth():
-    pass
 
-
-@deniedwebcall
+@web_denied
 def make_middleware(basepath, middleware):
     if not os.path.exists(os.path.join(os.path.join(basepath, 'server'), 'middleware.py')):
         fp = open(os.path.join(os.path.join(basepath, 'server'), 'middleware.py'), "w")
@@ -29,7 +25,7 @@ def make_middleware(basepath, middleware):
     pass
 
 
-@deniedwebcall
+@web_denied
 def make_controller(basepath, controller):
     generate(basepath, controller)
     fp = open(
@@ -48,7 +44,7 @@ def make_controller(basepath, controller):
     fp.close()
 
 
-@deniedwebcall
+@web_denied
 def make_project(basepath, project, inst_dir):
     create_project(basepath, project)
     create_server(project, os.path.join(basepath, project), inst_dir)
