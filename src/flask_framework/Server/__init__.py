@@ -140,19 +140,6 @@ class Process(object):
                 from flask_login_saml.client import FlaskSAML
                 cls.saml = FlaskSAML(prefix='SAML2')
                 cls.saml.init_app(cls._app)
-            if 'LDAP' in Environment.Logins:
-                if 'LDAP_HOST' not in Environment.FLASK['CONFIG'] and 'LDAP_DOMAIN' in Environment.FLASK['CONFIG']:
-                    from activedirectory.core.locate import Locator
-                    ldap = Locator()
-                    dns_response = ldap._dns_query(Environment.FLASK['CONFIG']['LDAP_DOMAIN'].upper(), 'ns')
-                    dns = []
-                    import re
-                    for name in list(dns_response.response.answer[0].items.keys()):
-                        dns.append(re.search("([a-z]|[A-Z]|[0-9])+(\.([A-Z])+){2}", name.target.to_text()).group())
-                    Environment.FLASK['CONFIG']['LDAP_HOSTS'] = dns
-                from flask_framework.Utils.Auth.ldap import LDAP
-                cls._app.config.update(Environment.FLASK['CONFIG'])
-                cls.ldap = LDAP(cls._app)
         cls._socket = SocketIO()
         if 'SOCKETIO_ENGINE' in Environment.FLASK['CONFIG']:
             if Environment.FLASK['CONFIG']['SOCKETIO_ENGINE']:
@@ -532,37 +519,3 @@ class Process(object):
             except ImportError:
                 pass
         return cls._csrf
-
-
-class WebDenyFunctionCall(DeprecationWarning):
-    """
-    Base class for disabling call of function.
-    """
-
-    def __init__(self, *args, **kwargs):  # real signature unknown
-        super(WebDenyFunctionCall, self).__init__(*args, **kwargs)
-
-    @staticmethod  # known case of __new__
-    def __new__(*args, **kwargs):  # real signature unknown
-        """ Create and return a new object.  See help(type) for accurate signature. """
-        return args[1]
-
-
-def deniedwebcall(func):
-    """Deprecation decorator which can be used to mark functions / classes
-    as deprecated. It will result in a warning being emitted
-    when the function is used."""
-
-    @functools.wraps(func)
-    def deny(*args, **kwargs):
-        from flask import redirect
-        from flask import request
-        from flask import url_for
-        if len(dir(request)) != 0:
-            warnings.simplefilter('always', WebDenyFunctionCall)  # turn off filter
-            warnings.warn("Access denied to function %s." % func.__name__, category=WebDenyFunctionCall, stacklevel=2)
-            warnings.simplefilter('default', WebDenyFunctionCall)  # reset filter
-            return redirect(request.referrer or url_for('home'))
-        return func(*args, **kwargs)
-
-    return deny

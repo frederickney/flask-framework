@@ -13,10 +13,13 @@ class Route(object):
 
     def __init__(self, srv):
         """
-        Constructor
-        :param srv: Flask server
+        Main entrypoint to load http routes rendering ui from working directory.
+        Looks for server or Server module within working directory for any ws or WS file containing
+        a Route class or method inside.
+        :param srv: Flask instance
         :type srv: flask.Flask
         :return: Route object
+        :rtype: Route
         """
         import logging
         try:

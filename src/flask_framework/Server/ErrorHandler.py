@@ -12,10 +12,13 @@ class Route(object):
 
     def __init__(self, srv):
         """
-        Constructor
-        :param srv: Flask server
+        Main entrypoint to load errors routes from working directory.
+        Looks for server or Server module within working directory for any errorhandler or ErrorHandler file containing
+        a Route class or method inside.
+        :param srv: Flask instance
         :type srv: flask.Flask
         :return: Route object
+        :rtype: Route
         """
         import logging
         import flask_framework.Controllers as Controllers
