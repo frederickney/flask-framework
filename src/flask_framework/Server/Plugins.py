@@ -2,15 +2,21 @@
 
 
 __author__ = 'Frederick NEY'
+from flask_framework.Deprecation import module_deprecation
+module_deprecation(__name__, __name__.lower().replace('server', 'core'), '1.3.0')
 
 
 class Load(object):
 
     def __init__(cls, **kwargs):
         """
-
-        :param server:
-        :type server: flask.Flask
+        Main entrypoint to load errors routes from working directory.
+        Looks for server or Server module within working directory for any errorhandler or ErrorHandler file containing
+        a Route class or method inside.
+        :param srv: FastAPI instance
+        :type srv: fastapi.FastAPI
+        :return: Route object
+        :rtype: Route
         """
         import logging
         try:

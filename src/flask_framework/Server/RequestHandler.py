@@ -2,28 +2,30 @@
 
 
 __author__ = 'Frederick NEY'
+from flask_framework.Deprecation import module_deprecation
+module_deprecation(__name__, __name__.lower().replace('server', 'core'), '1.3.0')
 
 
 class Init(object):
 
-    def __init__(self, server):
+    def __init__(self, srv):
         """
 
         :param server:
         :type server: flask.Flask
         """
         import logging
-        server.before_request(self.before_request)
-        server.teardown_request(self.after_request)
+        srv.before_request(self.before_request)
+        srv.teardown_request(self.after_request)
         try:
             from server.middleware import Middlewares
-            Middlewares.init(server)
+            Middlewares.init(srv)
         except Exception as e:
             import os
             logging.warning("{}: {} in {}".format(__name__, e, os.getcwd()))
             try:
                 from Server.Middleware import Middlewares
-                Middlewares.init(server)
+                Middlewares.init(srv)
             except Exception as ie:
                 import traceback
                 logging.warning("{}: {} in {}".format(__name__, ie, os.getcwd()))

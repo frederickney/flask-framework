@@ -24,6 +24,8 @@ classifiers = [
 'Programming Language :: Python :: 3.11',
 'Programming Language :: Python :: 3.12',
 'Programming Language :: Python :: 3.13',
+'Programming Language :: Python :: 3.14',
+'Programming Language :: Python :: 3.15',
 ]
 dependencies = [
     "certifi",
@@ -38,8 +40,6 @@ dependencies = [
     "SQLAlchemy",
     "redis",
     "tornado",
-    "python-ldap",
-    "activedirectory",
     "email-validator",
     "Flask",
     "Flask-GeoIP",
@@ -61,7 +61,7 @@ dependencies = [
     "Flask-Migrate",
     'importlib-metadata; python_version>"3.7"'
 ]
-version="1.1.15"
+version="1.2.0"
 
 
 [tool.poetry]

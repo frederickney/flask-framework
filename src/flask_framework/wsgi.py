@@ -3,6 +3,10 @@
 
 
 __author__ = 'Frederick NEY'
+# temporary rewrite python modules to enable compatibility to version 1.3.0
+from . import set_upper_version_module
+set_upper_version_module()
+
 
 try:
     import gevent.monkey
@@ -101,20 +105,20 @@ class Server(gunicorn.app.base.Application):
     @classmethod
     def load_options(cls):
         cls.options = {
-            'bind': '%s:%i' % (Environment.SERVER_DATA['BIND']['ADDRESS'], Environment.SERVER_DATA['BIND']['PORT']),
+            'bind': '%s:%i' % (Environment.SERVER['BIND']['ADDRESS'], Environment.SERVER['BIND']['PORT']),
             'workers': Server.number_of_workers(),
-            'threads': Environment.SERVER_DATA['THREADS_PER_CORE'],
-            'capture_output': Environment.SERVER_DATA['CAPTURE'],
+            'threads': Environment.SERVER['THREADS_PER_CORE'],
+            'capture_output': Environment.SERVER['CAPTURE'],
             "loglevel": loglevel,
-            "worker_class": Environment.SERVER_DATA['WORKERS'],
+            "worker_class": Environment.SERVER['WORKERS'],
             "reload_engine": 'poll'
         }
         if logging_dir_exist:
             cls.options["errorlog"] = os.path.join(os.environ.get("log_dir"), 'flask-error.log')
             cls.options["accesslog"] = os.path.join(os.environ.get("log_dir"), 'flask-access.log')
-        if 'SSL' in Environment.SERVER_DATA:
-            cls.options["certfile"] = Environment.SERVER_DATA['SSL']['Certificate']
-            cls.options["keyfile"] = Environment.SERVER_DATA['SSL']['PrivateKey']
+        if 'SSL' in Environment.SERVER:
+            cls.options["certfile"] = Environment.SERVER['SSL']['Certificate']
+            cls.options["keyfile"] = Environment.SERVER['SSL']['PrivateKey']
 
 
 if __name__ == '__main__':
@@ -157,16 +161,16 @@ if __name__ == '__main__':
         os.environ.setdefault('CONFIG_FILE', "/etc/server/config.json")
     logging.info("Configuration file loaded...")
     try:
-        loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
+        loglevel = Environment.SERVER['LOG']['LEVEL']
         logging.getLogger().setLevel(loglevel.upper())
     except KeyError as e:
         pass
     logging_dir_exist = False
     try:
-        if not os.path.exists(Environment.SERVER_DATA["LOG"]["DIR"]):
-            os.mkdir(Environment.SERVER_DATA["LOG"]["DIR"], 0o755)
+        if not os.path.exists(Environment.SERVER["LOG"]["DIR"]):
+            os.mkdir(Environment.SERVER["LOG"]["DIR"], 0o755)
         RotatingLogs = TimedRotatingFileHandler(
-            filename=os.path.join(Environment.SERVER_DATA["LOG"]["DIR"], 'process.log'),
+            filename=os.path.join(Environment.SERVER["LOG"]["DIR"], 'process.log'),
             when='midnight',
             backupCount=30
         )
@@ -175,7 +179,7 @@ if __name__ == '__main__':
             RotatingLogs
         ]
         logging.info('Logging handler initialized')
-        os.environ.setdefault("log_dir", Environment.SERVER_DATA["LOG"]["DIR"])
+        os.environ.setdefault("log_dir", Environment.SERVER["LOG"]["DIR"])
         logging_dir_exist = True
     except KeyError as e:
         pass
@@ -185,7 +189,7 @@ if __name__ == '__main__':
         pass
     if len(Environment.Databases) > 0:
         logging.debug("Connecting to database(s)...")
-        Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
+        Database.register_engines(echo=Environment.SERVER['CAPTURE'])
         Database.init()
         logging.debug("Database(s) connected...")
     logging.info("Loading options...")

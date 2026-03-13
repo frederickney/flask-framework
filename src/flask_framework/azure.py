@@ -5,6 +5,9 @@ import logging
 from flask_framework.Config import Environment
 from flask_framework.Database import Database
 from flask_framework.Server import Process
+# temporary rewrite python modules to enable compatibility to version 1.3.0
+from . import set_upper_version_module
+set_upper_version_module()
 
 
 def AzureFunctionsApp():
@@ -43,16 +46,16 @@ def AzureFunctionsApp():
         os.environ.setdefault('CONFIG_FILE', "/etc/server/config.json")
     logging.info("Configuration file loaded...")
     try:
-        loglevel = Environment.SERVER_DATA['LOG']['LEVEL']
+        loglevel = Environment.SERVER['LOG']['LEVEL']
         logging.getLogger().setLevel(loglevel.upper())
     except KeyError as e:
         pass
     logging_dir_exist = False
     try:
-        if not os.path.exists(Environment.SERVER_DATA["LOG"]["DIR"]):
-            os.mkdir(Environment.SERVER_DATA["LOG"]["DIR"], 0o755)
+        if not os.path.exists(Environment.SERVER["LOG"]["DIR"]):
+            os.mkdir(Environment.SERVER["LOG"]["DIR"], 0o755)
         RotatingLogs = TimedRotatingFileHandler(
-            filename=os.path.join(Environment.SERVER_DATA["LOG"]["DIR"], 'process.log'),
+            filename=os.path.join(Environment.SERVER["LOG"]["DIR"], 'process.log'),
             when='midnight',
             backupCount=30
         )
@@ -61,7 +64,7 @@ def AzureFunctionsApp():
             RotatingLogs
         ]
         logging.info('Logging handler initialized')
-        os.environ.setdefault("log_dir", Environment.SERVER_DATA["LOG"]["DIR"])
+        os.environ.setdefault("log_dir", Environment.SERVER["LOG"]["DIR"])
         logging_dir_exist = True
     except KeyError as e:
         pass
@@ -72,7 +75,7 @@ def AzureFunctionsApp():
     logging.info("Loading options...")
     if len(Environment.Databases) > 0:
         logging.debug("Connecting to database(s)...")
-        Database.register_engines(echo=Environment.SERVER_DATA['CAPTURE'])
+        Database.register_engines(echo=Environment.SERVER['CAPTURE'])
         Database.init()
         logging.debug("Database(s) connected...")
     logging.info("Initializing the server...")

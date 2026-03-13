@@ -6,6 +6,10 @@ from flask import current_app
 from flask import request
 from flask_login.config import EXEMPT_METHODS
 from flask_login.utils import current_user
+from flask_framework.Deprecation import module_deprecation
+module_deprecation(__name__, __name__.lower(), '1.3.0')
+
+
 
 __author__ = 'Frederick NEY'
 

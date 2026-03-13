@@ -6,13 +6,15 @@ __author__ = 'Frederick NEY'
 import os
 import logging
 import sqlalchemy
-import warnings
 
 from .driver import Driver
-from flask_framework.Deprecation import deprecated, outdated, class_outdated
+from ..Deprecation import deprecated
 
 
 def _rollback():
+    """
+    Doing rollback
+    """
     for session in Driver.sessions:
         try:
             session.rollback()
@@ -22,63 +24,33 @@ def _rollback():
         Driver.session.rollback()
     except Exception as e:
         logging.error(e)
-        raise e
 
 
+@deprecated(message='Use fastapi_framework_mvc.database.safe')
 def safe(func):
-
+    """
+    Secure database connections on disconnection or pending rollback other a specific function.
+    :param func: The function to secure
+    :type func: callable
+    :return: The result of the function
+    :type func: any
+    """
     def decorated(*args, **kwargs):
+        """
+        Retrieving functions arguments
+        :param args: The arguments
+        :type args: tuple[any]
+        :param kwargs: The keyword arguments
+        :type kwargs: dict[str, any]
+        """
         try:
             return func(*args, **kwargs)
         except sqlalchemy.exc.PendingRollbackError as e:
             logging.warning(e)
-            _rollback() 
+            _rollback()
             return func(*args, **kwargs)
         except sqlalchemy.exc.OperationalError as e:
             logging.warning(e)
             Driver.reconnect_all()
             return func(*args, **kwargs)
-
     return decorated
-
-
-@class_outdated
-class Database(object):
-    cls: object = None
-
-    @outdated
-    def load(self, cls):
-        """
-        :deprecated : will be removed on version 1.2.0
-        """
-        def decorator(*args, **kwargs):
-            instance = cls(*args, **kwargs)
-            self.cls = instance
-            return instance
-
-        return decorator
-
-    @deprecated(f'Use {__package__}.{os.path.basename(__file__).removesuffix(".py")}.safe')
-    def use(self, databases=['default']):
-        self.load()
-        def using(func):
-            return safe(func)
-
-        return using
-
-    @staticmethod
-    @deprecated(f'Use {__package__}.{os.path.basename(__file__).removesuffix(".py")}.safe')
-    def use_db(databases=['default']):
-
-        def using(func):
-            return safe(func)
-
-        return using
-
-    @staticmethod
-    @deprecated(f'Use {__package__}.{os.path.basename(__file__).removesuffix(".py")}.safe')
-    def safe_use_db(databases=['default']):
-        def using(func):
-            return safe(func)
-
-        return using

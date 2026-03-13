@@ -11,8 +11,10 @@ import apscheduler.jobstores.redis
 from flask import Flask
 from flask_apscheduler import APScheduler
 from flask_session import Session
+from flask_framework.Deprecation import module_deprecation
 
 from . import WS, Web, ErrorHandler, Middleware, RequestHandler, Socket, Plugins
+module_deprecation(__name__, __name__.lower(), '1.3.0')
 
 
 def configure_logs(name, format, output_file, debug='info'):
@@ -65,53 +67,53 @@ class Process(object):
         from flask import Flask
         from flask_framework.Config import Environment
         cls._app = Flask(
-            Environment.SERVER_DATA['APP_NAME'],
+            Environment.SERVER['APP_NAME'],
             static_url_path="/file",
             static_folder=
-            os.path.abspath(Environment.SERVER_DATA['STATIC_PATH']
-                            if 'STATIC_PATH' in Environment.SERVER_DATA
+            os.path.abspath(Environment.SERVER['STATIC_PATH']
+                            if 'STATIC_PATH' in Environment.SERVER
                             else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'static')),
             template_folder=
-            os.path.abspath(Environment.SERVER_DATA['TEMPLATE_PATH']
-                            if 'TEMPLATE_PATH' in Environment.SERVER_DATA
+            os.path.abspath(Environment.SERVER['TEMPLATE_PATH']
+                            if 'TEMPLATE_PATH' in Environment.SERVER
                             else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'template'))
         )
         if 'CONFIG' in Environment.FLASK:
             if Environment.FLASK['CONFIG'] is not None:
                 cls._app.config.update(Environment.FLASK['CONFIG'])
-        if 'APP_KEY' in Environment.SERVER_DATA:
+        if 'APP_KEY' in Environment.SERVER:
             from flask_wtf.csrf import CSRFProtect
             cls._session = Session()
             # cls._app.config['TESTING'] = True
             # cls._app.config['TEMPLATES_AUTO_RELOAD'] = True
-            cls._app.config['SECRET_KEY'] = Environment.SERVER_DATA['APP_KEY']
-            cls._app.config['SESSION_TYPE'] = Environment.SERVER_DATA['SESSION']
-            if Environment.SERVER_DATA['SESSION'] == 'filesystem':
-                cls._app.config['SESSION_FILE_DIR'] = Environment.Services[Environment.SERVER_DATA['SESSION']]['PATH']
-            if Environment.SERVER_DATA['SESSION'] == 'memcached':
+            cls._app.config['SECRET_KEY'] = Environment.SERVER['APP_KEY']
+            cls._app.config['SESSION_TYPE'] = Environment.SERVER['SESSION']
+            if Environment.SERVER['SESSION'] == 'filesystem':
+                cls._app.config['SESSION_FILE_DIR'] = Environment.Services[Environment.SERVER['SESSION']]['PATH']
+            if Environment.SERVER['SESSION'] == 'memcached':
                 import pymemcache
                 cls._app.config['SESSION_MEMCACHED'] = pymemcache.Client(
                     (
-                        Environment.Services[Environment.SERVER_DATA['SESSION']]['HOST'],
-                        Environment.Services[Environment.SERVER_DATA['SESSION']]['PORT']
+                        Environment.Services[Environment.SERVER['SESSION']]['HOST'],
+                        Environment.Services[Environment.SERVER['SESSION']]['PORT']
                     )
                 )
-            if Environment.SERVER_DATA['SESSION'] == 'redis':
+            if Environment.SERVER['SESSION'] == 'redis':
                 import redis
                 cls._app.config['SESSION_REDIS'] = redis.from_url("%s://%s:%d/redis" % (
-                    Environment.SERVER_DATA['SESSION'],
-                    Environment.Services[Environment.SERVER_DATA['SESSION']]['HOST'],
-                    Environment.Services[Environment.SERVER_DATA['SESSION']]['PORT']
+                    Environment.SERVER['SESSION'],
+                    Environment.Services[Environment.SERVER['SESSION']]['HOST'],
+                    Environment.Services[Environment.SERVER['SESSION']]['PORT']
                 )
                                                                   )
-            if Environment.SERVER_DATA['SESSION'] == 'sqlalchemy':
+            if Environment.SERVER['SESSION'] == 'sqlalchemy':
                 from flask_framework.Database import Database
                 cls._app = Database.setup_sessions(
                     cls._app
                 )
-            if Environment.SERVER_DATA['SESSION'] == 'mongodb':
+            if Environment.SERVER['SESSION'] == 'mongodb':
                 from pymongo import MongoClient
-                db_conf = Environment.Services[Environment.SERVER_DATA['SESSION']]
+                db_conf = Environment.Services[Environment.SERVER['SESSION']]
                 cls._app.config['SESSION_MONGODB'] = MongoClient(
                     "%s://%s:%s@%s:%d" % (
                         db_conf['driver'],
@@ -138,19 +140,6 @@ class Process(object):
                 from flask_login_saml.client import FlaskSAML
                 cls.saml = FlaskSAML(prefix='SAML2')
                 cls.saml.init_app(cls._app)
-            if 'LDAP' in Environment.Logins:
-                if 'LDAP_HOST' not in Environment.FLASK['CONFIG'] and 'LDAP_DOMAIN' in Environment.FLASK['CONFIG']:
-                    from activedirectory.core.locate import Locator
-                    ldap = Locator()
-                    dns_response = ldap._dns_query(Environment.FLASK['CONFIG']['LDAP_DOMAIN'].upper(), 'ns')
-                    dns = []
-                    import re
-                    for name in list(dns_response.response.answer[0].items.keys()):
-                        dns.append(re.search("([a-z]|[A-Z]|[0-9])+(\.([A-Z])+){2}", name.target.to_text()).group())
-                    Environment.FLASK['CONFIG']['LDAP_HOSTS'] = dns
-                from flask_framework.Utils.Auth.ldap import LDAP
-                cls._app.config.update(Environment.FLASK['CONFIG'])
-                cls.ldap = LDAP(cls._app)
         cls._socket = SocketIO()
         if 'SOCKETIO_ENGINE' in Environment.FLASK['CONFIG']:
             if Environment.FLASK['CONFIG']['SOCKETIO_ENGINE']:
@@ -199,18 +188,18 @@ class Process(object):
             cls._scheduler.start()
             # logger.info("Starting listening on " + args.listening_address + " on port " + args.listening_port)
             print("Starting listening on %s on port %d" % (args.listening_address, int(args.listening_port)))
-            if 'SSL' in Environment.SERVER_DATA:
+            if 'SSL' in Environment.SERVER:
                 if args.debug:
                     cls._app.run(host=args.listening_address, port=int(args.listening_port), debug=args.debug,
-                                 ssl_context=(Environment.SERVER_DATA['SSL']['Certificate'],
-                                              Environment.SERVER_DATA['SSL']['PrivateKey']))
+                                 ssl_context=(Environment.SERVER['SSL']['Certificate'],
+                                              Environment.SERVER['SSL']['PrivateKey']))
                 else:
                     try:
                         if args.pid:
                             cls.pid()
                         cls._server = WSGIServer((args.listening_address, int(args.listening_port)), cls._app,
-                                                 keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'],
-                                                 certfile=Environment.SERVER_DATA['SSL']['Certificate'])
+                                                 keyfile=Environment.SERVER['SSL']['PrivateKey'],
+                                                 certfile=Environment.SERVER['SSL']['Certificate'])
                         cls._server.serve_forever()
                     finally:
                         if args.pid:
@@ -232,17 +221,17 @@ class Process(object):
             cls._scheduler.start()
             # logger.info("Starting listening on 0.0.0.0 on port " + args.listening_port)
             print("Starting listening on 0.0.0.0 on port %d" % int(args.listening_port))
-            if 'SSL' in Environment.SERVER_DATA:
+            if 'SSL' in Environment.SERVER:
                 if args.debug:
                     cls._app.run(host="0.0.0.0", port=int(args.listening_port), debug=args.debug, ssl_context=(
-                        Environment.SERVER_DATA['SSL']['Certificate'], Environment.SERVER_DATA['SSL']['PrivateKey']))
+                        Environment.SERVER['SSL']['Certificate'], Environment.SERVER['SSL']['PrivateKey']))
                 else:
                     try:
                         if args.pid:
                             cls.pid()
                         cls._server = WSGIServer(("0.0.0.0", int(args.listening_port)), cls._app,
-                                                 keyfile=Environment.SERVER_DATA['SSL']['PrivateKey'],
-                                                 certfile=Environment.SERVER_DATA['SSL']['Certificate'])
+                                                 keyfile=Environment.SERVER['SSL']['PrivateKey'],
+                                                 certfile=Environment.SERVER['SSL']['Certificate'])
                         cls._server.serve_forever()
                     finally:
                         if args.pid:
@@ -530,37 +519,3 @@ class Process(object):
             except ImportError:
                 pass
         return cls._csrf
-
-
-class WebDenyFunctionCall(DeprecationWarning):
-    """
-    Base class for disabling call of function.
-    """
-
-    def __init__(self, *args, **kwargs):  # real signature unknown
-        super(WebDenyFunctionCall, self).__init__(*args, **kwargs)
-
-    @staticmethod  # known case of __new__
-    def __new__(*args, **kwargs):  # real signature unknown
-        """ Create and return a new object.  See help(type) for accurate signature. """
-        return args[1]
-
-
-def deniedwebcall(func):
-    """Deprecation decorator which can be used to mark functions / classes
-    as deprecated. It will result in a warning being emitted
-    when the function is used."""
-
-    @functools.wraps(func)
-    def deny(*args, **kwargs):
-        from flask import redirect
-        from flask import request
-        from flask import url_for
-        if len(dir(request)) != 0:
-            warnings.simplefilter('always', WebDenyFunctionCall)  # turn off filter
-            warnings.warn("Access denied to function %s." % func.__name__, category=WebDenyFunctionCall, stacklevel=2)
-            warnings.simplefilter('default', WebDenyFunctionCall)  # reset filter
-            return redirect(request.referrer or url_for('home'))
-        return func(*args, **kwargs)
-
-    return deny

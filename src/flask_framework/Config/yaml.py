@@ -12,7 +12,14 @@ __env_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
 
 def __env_constructor(loader, node):
-    ''' Extract the matched value, expand env variable, and replace the match '''
+    """
+    Extract the matched value, expand env variable, and replace the match.
+    If not found then warning is raised to inform the user that there is missing environ variable.
+    :param: loader (Unused here only to make function compatible with pyyaml library)
+    :type loader: yaml.Loader
+    :param: node of the yaml file
+    :type node: yaml.Node
+    """
     import logging
     value = node.value
     match = __env_matcher.match(value)
@@ -25,6 +32,16 @@ def __env_constructor(loader, node):
 
 
 def _load(file):
+    """
+    Load yaml file.
+    :param file: yaml file.
+    :type file: str
+    :rtype: dict[str, dict]
+    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.NotAConfigurationFileError:
+    if file not exist or if is something else than a file.
+    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.InvalidConfigurationFileError:
+    if file is not a valid yaml file.
+    """
     import os.path, yaml
     yaml.add_implicit_resolver('!env', __env_matcher)
     yaml.add_constructor('!env', __env_constructor)
@@ -54,4 +71,14 @@ def _load(file):
 
 
 def load(file):
+    """
+    Load yaml file.
+    :param file: yaml file.
+    :type file: str
+    :rtype: dict[str, dict]
+    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.NotAConfigurationFileError:
+    if file not exist or if is something else than a file.
+    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.InvalidConfigurationFileError:
+    if file is not a valid yaml file.
+    """
     return _load(file)

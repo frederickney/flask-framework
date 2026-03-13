@@ -89,7 +89,7 @@ DATABASES:
 
 ### Adding users session
 
-To enable sessions in the server you need to add __"APP_KEY"__ and __"SESSION"__ into the __"SERVER_DATA"__ section in the configuration file
+To enable sessions in the server you need to add __"APP_KEY"__ and __"SESSION"__ into the __"SERVER"__ section in the configuration file
 
 __"APP_KEY"__ : random string value (keep that secret)
 
