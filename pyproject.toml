@@ -39,6 +39,7 @@ dependencies = [
     "SQLAlchemy",
     "redis",
     "tornado",
+    "gevent",
     "email-validator",
     "Flask",
     "Flask-GeoIP",
