@@ -36,22 +36,17 @@ dependencies = [
     "gunicorn",
     "pyyaml",
     "pyopenssl",
-    "WTForms",
     "SQLAlchemy",
     "redis",
     "tornado",
     "email-validator",
     "Flask",
     "Flask-GeoIP",
-    "Flask-LoginManager",
-    "flask-monitor",
-    "Flask-Profile",
-    "Flask-Auth",
     "Flask-APScheduler",
     "flask-sqlalchemy",
-    "Flask-Sessions",
     "Flask-SocketIO",
     "Flask-Session",
+    "database-connector-kit"
     'importlib-metadata; python_version>"3.7"'
 ]
 version="1.3.0"
@@ -78,7 +73,8 @@ server =  "flask_framework:server"
 app =  "flask_framework:app"
 
 [project.scripts]
-flask_framework="flask_framework:app"
-flask_framework_wsgi="flask_framework:wsgi"
+"flask_framework_mvc.wsgi" = "flask_framework.wsgi:main"
+"flask_framework_mvc.server" =  "flask_framework.server:main"
+"flask_framework_mvc.cli" =  "flask_framework.cli:parser"
 
 
