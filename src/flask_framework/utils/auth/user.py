@@ -1,8 +1,6 @@
 # coding: utf-8
 
 
-
-
 class LDAPUser(object):
     def __init__(self, attrs):
         for key, attr in attrs.items():

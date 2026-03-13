@@ -23,7 +23,7 @@ def _load(file, loader):
     return loader.load(file)
 
 
-def load_file(file, loader = yaml):
+def load_file(file, loader=yaml):
     """
     Load
     :param file: path to file to load

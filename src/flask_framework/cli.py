@@ -9,7 +9,6 @@ import os
 from flask_framework.utils import make_controller, make_middleware, make_project
 
 
-
 def parser():
     import argparse
     parser = argparse.ArgumentParser(description='Python FLASK server')

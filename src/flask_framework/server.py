@@ -4,14 +4,14 @@
 
 __author__ = 'Frederick NEY'
 
-import os
 import logging
+import os
 from logging.handlers import TimedRotatingFileHandler
 
-from flask_framework.core import Process
+import flask_framework.extensions as extensions
 from flask_framework.config import Environment
+from flask_framework.core import Process
 from flask_framework.database import Database
-import extensions
 
 try:
     import gevent.monkey
@@ -132,7 +132,6 @@ def main():
     Process.load_socket_events()
     logging.debug("Websocket events loaded...")
     # app.teardown_appcontext(Database.save)
-    import flask_framework.extensions as Extensions
     extensions.load()
     logging.info("Server is now starting...")
     Process.start(args)

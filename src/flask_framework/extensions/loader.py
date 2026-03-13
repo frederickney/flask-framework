@@ -255,7 +255,8 @@ def init_module(package, ext, db):
     """
     
     Used for initializing extension. 
-    In order to use, all your extension must implement an <extension>.loaded property that will tell if it is already loaded to enchance performances. 
+    In order to use, all your extension must implement an <extension>.loaded property that will tell if it is already
+    loaded to enchance performances.
     If not present your extension will be loaded on every single call.  
     Notice it will end up generating exceptions or errors because of the routes / blueprints that will be also loaded.
     :param package: name of the application extensions module
@@ -305,12 +306,14 @@ def installer(module, _ext='extensions'):
             "{}: {} not found in {}".format(
                 __name__,
                 (
-                    module if not os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
+                    module if not os.path.exists(
+                        os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     '{}.{}'.format(
                         _ext,
                         module
-                    ) if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
+                    ) if os.path.exists(
+                        os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     module
                 ),
@@ -325,7 +328,7 @@ def installer(module, _ext='extensions'):
         logging.info('Error in module "%s"' % module)
 
 
-def module(module, _ext = 'extensions'):
+def module(module, _ext='extensions'):
     try:
         if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext)):
             return importlib.import_module('{}.{}'.format(_ext, module))
@@ -336,13 +339,15 @@ def module(module, _ext = 'extensions'):
             "{}: {} not found in {}".format(
                 __name__,
                 (
-                    module if not os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
+                    module if not os.path.exists(
+                        os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     '{}.{}'.format(
                         _ext,
                         module
                     )
-                    if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
+                    if os.path.exists(
+                        os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     module
                 ),

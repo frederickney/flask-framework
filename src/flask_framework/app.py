@@ -8,11 +8,10 @@ import logging
 import os
 
 import flask_framework.extensions as extensions
-from flask_framework.core import Process
 from flask_framework.config import Environment
+from flask_framework.core import Process
 from flask_framework.database import Database
 from flask_framework.utils import make_controller, make_middleware, make_project
-
 
 
 def parser():

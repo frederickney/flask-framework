@@ -3,9 +3,8 @@
 import logging
 
 from flask_framework.config import Environment
-from flask_framework.database import Database
 from flask_framework.core import Process
-
+from flask_framework.database import Database
 
 
 def AzureFunctionsApp():

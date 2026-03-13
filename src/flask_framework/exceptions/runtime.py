@@ -2,6 +2,7 @@
 
 
 __author__ = 'Frederick NEY'
+
 import functools
 import warnings
 
@@ -48,7 +49,6 @@ class ServiceChangeException(RuntimeException):
 
     def __str__(self):
         return self.message
-
 
 
 class WebDenyFunctionCall(DeprecationWarning):

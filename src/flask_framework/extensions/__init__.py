@@ -2,7 +2,7 @@
 
 
 __author__ = 'Frederick NEY'
-import os
+
 import pathlib
 
 
@@ -10,7 +10,7 @@ class Loader(object):
     __loaded__ = False
 
     @classmethod
-    def load(cls, _ext = None):
+    def load(cls, _ext=None):
         from . import loader
         from flask_framework.database import Database
         from flask_framework.core import Process
@@ -25,7 +25,7 @@ class Loader(object):
         return
 
     @classmethod
-    def reload(cls, _ext = None):
+    def reload(cls, _ext=None):
         from . import loader
         from flask_framework.database import Database
         from flask_framework.core import Process
@@ -41,7 +41,7 @@ class Loader(object):
         return cls.__loaded__
 
 
-def all(_ext = None):
+def all(_ext=None):
     import re
     import os
     import importlib
@@ -50,10 +50,13 @@ def all(_ext = None):
         '^([a-zA-Z]+(_[a-zA-Z]+)*)$',
         re.IGNORECASE
     )
-    if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext or 'extensions')):
+    if os.path.exists(
+            os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext or 'extensions')
+    ):
         mods_dir = filter(
             research.search,
-            os.listdir(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext or 'extensions'))
+            os.listdir(
+                os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext or 'extensions'))
         )
     else:
         mods_dir = []

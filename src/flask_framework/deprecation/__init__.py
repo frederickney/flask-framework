@@ -106,7 +106,6 @@ def deprecated(message='Using {function}'):
     when the function is used."""
 
     def using(func):
-
         @functools.wraps(func)
         def deprecation(*args, **kwargs):
             warnings.simplefilter('always', DeprecatedFunctionCall)  # turn off filter
@@ -154,6 +153,7 @@ class Future(object):
         It will result in a error being emitted
         when the function is used.
         """
+
         def removed(func):
             @functools.wraps(func)
             def removal(*args, **kwargs):
@@ -177,7 +177,7 @@ class Future(object):
     def replace(version, name):
         """
         Future mark functions as replaced by another.
-        It will result in a error being emitted
+        It will result in an error being emitted
         when the function is used.
         """
         def replacing(func):
@@ -197,5 +197,3 @@ class Future(object):
                 return func(*args, **kwargs)
             return replaced
         return replacing
-
-module_deprecation(__name__, __name__.lower(), '1.3.0')
