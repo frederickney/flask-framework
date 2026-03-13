@@ -11,9 +11,9 @@ class Route(object):
 
     def __init__(self, srv):
         """
-        Main entrypoint to load http routes rendering ui from working directory.
+        Main entrypoint to load http rest api routes from working directory.
         Looks for server or Server module within working directory for any ws or WS file containing
-        a Route class or method inside.
+        a Route class.
         :param srv: Flask instance
         :type srv: flask.Flask
         :return: Route object

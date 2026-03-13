@@ -8,9 +8,9 @@ class Handler(object):
 
     def __init__(self, socketio):
         """
-        Main entrypoint to load plugins from working directory.
+        Main entrypoint to load websockets from working directory.
         Looks for server or Server module within working directory for any socket or Socket file containing
-        a Handle class or method inside.
+        a Handler class.
         :param socketio: SocketIO instance
         :type socketio: flask_socketio.SocketIO
         :return: Handler object

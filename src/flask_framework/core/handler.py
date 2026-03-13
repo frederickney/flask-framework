@@ -8,9 +8,13 @@ class Init(object):
 
     def __init__(self, srv):
         """
-
-        :param server:
-        :type server: flask.Flask
+        Main entrypoint to load handles before/after requests from working directory.
+        Looks for server or Server module within working directory for any middleware or Middleware file containing
+        a Middlewares class with init, before_request and after_request methods.
+        :param srv: Flask instance
+        :type srv: flask.Flask
+        :return: Load object
+        :rtype: Init
         """
         import logging
         srv.before_request(self.before_request)

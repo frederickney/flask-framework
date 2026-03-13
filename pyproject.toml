@@ -46,19 +46,12 @@ dependencies = [
     "Flask-LoginManager",
     "flask-monitor",
     "Flask-Profile",
-    "Flask-Builder",
     "Flask-Auth",
     "Flask-APScheduler",
     "flask-sqlalchemy",
     "Flask-Sessions",
-    "Flask-Login",
-    "flask-login-saml",
-    "flask-login-oidc",
     "Flask-SocketIO",
-    "Flask-WTF",
     "Flask-Session",
-    "Flask-Script",
-    "Flask-Migrate",
     'importlib-metadata; python_version>"3.7"'
 ]
 version="1.3.0"

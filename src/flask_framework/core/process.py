@@ -3,15 +3,42 @@
 
 __author__ = 'Frederick NEY'
 
+import os
+import pathlib
+import sys
 from datetime import datetime, timedelta
 
 import apscheduler.jobstores.redis
 from flask import Flask
 from flask_apscheduler import APScheduler
 from flask_session import Session
+from flask_socketio import SocketIO
+from gevent.pywsgi import WSGIServer
+
+from flask_framework.config import Environment
+from . import errors
+from . import handler
+from . import middleware
+from . import plugins
+from . import socket
+from . import web
+from . import ws
 
 
 class Process(object):
+    """
+        Core class ot the framework, handles all fastapi configuration / registration
+
+        Contains following attributes:
+        Attributes
+        ----------
+            sso: SSO
+                for handling user authentication both in swagger and endpoints uses flask_sso.SSO
+            openid: FlaskOIDC
+                for handling user authentication both in swagger and endpoints uses flask_login_oidc.FlaskOIDC
+            saml: FlaskSAML
+                for handling user authentication both in swagger and endpoints uses flask_login_saml.FlaskSAML
+        """
     _app: Flask = None
     _scheduler: APScheduler = None
     _pidfile = "/run/flask.pid"
@@ -20,34 +47,28 @@ class Process(object):
     _csrf = None
     sso = None
     openid = None
-    ldap = None
     saml = None
 
     @classmethod
     def init(cls, tracking_mode=False):
         """
-
+        Initialize the framework and creates flask instances with others plugins based on configuration
         :param tracking_mode:
         :type tracking_mode: bool
         :return:
         :rtype: flask.Flask
         """
-        import os.path
-        import pathlib
-        from flask_socketio import SocketIO
-        from flask import Flask
-        from flask_framework.config import Environment
         cls._app = Flask(
             Environment.SERVER['APP_NAME'],
             static_url_path="/file",
-            static_folder=
-            os.path.abspath(Environment.SERVER['STATIC_PATH']
-                            if 'STATIC_PATH' in Environment.SERVER
-                            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'static')),
-            template_folder=
-            os.path.abspath(Environment.SERVER['TEMPLATE_PATH']
-                            if 'TEMPLATE_PATH' in Environment.SERVER
-                            else os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'template'))
+            static_folder=(
+                os.path.abspath(Environment.SERVER['STATIC_PATH'] if 'STATIC_PATH' in Environment.SERVER else
+                                os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'static'))
+            ),
+            template_folder=(
+                os.path.abspath(Environment.SERVER['TEMPLATE_PATH'] if 'TEMPLATE_PATH' in Environment.SERVER else
+                                os.path.join(pathlib.Path(__file__).resolve().parent.resolve().parent, 'template'))
+            )
         )
         if 'CONFIG' in Environment.FLASK:
             if Environment.FLASK['CONFIG'] is not None:
@@ -121,13 +142,11 @@ class Process(object):
         return cls._app
 
     @classmethod
-    def instanciate(cls):
+    def instantiate(cls):
         """
-            :param
-            args:
             :return:
+            :rtype: flask.Flask
         """
-        from flask_apscheduler import APScheduler
         cls._scheduler = APScheduler()
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
@@ -141,14 +160,13 @@ class Process(object):
     @classmethod
     def start(cls, args):
         """
-
-        :param args:
+        Start flask application using WSGIServer. This method is blocking and is the main process.
+        Can be stopped using keyboard signals
+        :param args: needs arguments listening_address (nullable), listening_port (required) and pid (nullable)
+        :type args: argparse.Namespace
         :return:
         """
         cls._args = args
-        from flask_apscheduler import APScheduler
-        from gevent.pywsgi import WSGIServer
-        from flask_framework.config import Environment
         cls._scheduler = APScheduler()
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
@@ -239,7 +257,6 @@ class Process(object):
         :return:
         :rtype: flask.Flask
         """
-        from flask_apscheduler import APScheduler
         cls._scheduler = APScheduler()
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
@@ -251,13 +268,23 @@ class Process(object):
 
     @classmethod
     def load_socket_events(cls):
+        """
+        Part that loads all websocket events in working directory where the framework is called.
+        Provides Process._socket attribute to socket as argument.
+        """
         if cls._socket is not None:
             socket.Handler(cls._socket)
 
     @classmethod
     def load_plugins(cls):
+        """
+        Part that enable plugin to be loaded on working directory where the framework is called.
+        Provides
+        Process._app, Process._scheduler, Process._session (nullable), Process._csrf (nullable), Process._socket
+        attributes to plugins as argument.
+        """
         plugins.Load(
-            server=cls._app,
+            srv=cls._app,
             scheduler=cls._scheduler,
             session=getattr(cls, "_session", None),
             csrf=getattr(cls, "_csrf", None),
@@ -267,8 +294,8 @@ class Process(object):
     @classmethod
     def load_routes(cls):
         """
-
-        :return:
+        Part that loads all endpoints / routes in working directory where the framework is called.
+        Provides Process._app attribute to routes and request before / after handler as argument.
         """
         handler.Init(cls._app)
         ws.Route(cls._app)
@@ -278,19 +305,24 @@ class Process(object):
     @classmethod
     def load_middleware(cls):
         """
-
-        :return:
+        Part that enable middlewares to be loaded on working directory where the framework is called.
+        Provides Process._app attribute to plugins as argument.
         """
         middleware.Load(cls._app)
 
     @classmethod
     def get_ws(cls):
+        """
+
+        :return:
+        :rtype: flask_socketio.SocketIO
+        """
         return cls._socket
 
     @classmethod
     def add_task(cls, function, id=None, args=(), trigger='interval', seconds=0, minutes=0, hours=0, days=0, weeks=0):
         """
-
+        Adds scheduled functions to flask
         :param function:
         :type function: str
         :param id:
@@ -311,7 +343,6 @@ class Process(object):
         :type weeks: int
         :return:
         """
-        from flask_framework.config import Environment
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
         jobs = cls._app.config['JOBS']
@@ -347,7 +378,7 @@ class Process(object):
     @classmethod
     def add_cron(cls, function, id=None, args=(), trigger='interval', seconds=0, minutes=0, hours=0, days=0, weeks=0):
         """
-
+        Adds cron functions to flask
         :param function:
         :type function: str
         :param id:
@@ -386,7 +417,7 @@ class Process(object):
     @classmethod
     def add_parallel_task(cls, function, id=None, args=(), trigger='date', date=datetime.now() + timedelta(0, 0)):
         """
-
+        Adds functions to be executed in parallel to flask
         :param function:
         :type function: str
         :param id:
@@ -399,8 +430,13 @@ class Process(object):
         :type date: datetime.datetime
         :return:
         """
-        cls._scheduler.add_job(id=function, func=function.replace('.', ':', 1), args=args, trigger=trigger,
-                               run_date=date)
+        cls._scheduler.add_job(
+            id=function,
+            func=function.replace('.', ':', 1),
+            args=args,
+            trigger=trigger,
+            run_date=date
+        )
         cls._scheduler.run_job(id=id if id is not None else function)
         if 'SCHEDULER_API_ENABLED' not in cls._app.config:
             cls._app.config['SCHEDULER_API_ENABLED'] = True
@@ -408,11 +444,8 @@ class Process(object):
     @classmethod
     def pid(cls):
         """
-
-        :return:
+        Creates a pid file for the current process.
         """
-        import os
-        import sys
         pid = str(os.getpid())
         if os.path.isfile(cls._pidfile):
             print("%s already exists, exiting" % cls._pidfile)
@@ -424,16 +457,14 @@ class Process(object):
     @classmethod
     def shutdown(cls):
         """
-
-        :return:
+        Removes the pid file.
         """
-        import os
         os.unlink(cls._pidfile)
 
     @classmethod
     def get(cls):
         """
-
+        Returns the current running fastapi instance
         :return:
         :rtype: flask.Flask
         """
@@ -442,7 +473,7 @@ class Process(object):
     @classmethod
     def stop(cls, code=0):
         """
-
+        Shutdown the current process.
         :param code:
         :type: int
         :return:
@@ -453,7 +484,6 @@ class Process(object):
 
     @classmethod
     def init_sheduler(cls):
-        from flask_framework.config import Environment
         if 'JOBS' not in cls._app.config:
             cls._app.config['JOBS'] = []
         cls._app.config['SCHEDULER_API_ENABLED'] = True
@@ -469,7 +499,7 @@ class Process(object):
     @classmethod
     def login_manager(cls, login_manager=None):
         """
-
+        Use to set up or retrieve user login manager rules on flask, needs flask_login installed
         :param login_manager:
         :type login_manager: flask_login.LoginManager
         :return:
@@ -488,10 +518,13 @@ class Process(object):
                 pass
         return cls._login_manager
 
+
+
     @classmethod
     def csrf(cls, csrf=None):
         """
-
+        Return CSRFProtect instance if it API_KEY has been within configuration otherwise can be set later
+        on plugins loading step
         :param csrf:
         :type csrf: flask_wtf.CSRFProtect
         :return:
