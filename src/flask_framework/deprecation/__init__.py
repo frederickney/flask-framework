@@ -96,7 +96,8 @@ def class_outdated(func):
 
 def module_deprecation(module, new, version):
     warnings.simplefilter('always', DeprecatedModuleCall)  # turn off filter
-    warnings.warn(f"Call to deprecated module {module}, replaced by {new} in version({version}).", category=DeprecatedModuleCall, stacklevel=3)
+    warnings.warn(f"Call to deprecated module {module}, replaced by {new} in version({version}).",
+                  category=DeprecatedModuleCall, stacklevel=3)
     warnings.simplefilter('default', DeprecatedModuleCall)  # reset filter
 
 
@@ -111,12 +112,17 @@ def deprecated(message='Using {function}'):
             warnings.simplefilter('always', DeprecatedFunctionCall)  # turn off filter
             warnings.warn(
                 "{} instead of function {}.".format(
-                message,
-                    f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(func) else f"{func.__module__}.{func.__qualname__}",
+                    message,
+                    f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(
+                        func) else f"{func.__module__}.{func.__qualname__}",
                 ),
                 category=DeprecatedFunctionCall
             )
-            warnings.warn("Call to deprecated function %s." % func.__name__, category=DeprecatedFunctionCall, stacklevel=2)
+            warnings.warn(
+                "Call to deprecated function %s." % func.__name__,
+                category=DeprecatedFunctionCall,
+                stacklevel=2
+            )
             warnings.simplefilter('default', DeprecatedFunctionCall)  # reset filter
             return func(*args, **kwargs)
 
@@ -135,8 +141,10 @@ def outdated(func):
         warnings.simplefilter('always', OutdatedFunctionCall)  # turn off filter
         warnings.warn(
             "Call to outdated function %s." %
-            f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(func) else f"{func.__module__}.{func.__qualname__}",
-            category=OutdatedFunctionCall, stacklevel=2
+            f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(
+                func) else f"{func.__module__}.{func.__qualname__}",
+            category=OutdatedFunctionCall,
+            stacklevel=2
         )
         warnings.simplefilter('default', OutdatedFunctionCall)  # reset filter
         return func(*args, **kwargs)
@@ -161,7 +169,8 @@ class Future(object):
                 warnings.warn(
                     "Call to function that will be removed on next minor release({}): {}.".format(
                         version,
-                        f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(func) else f"{func.__module__}.{func.__qualname__}",
+                        f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(
+                            func) else f"{func.__module__}.{func.__qualname__}",
                     ),
                     category=FutureRemovalFunctionCall,
                     stacklevel=2
@@ -180,6 +189,7 @@ class Future(object):
         It will result in an error being emitted
         when the function is used.
         """
+
         def replacing(func):
             @functools.wraps(func)
             def replaced(*args, **kwargs):
@@ -188,12 +198,15 @@ class Future(object):
                     "Call to function that will be replaced by {} on release({}): {}.".format(
                         name,
                         version,
-                        f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(func) else f"{func.__module__}.{func.__qualname__}",
+                        f"{func.__module__}.{func.__name__}" if "__qualname__" not in dir(
+                            func) else f"{func.__module__}.{func.__qualname__}",
                     ),
                     category=FutureRemovalFunctionCall,
                     stacklevel=2
                 )
                 warnings.simplefilter('default', FutureRemovalFunctionCall)  # reset filter
                 return func(*args, **kwargs)
+
             return replaced
+
         return replacing
