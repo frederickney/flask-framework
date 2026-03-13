@@ -7,14 +7,12 @@ __author__ = 'Frederick NEY'
 import logging
 import os
 
-import flask_framework.Extensions as Extensions
-import flask_framework.Server as Server
-from flask_framework.Config import Environment
-from flask_framework.Database import Database
-from flask_framework.Utils import make_controller, make_middleware, make_project
-# temporary rewrite python modules to enable compatibility to version 1.3.0
-from . import set_upper_version_module
-set_upper_version_module()
+import flask_framework.extensions as extensions
+from flask_framework.core import Process
+from flask_framework.config import Environment
+from flask_framework.database import Database
+from flask_framework.utils import make_controller, make_middleware, make_project
+
 
 
 def parser():
@@ -65,21 +63,21 @@ logging.debug("Connecting to database(s)...")
 Database.register_engines(echo=Environment.SERVER['CAPTURE'])
 Database.init()
 logging.debug("Database(s) connected...")
-Server.Process.init(tracking_mode=False)
+Process.init(tracking_mode=False)
 # Server.Process.init_sheduler()
 logging.debug("Server initialized...")
-Server.Process.load_plugins()
+Process.load_plugins()
 logging.debug("Loading server routes...")
-Server.Process.load_routes()
-Server.Process.load_middleware()
+Process.load_routes()
+Process.load_middleware()
 logging.debug("Server routes loaded...")
 logging.debug("Loading websocket events")
-Server.Process.load_socket_events()
+Process.load_socket_events()
 logging.debug("Websocket events loaded...")
 # app.teardown_appcontext(Database.save)
-Extensions.load()
+extensions.load()
 logging.info("Server is now starting...")
-app = Server.Process.get()
+app = Process.get()
 
 if __name__ == '__main__':
     parser()

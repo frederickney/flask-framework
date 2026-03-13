@@ -8,13 +8,10 @@ import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-import flask_framework.Server as Server
-from flask_framework.Config import Environment
-from flask_framework.Database import Database
-# temporary rewrite python modules to enable compatibility to version 1.3.0
-from . import set_upper_version_module
-set_upper_version_module()
-
+from flask_framework.core import Process
+from flask_framework.config import Environment
+from flask_framework.database import Database
+import extensions
 
 try:
     import gevent.monkey
@@ -124,21 +121,21 @@ def main():
         Database.register_engines(echo=Environment.SERVER['CAPTURE'])
         Database.init()
         logging.debug("Database(s) connected...")
-    Server.Process.init(tracking_mode=False)
+    Process.init(tracking_mode=False)
     logging.debug("Server initialized...")
-    Server.Process.load_plugins()
+    Process.load_plugins()
     logging.debug("Loading server routes...")
-    Server.Process.load_routes()
-    Server.Process.load_middleware()
+    Process.load_routes()
+    Process.load_middleware()
     logging.debug("Server routes loaded...")
     logging.debug("Loading websocket events")
-    Server.Process.load_socket_events()
+    Process.load_socket_events()
     logging.debug("Websocket events loaded...")
     # app.teardown_appcontext(Database.save)
-    import flask_framework.Extensions as Extensions
-    Extensions.load()
+    import flask_framework.extensions as Extensions
+    extensions.load()
     logging.info("Server is now starting...")
-    Server.Process.start(args)
+    Process.start(args)
 
 
 if __name__ == '__main__':

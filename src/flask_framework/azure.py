@@ -2,12 +2,10 @@
 
 import logging
 
-from flask_framework.Config import Environment
-from flask_framework.Database import Database
-from flask_framework.Server import Process
-# temporary rewrite python modules to enable compatibility to version 1.3.0
-from . import set_upper_version_module
-set_upper_version_module()
+from flask_framework.config import Environment
+from flask_framework.database import Database
+from flask_framework.core import Process
+
 
 
 def AzureFunctionsApp():

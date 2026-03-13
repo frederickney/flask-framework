@@ -3,10 +3,6 @@
 
 
 __author__ = 'Frederick NEY'
-# temporary rewrite python modules to enable compatibility to version 1.3.0
-from . import set_upper_version_module
-set_upper_version_module()
-
 
 try:
     import gevent.monkey
@@ -26,7 +22,7 @@ import multiprocessing
 import gunicorn.app.base
 from six import iteritems
 
-from flask_framework.Database import Database
+from flask_framework.database import Database
 
 
 class Server(gunicorn.app.base.Application):
@@ -43,8 +39,8 @@ class Server(gunicorn.app.base.Application):
     @staticmethod
     def application():
         import logging
-        from flask_framework.Server import Process
-        import flask_framework.Extensions as Extensions
+        from flask_framework.core import Process
+        import flask_framework.extensions as extensions
         logging.info("Initializing the server...")
         Process.init(tracking_mode=False)
         logging.info("Server initialized...")
@@ -57,7 +53,7 @@ class Server(gunicorn.app.base.Application):
         Process.load_socket_events()
         logging.debug("Websocket events loaded...")
         # app.teardown_appcontext(Database.save)
-        Extensions.load()
+        extensions.load()
         logging.info("Server started...")
         return Process.wsgi_setup()
 
@@ -123,10 +119,10 @@ class Server(gunicorn.app.base.Application):
 
 if __name__ == '__main__':
     import os
-    import flask_framework.Server as Process
+    import flask_framework.core as Process
     import logging
     from logging.handlers import TimedRotatingFileHandler
-    from flask_framework.Config import Environment
+    from flask_framework.config import Environment
 
     loglevel = 'warning'
     logging_dir_exist = False
