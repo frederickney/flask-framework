@@ -34,7 +34,6 @@ def modules_loader(package):
     plugins = map(_dir_to_mod, mod_dir)
     importlib.import_module(package)
     for plugin in plugins:
-        print(plugin)
         if not plugin.startswith('__'):
             load(package, plugin)
     return
@@ -108,27 +107,23 @@ def routes_loader(package, app):
     :return :
     """
     research = re.compile(_pattern, re.IGNORECASE)
-    if 'extensions' in Environment.SERVER:
-        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER['extensions']['GlobalPath']))):
-            mods_dir = filter(
-                research.search,
-                os.listdir(
-                    os.path.join(
-                        os.path.join(
-                            os.curdir,
-                            Environment.SERVER['extensions']['GlobalPath']
-                        ),
-                        package
-                    )
+    if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), package)):
+        mods_dir = filter(
+            research.search,
+            os.listdir(
+                os.path.join(
+                    Environment.SERVER.get('extensions', {}).get('path', os.getcwd()),
+                    package
                 )
             )
-        else:
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, package)))
-        mods = map(_dir_to_mod, mods_dir)
-        importlib.import_module(package)
-        for mod in mods:
-            if not mod.startswith('__'):
-                load_routes(package, mod, app)
+        )
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, package)))
+    mods = map(_dir_to_mod, mods_dir)
+    importlib.import_module(package)
+    for mod in mods:
+        if not mod.startswith('__'):
+            load_routes(package, mod, app)
     return
 
 
@@ -148,18 +143,18 @@ def load_routes(package, ext, app):
         imported_mod = importlib.import_module(
             '{}.{}'.format(package, ext)
         ).register_routes(app)
-        logging.info('Routes for "%s" loaded' % ext.split('.')[1])
+        logging.info('Routes for "%s" loaded' % ext)
     except AttributeError as e:
         logging.debug(e)
-        logging.info('No routes for module "%s"' % ext.split('.')[1])
+        logging.info('No routes for module "%s"' % ext)
         pass
     except NameError as e:
         logging.debug(e)
-        logging.info('Error in module "%s"' % ext.split('.')[1])
+        logging.info('Error in module "%s"' % ext)
         pass
     except Exceptions.RuntimeExceptions.RuntimeException as e:
         logging.debug(e)
-        logging.info('Routes already loaded for module "%s"' % ext.split('.')[1])
+        logging.info('Routes already loaded for module "%s"' % ext)
         pass
 
 
@@ -174,27 +169,23 @@ def blueprints_loader(package, app):
     :return :
     """
     research = re.compile(_pattern, re.IGNORECASE)
-    if 'extensions' in Environment.SERVER:
-        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER['extensions']['GlobalPath']))):
-            mods_dir = filter(
-                research.search,
-                os.listdir(
-                    os.path.join(
-                        os.path.join(
-                            os.curdir,
-                            Environment.SERVER['extensions']['GlobalPath']
-                        ),
-                        package
-                    )
+    if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), package)):
+        mods_dir = filter(
+            research.search,
+            os.listdir(
+                os.path.join(
+                    Environment.SERVER.get('extensions', {}).get('path', os.getcwd()),
+                    package
                 )
             )
-        else:
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, package)))
-        exts = map(_dir_to_mod, mods_dir)
-        importlib.import_module(package)
-        for ext in exts:
-            if not ext.startswith('__'):
-                load_blueprints(package, ext, app)
+        )
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, package)))
+    exts = map(_dir_to_mod, mods_dir)
+    importlib.import_module(package)
+    for ext in exts:
+        if not ext.startswith('__'):
+            load_blueprints(package, ext, app)
     return
 
 
@@ -214,18 +205,18 @@ def load_blueprints(package, ext, app):
         imported_mod = importlib.import_module(
             '{}.{}'.format(package, ext)
         ).register_blueprints(app)
-        logging.info('Blueprints for "%s" loaded' % ext.split('.')[1])
+        logging.info('Blueprints for "%s" loaded' % ext)
     except AttributeError as e:
         logging.debug(e)
-        logging.info('No blueprints for module "%s"' % ext.split('.')[1])
+        logging.info('No blueprints for module "%s"' % ext)
         pass
     except NameError as e:
         logging.debug(e)
-        logging.info('Error in module "%s"' % ext.split('.')[1])
+        logging.info('Error in module "%s"' % ext)
         pass
     except Exceptions.RuntimeExceptions.RuntimeException as e:
         logging.debug(e)
-        logging.info('Blueprints already loaded for module "%s"' % ext.split('.')[1])
+        logging.info('Blueprints already loaded for module "%s"' % ext)
         pass
 
 
@@ -242,26 +233,23 @@ def init_modules(package, db):
     :return:
     """
     research = re.compile(_pattern, re.IGNORECASE)
-    if 'extensions' in Environment.SERVER:
-        if os.path.exists(os.path.join(os.path.join(os.curdir, Environment.SERVER['extensions']['GlobalPath']))):
-            mods_dir = filter(
-                research.search,
-                os.listdir(
-                    os.path.join(
-                        os.path.join(
-                            os.curdir, Environment.SERVER['extensions']['GlobalPath']
-                        ),
-                        package
-                    )
+    if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), package)):
+        mods_dir = filter(
+            research.search,
+            os.listdir(
+                os.path.join(
+                    Environment.SERVER.get('extensions', {}).get('path', os.getcwd()),
+                    package
                 )
             )
-        else:
-            mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, package)))
-        mods = map(_dir_to_mod, mods_dir)
-        importlib.import_module(package)
-        for mod in mods:
-            if not mod.startswith('__'):
-                init_module(package, mod, db)
+        )
+    else:
+        mods_dir = filter(research.search, os.listdir(os.path.join(os.curdir, package)))
+    mods = map(_dir_to_mod, mods_dir)
+    importlib.import_module(package)
+    for mod in mods:
+        if not mod.startswith('__'):
+            init_module(package, mod, db)
     return
 
 
@@ -288,91 +276,29 @@ def init_module(package, ext, db):
             imported_mod.init(db)
         elif not imported_mod.loaded:
             imported_mod.init(db)
-        logging.info('Module "%s" initialized' % ext.split('.')[1])
+        logging.info('Module "%s" initialized' % ext)
     except AttributeError as e:
         logging.debug(e)
-        logging.info('No initialization for module "%s"' % ext.split('.')[1])
+        logging.info('No initialization for module "%s"' % ext)
         pass
     except NameError as e:
         logging.debug(e)
-        logging.info('Error in module "%s"' % ext.split('.')[1])
+        logging.info('Error in module "%s"' % ext)
         pass
     except Exceptions.ConfigExceptions.ConfException as e:
         logging.debug(e)
-        logging.info('Initialization already done for module "%s"' % ext.split('.')[1])
+        logging.info('Initialization already done for module "%s"' % ext)
         pass
 
 
-def installer(module):
-    import pip
-    try:
-        if 'extensions' in Environment.SERVER:
-            if 'BaseModule' in Environment.SERVER['extensions']:
-                packages = importlib.import_module(
-                    '{}.{}'.format(
-                        Environment.SERVER['extensions']['BaseModule'],
-                        module
-                    )
-                ).Loader.packages()
-            else:
-                logging.warning(
-                    "{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(
-                        __name__,
-                        os.environ.get('CONFIG_FILE', "/etc/server/config.json")
-                    )
-                )
-        else:
-            packages = importlib.import_module(module).Loader.packages()
-        for package in packages:
-            pip.main(['install', package])
-        logging.info('Packages for "%s" installed' % module)
-    except ImportError as e:
-        logging.warning(
-            "{}: {} not found in {}".format(
-                __name__,
-                (
-                    module if 'extensions' not in Environment.SERVER
-                    else
-                    '{}.{}'.format(
-                        Environment.SERVER['extensions']['BaseModule'],
-                        module
-                    ) if 'BaseModule' in Environment.SERVER['extensions']
-                    else
-                    module
-                ),
-                os.getcwd()
-            )
-        )
-    except AttributeError as e:
-        logging.debug(e)
-        logging.info('No package dependencies for module "%s"' % module)
-    except NameError as e:
-        logging.debug(e)
-        logging.info('Error in module "%s"' % module)
-
-
-def installer(module):
+def installer(module, _ext='extensions'):
     import pip
     try:
         packages = []
-        if 'extensions' in Environment.SERVER:
-            if 'BaseModule' in Environment.SERVER['extensions']:
-                packages = importlib.import_module(
-                    '{}.{}.{}'.format(
-                        Environment.SERVER['extensions']['BaseModule'],
-                        module,
-                        'Loader'
-                    )
-                ).packages()
-            else:
-                logging.warning(
-                    "{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(
-                        __name__,
-                        os.environ.get('CONFIG_FILE', "/etc/server/config.json")
-                    )
-                )
+        if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext)):
+            packages = importlib.import_module('{}.{}.{}'.format(_ext, module, 'Loader')).packages()
         else:
-            packages = importlib.import_module("{}.{}".format(module, 'Loader')).packages()
+            packages = importlib.import_module('{}.{}'.format(module, 'Loader')).packages()
         for package in packages:
             pip.main(['install', package])
         logging.info('Packages for "%s" installed' % module)
@@ -381,12 +307,12 @@ def installer(module):
             "{}: {} not found in {}".format(
                 __name__,
                 (
-                    module if 'extensions' not in Environment.SERVER
+                    module if not os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     '{}.{}'.format(
-                        Environment.SERVER['extensions']['BaseModule'],
+                        _ext,
                         module
-                    ) if 'BaseModule' in Environment.SERVER['extensions']
+                    ) if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     module
                 ),
@@ -401,18 +327,10 @@ def installer(module):
         logging.info('Error in module "%s"' % module)
 
 
-def module(module):
+def module(module, _ext = 'extensions'):
     try:
-        if 'extensions' in Environment.SERVER:
-            if 'BaseModule' in Environment.SERVER['extensions']:
-                return importlib.import_module(
-                    '{}.{}'.format(Environment.SERVER['extensions']['BaseModule'], module)
-                )
-            else:
-                logging.warning("{}: extensions.BaseModule not configured in section SERVER_ENV in {}".format(
-                    __name__,
-                    os.environ.get('CONFIG_FILE', "/etc/server/config.json"))
-                )
+        if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext)):
+            return importlib.import_module('{}.{}'.format(_ext, module))
         else:
             return importlib.import_module(module)
     except ImportError as e:
@@ -420,13 +338,13 @@ def module(module):
             "{}: {} not found in {}".format(
                 __name__,
                 (
-                    module if 'extensions' not in Environment.SERVER
+                    module if not os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     '{}.{}'.format(
-                        Environment.SERVER['extensions']['BaseModule'],
+                        _ext,
                         module
                     )
-                    if 'BaseModule' in Environment.SERVER['extensions']
+                    if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext))
                     else
                     module
                 ),

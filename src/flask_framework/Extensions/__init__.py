@@ -2,6 +2,8 @@
 
 
 __author__ = 'Frederick NEY'
+import os
+import pathlib
 from flask_framework.Deprecation import module_deprecation
 module_deprecation(__name__, __name__.lower(), '1.3.0')
 
@@ -9,38 +11,38 @@ class Loader(object):
     __loaded__ = False
 
     @classmethod
-    def load(cls):
+    def load(cls, _ext = None):
         from . import loader
         from flask_framework.Database import Database
         from flask_framework.Server import Process
         import logging
         logging.info('Loading plugins')
-        loader.modules_loader('extensions')
-        loader.init_modules('extensions', db=Database)
-        loader.routes_loader('extensions', app=Process.get())
-        loader.blueprints_loader('extensions', app=Process.get())
+        loader.modules_loader(_ext or 'extensions')
+        loader.init_modules(_ext or 'extensions', db=Database)
+        loader.routes_loader(_ext or 'extensions', app=Process.get())
+        loader.blueprints_loader(_ext or 'extensions', app=Process.get())
         cls.__loaded__ = True
         logging.info('Plugins loaded')
         return
 
     @classmethod
-    def reload(cls):
+    def reload(cls, _ext = None):
         from . import loader
         from flask_framework.Database import Database
         from flask_framework.Server import Process
         import logging
         logging.info('Reloading plugins')
-        loader.modules_reloader('extensions')
-        loader.init_modules('extensions', db=Database)
-        loader.routes_loader('extensions', app=Process.get())
-        loader.blueprints_loader('extensions', app=Process.get())
+        loader.modules_reloader(_ext or 'extensions')
+        loader.init_modules(_ext or 'extensions', db=Database)
+        loader.routes_loader(_ext or 'extensions', app=Process.get())
+        loader.blueprints_loader(_ext or 'extensions', app=Process.get())
 
     @classmethod
     def loaded(cls):
         return cls.__loaded__
 
 
-def all():
+def all(_ext = None):
     import re
     import os
     import importlib
@@ -49,10 +51,13 @@ def all():
         '^([a-zA-Z]+(_[a-zA-Z]+)*)$',
         re.IGNORECASE
     )
-    mods_dir = filter(
-        research.search,
-        os.listdir(os.path.join(Environment.SERVER['extensions']['GlobalPath'], 'extensions'))
-    )
+    if os.path.exists(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext or 'extensions')):
+        mods_dir = filter(
+            research.search,
+            os.listdir(os.path.join(Environment.SERVER.get('extensions', {}).get('path', os.getcwd()), _ext or 'extensions'))
+        )
+    else:
+        mods_dir = []
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
     importlib.import_module('extensions')
@@ -64,4 +69,7 @@ def all():
 
 
 def load():
-    Loader.load() if not Loader.loaded() else Loader.reload()
+    from flask_framework.Config import Environment
+    if pathlib.Path(Environment.SERVER.get('extensions', {}).get('path', 'extensions')).is_dir():
+        ext = Environment.SERVER.get('extensions', {}).get('path', 'extensions')
+        Loader.load(ext) if not Loader.loaded() else Loader.reload(ext)
