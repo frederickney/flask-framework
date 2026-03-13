@@ -60,7 +60,6 @@ def all(_ext = None):
         mods_dir = []
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     mods = map(form_module, mods_dir)
-    importlib.import_module('extensions')
     modules = []
     for mod in mods:
         if not mod.startswith('__'):
