@@ -7,10 +7,10 @@ __author__ = 'Frederick NEY'
 import logging
 import os
 
-import flask_framework.extensions as extensions
+import flask_framework.core as core
+from flask_framework.common import BaseApp
 from flask_framework.config import Environment
-from flask_framework.core import Process
-from flask_framework.database import Database
+from flask_framework.core.logging import configure_basic_logger
 from flask_framework.utils import make_controller, make_middleware, make_project
 
 
@@ -45,38 +45,29 @@ def parser():
 
 
 logging.info("Starting server...")
+if "CONFIG_FILE" not in os.environ and not os.path.exists("/etc/flask/"):
+    os.environ.setdefault(
+        'CONFIG_FILE',
+        "config/config.yml" if os.path.exists("config/config.yml")
+        else "/etc/flask/config.yml" if os.path.exists("/etc/flask/config.yml")
+        else None
+    )
+if not 'CONFIG_FILE' in os.environ:
+    print('Unable tp detect any configuration files, use CONFIG_FILE env to override detection')
+    exit(255)
 logging.info("Loading configuration file...")
-Environment.load(os.environ.get('CONFIG_FILE', "/etc/server/config.json"))
+Environment.load(os.environ['CONFIG_FILE'])
+logging.info("Configuration file loaded...")
 try:
     loglevel = Environment.SERVER['LOG']['LEVEL']
-    logging.basicConfig(
-        level=loglevel.upper(),
-        format='%(asctime)s %(levelname)s %(message)s'
-    )
+    configure_basic_logger(loglevel)
 except KeyError as e:
-    logging.basicConfig(
-        level=logging.getLevelName(logging.INFO),
-        format='%(asctime)s %(levelname)s %(message)s'
-    )
-logging.debug("Connecting to database(s)...")
-Database.register_engines(echo=Environment.SERVER['CAPTURE'])
-Database.init()
-logging.debug("Database(s) connected...")
-Process.init(tracking_mode=False)
-# Server.Process.init_sheduler()
-logging.debug("Server initialized...")
-Process.load_plugins()
-logging.debug("Loading server routes...")
-Process.load_routes()
-Process.load_middleware()
-logging.debug("Server routes loaded...")
-logging.debug("Loading websocket events")
-Process.load_socket_events()
-logging.debug("Websocket events loaded...")
-# app.teardown_appcontext(Database.save)
-extensions.load()
+    configure_basic_logger(logging.INFO)
+base_app = BaseApp()
+base_app.load_app()
+core.Process.init(tracking_mode=False)
 logging.info("Server is now starting...")
-app = Process.get()
+app = core.Process.get()
 
 if __name__ == '__main__':
     parser()

@@ -6,6 +6,7 @@ __author__ = 'Frederick NEY'
 import os
 import pathlib
 import sys
+import multiprocessing
 from datetime import datetime, timedelta
 
 import apscheduler.jobstores.redis
@@ -25,9 +26,13 @@ from . import web
 from . import ws
 
 
+def number_of_workers():
+    return multiprocessing.cpu_count() * 2
+
+
 class Process(object):
     """
-        Core class ot the framework, handles all fastapi configuration / registration
+        Core class ot the framework, handles all flask configuration / registration
 
         Contains following attributes:
         Attributes
@@ -464,7 +469,7 @@ class Process(object):
     @classmethod
     def get(cls):
         """
-        Returns the current running fastapi instance
+        Returns the current running flask instance
         :return:
         :rtype: flask.Flask
         """

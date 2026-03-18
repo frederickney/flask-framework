@@ -1,26 +1,72 @@
 # coding: utf-8
-
-
 import logging
+import os
+from logging.handlers import TimedRotatingFileHandler
+
+_level = logging.WARNING
 
 
-def configure_logs(name, format, output_file, debug='info'):
+def configure_logs(name, level=_level):
     """
-    Setup logging configuration, logging handler, logging formatting, ...
+    Setup logging configuration, logging level for name
     :param name:
     :type name: str
-    :param format:
-    :type format: str
-    :param output_file:
-    :type output_file: str
-    :param debug:
-    :type debug: str
+    :param level:
+    :type level: str
+    :type level: int
     :return:
     """
+
     logger = logging.getLogger(name)
-    formatter = logging.Formatter(format)
-    file_handler = logging.FileHandler(output_file)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    logging.getLevelName(debug.upper())
-    logger.setLevel(logging.getLevelName(debug.upper()))
+    if isinstance(level, str):
+        logger.setLevel(level.upper())
+    else:
+        logger.setLevel(level)
+
+
+def configure_basic_logger(level=_level):
+    """
+    Setup logging base configuration, logging level
+    :param level:
+    :type level: str
+    :type level: int
+    """
+    logging.getLogger().handlers = []
+    logging.basicConfig(
+        level=level.upper() if isinstance(level, str) else level,
+        format='%(asctime)s %(levelname)s %(message)s',
+    )
+
+
+def setup_file_logging(level=_level):
+    """
+    Setup logging configuration, logging handler, logging formatting, ...
+    :param level:
+    :type level: str
+    :type level: int
+    :return:
+    """
+    logging.getLogger().handlers = []
+    if os.environ.get("LOG_DIR", None):
+        os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
+        os.environ.setdefault("log_file", os.path.join(os.environ.get("log_dir"), 'process.log'))
+        if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
+            os.mkdir(os.path.dirname(os.environ.get('log_file')), 0o755)
+    if os.environ.get("log_file", None):
+        logging.basicConfig(
+            level=level.upper() if isinstance(level, str) else level,
+            format='%(asctime)s %(levelname)s %(message)s',
+            handlers=[
+                TimedRotatingFileHandler(
+                    filename=os.environ.get('log_file'),
+                    when='midnight',
+                    backupCount=30
+                )
+            ]
+        )
+    else:
+        logging.basicConfig(
+            level=level.upper() if isinstance(level, str) else level,
+            format='%(asctime)s %(levelname)s %(message)s',
+        )
+    return os.environ.get("log_file", None)

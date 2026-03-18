@@ -6,22 +6,20 @@ __author__ = 'Frederick NEY'
 
 import logging
 import os
-from logging.handlers import TimedRotatingFileHandler
+import sys
 
-import flask_framework.extensions as extensions
+from flask_framework.common import BaseApp
 from flask_framework.config import Environment
 from flask_framework.core import Process
-from flask_framework.database import Database
+from flask_framework.core.logging import configure_basic_logger, setup_file_logging
+
 
 try:
     import gevent.monkey
 
     gevent.monkey.patch_all()
 except ImportError as e:
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s %(levelname)s %(message)s'
-    )
+    configure_basic_logger('info')
     logging.error('{}: gevent not found in python packages'.format(__file__))
     logging.info(
         '{}: gevent is not required if running wsgi as it depends on your worker class you put into the configuration file'
@@ -52,88 +50,65 @@ def args_parser():
         required=True,
         help='Port of the server to listen'
     )
+    parser.add_argument(
+        '-d', '--disable-log-files',
+        action='store_true',
+        required=False,
+        help='Deactivate logs to file'
+    )
+
     args = parser.parse_args()
     return args
 
 
 def main():
+    """
+        main entry point for flask_framework.server
+        """
+    if os.getcwd() not in sys.path:
+        sys.path.append(os.getcwd())
     args = args_parser()
-    os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "log/process.log"))
-    if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
-        os.mkdir(os.path.dirname(os.environ.get('log_file')), 0o755)
-    logging.basicConfig(
-        level=logging.DEBUG if args.debug else logging.INFO,
-        format='%(asctime)s %(levelname)s %(message)s',
-        filename=os.environ.get('log_file')
-    )
-    if os.environ.get("LOG_FILE", None) or os.environ.get("LOG_DIR", None):
-        os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "log"))
-        os.environ.setdefault(
-            "log_file",
-            os.environ.get('LOG_FILE', os.path.join(os.environ.get("log_dir"), 'process.log'))
-        )
-    if os.environ.get("log_file", None):
-        logging.basicConfig(
-            level=logging.DEBUG if args.debug else logging.INFO,
-            format='%(asctime)s %(levelname)s %(message)s',
-            handlers=[
-                TimedRotatingFileHandler(
-                    filename=os.environ.get('log_file'),
-                    when='midnight',
-                    backupCount=30
-                )
-            ]
-        )
-    else:
-        logging.basicConfig(
-            level=logging.DEBUG if args.debug else logging.INFO,
-            format='%(asctime)s %(levelname)s %(message)s'
-        )
+    configure_basic_logger(None)
+    if not args.disable_log_files:
+        setup_file_logging()
+    if os.environ.get("LOG_DIR", None):
+        os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/flask"))
+    if not args.disable_log_files:
+        os.environ.setdefault("log_file", os.environ.get("LOG_FILE", "log/process.log"))
+        if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
+            os.mkdir(os.path.dirname(os.environ.get('log_file')), 0o755)
+        setup_file_logging()
     logging.info("Starting server...")
     logging.debug("Loading configuration file...")
-    if 'CONFIG_FILE' in os.environ:
-        Environment.load(os.environ['CONFIG_FILE'])
-    else:
-        Environment.load("/etc/server/config.json")
+    if "CONFIG_FILE" not in os.environ and not os.path.exists("/etc/flask/"):
+        os.environ.setdefault(
+            'CONFIG_FILE',
+            "config/config.yml" if os.path.exists("config/config.yml")
+            else "/etc/flask/config.yml" if os.path.exists("/etc/flask/config.yml")
+            else None
+        )
+    if not 'CONFIG_FILE' in os.environ:
+        print('Unable tp detect any configuration files, use CONFIG_FILE env to overide detection')
+        exit(255)
+    Environment.load(os.environ['CONFIG_FILE'])
     try:
-        loglevel = Environment.SERVER['LOG']['LEVEL']
-        logging.getLogger().setLevel(loglevel.upper())
+        configure_basic_logger(
+            'warning' if not 'LEVEL' in Environment.SERVER['LOG'] else Environment.SERVER['LOG']['LEVEL']
+        )
     except KeyError as e:
         pass
     try:
-        RotatingLogs = TimedRotatingFileHandler(
-            filename=os.path.join(Environment.SERVER["LOG"]["DIR"], 'process.log'),
-            when='midnight',
-            backupCount=30
-        )
-        RotatingLogs.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-        logging.getLogger().handlers = [
-            RotatingLogs
-        ]
-        logging.info('Logging handler initialized')
+        if not args.disable_log_files:
+            setup_file_logging(
+                'warning' if not 'LEVEL' in Environment.SERVER['LOG'] else Environment.SERVER['LOG']['LEVEL']
+            )
     except KeyError as e:
         pass
     except FileNotFoundError as e:
         pass
     logging.debug("Configuration file loaded...")
-    if len(Environment.Databases) > 0:
-        logging.debug("Connecting to database(s)...")
-        Database.register_engines(echo=Environment.SERVER['CAPTURE'])
-        Database.init()
-        logging.debug("Database(s) connected...")
-    Process.init(tracking_mode=False)
-    logging.debug("Server initialized...")
-    Process.load_plugins()
-    logging.debug("Loading server routes...")
-    Process.load_routes()
-    Process.load_middleware()
-    logging.debug("Server routes loaded...")
-    logging.debug("Loading websocket events")
-    Process.load_socket_events()
-    logging.debug("Websocket events loaded...")
-    # app.teardown_appcontext(Database.save)
-    extensions.load()
-    logging.info("Server is now starting...")
+    base_app = BaseApp()
+    base_app.load_app()
     Process.start(args)
 
 

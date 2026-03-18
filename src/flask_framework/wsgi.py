@@ -4,63 +4,65 @@
 
 __author__ = 'Frederick NEY'
 
-try:
-    import gevent.monkey
+import argparse
+import logging
+import os
+import sys
 
-    gevent.monkey.patch_all()
-except ImportError as e:
-    pass
 try:
     import eventlet
-
     eventlet.monkey_patch(all=True)
 except ImportError as e:
     pass
 
-import multiprocessing
-
-import gunicorn.app.base
+try:
+    import gunicorn.app.base as WSGIServer
+    try:
+        import gevent.monkey
+        gevent.monkey.patch_all()
+    except ImportError as e:
+        pass
+except ImportError:
+    from waitress.server import WSGIServer
 from six import iteritems
 
-from flask_framework.database import Database
+from flask_framework.config import Environment
+from flask_framework.core import Process
+from flask_framework.core.logging import setup_file_logging, configure_basic_logger
+from flask_framework.common import Logging
+from flask_framework.common import BaseApp
+from flask_framework.core.process import number_of_workers
+
+parser = argparse.ArgumentParser(description='Python FLASK USGI server')
+parser.add_argument(
+    '-d', '--disable-log-files',
+    action='store_true',
+    required=False,
+    help='Deactivate logs to file'
+)
 
 
-class Server(gunicorn.app.base.Application):
+class Server(WSGIServer, BaseApp):
 
     def init(self, parser, opts, args):
         print(parser)
         print(opts)
         print(args)
 
-    @staticmethod
-    def number_of_workers():
-        return multiprocessing.cpu_count() * 2
-
-    @staticmethod
-    def application():
-        import logging
-        from flask_framework.core import Process
-        import flask_framework.extensions as extensions
-        logging.info("Initializing the server...")
-        Process.init(tracking_mode=False)
-        logging.info("Server initialized...")
-        Process.load_plugins()
-        logging.debug("Loading server routes...")
-        Process.load_routes()
-        Process.load_middleware()
-        logging.debug("Server routes loaded...")
-        logging.debug("Loading websocket events")
-        Process.load_socket_events()
-        logging.debug("Websocket events loaded...")
-        # app.teardown_appcontext(Database.save)
-        extensions.load()
-        logging.info("Server started...")
-        return Process.wsgi_setup()
-
     def __init__(self, options=None):
         Server.options = (options or {}) if not hasattr(Server, 'options') else Server.options
-        self.application = Server.application()
-        super(Server, self).__init__()
+        Server.load_app()
+        self.application = Process.get()
+        try:
+            super(Server, self).__init__()
+        except TypeError as e:
+            super(Server, self).__init__(
+                self.application,
+                host=Environment.SERVER['BIND']['ADDRESS'],
+                port=Environment.SERVER['BIND']['PORT'],
+                threads=number_of_workers(),
+            )
+        BaseApp.__init__(self)
 
     def reload(self):
         """
@@ -74,18 +76,28 @@ class Server(gunicorn.app.base.Application):
         except ImportError as e:
             pass
         Environment.reload(os.environ['CONFIG_FILE'])
-        self.application = Server.application()
+        Server.load_app()
+        self.application = Process.get()
         Server.load_options()
         super(Server, self).reload()
 
     def load_config(self):
+        """
+        Load gunicorn options
+        """
         logging.info(Server.options)
-        config = dict([(key, value) for key, value in iteritems(Server.options)
-                       if key in self.cfg.settings and value is not None])
+        config = dict(
+            [(key, value) for key, value in iteritems(Server.options) if key in self.cfg.settings and value is not None]
+        )
         for key, value in iteritems(config):
             self.cfg.set(key.lower(), value)
 
     def load(self):
+        """
+        Load app for gunicorn.
+
+        Called on gunicorn.load event
+        """
         try:
             import eventlet
             eventlet.monkey_patch(all=True)
@@ -102,14 +114,14 @@ class Server(gunicorn.app.base.Application):
     def load_options(cls):
         cls.options = {
             'bind': '%s:%i' % (Environment.SERVER['BIND']['ADDRESS'], Environment.SERVER['BIND']['PORT']),
-            'workers': Server.number_of_workers(),
+            'workers': number_of_workers(),
             'threads': Environment.SERVER['THREADS_PER_CORE'],
             'capture_output': Environment.SERVER['CAPTURE'],
-            "loglevel": loglevel,
+            "loglevel": Logging.get_loglevel(),
             "worker_class": Environment.SERVER['WORKERS'],
             "reload_engine": 'poll'
         }
-        if logging_dir_exist:
+        if Logging.logging_dir_exist:
             cls.options["errorlog"] = os.path.join(os.environ.get("log_dir"), 'flask-error.log')
             cls.options["accesslog"] = os.path.join(os.environ.get("log_dir"), 'flask-access.log')
         if 'SSL' in Environment.SERVER:
@@ -117,79 +129,66 @@ class Server(gunicorn.app.base.Application):
             cls.options["keyfile"] = Environment.SERVER['SSL']['PrivateKey']
 
 
-if __name__ == '__main__':
-    import os
-    import flask_framework.core as Process
-    import logging
-    from logging.handlers import TimedRotatingFileHandler
-    from flask_framework.config import Environment
+def start(args):
+    """
+    Loads options and starts process.
+    :param args:
+    :type args: argparse.Namespace
+    """
+    logging.info("Loading options...")
+    Server.load_options()
+    logging.info("Options loaded...")
+    logging.info("Starting the server...")
+    try:
+        Server().run()
+    except RuntimeError as e:
+        exit(255)
 
-    loglevel = 'warning'
-    logging_dir_exist = False
-    if os.environ.get("LOG_DIR", None):
-        os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
-        os.environ.setdefault("log_file", os.path.join(os.environ.get("log_dir"), 'process.log'))
-        if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
-            os.mkdir(os.path.dirname(os.environ.get('log_file')), 0o755)
-    if os.environ.get("log_file", None):
-        logging.basicConfig(
-            level=loglevel.upper(),
-            format='%(asctime)s %(levelname)s %(message)s',
-            handlers=[
-                TimedRotatingFileHandler(
-                    filename=os.environ.get('log_file'),
-                    when='midnight',
-                    backupCount=30
-                )
-            ]
+
+def main():
+    """"
+    main entrypoint for flask_framework.wsgi
+    loads environments and setups loging handler
+    """
+    if os.getcwd() not in sys.path:
+        sys.path.append(os.getcwd())
+    args = parser.parse_args()
+    configure_basic_logger(None)
+    if not args.disable_log_files:
+        setup_file_logging()
+    if "CONFIG_FILE" not in os.environ and not os.path.exists("/etc/flask/"):
+        os.environ.setdefault(
+            'CONFIG_FILE',
+            "config/config.yml" if os.path.exists("config/config.yml")
+            else "/etc/flask/config.yml" if os.path.exists("/etc/flask/config.yml")
+            else None
         )
-        logging_dir_exist = True
-    else:
-        logging.basicConfig(
-            level=loglevel.upper(),
-            format='%(asctime)s %(levelname)s %(message)s',
-        )
+    if not 'CONFIG_FILE' in os.environ:
+        print('Unable tp detect any configuration files, use CONFIG_FILE env to overide detection')
+        exit(255)
     logging.info("Loading configuration file...")
-    if 'CONFIG_FILE' in os.environ:
-        Environment.load(os.environ['CONFIG_FILE'])
-    else:
-        Environment.load("/etc/server/config.json")
-        os.environ.setdefault('CONFIG_FILE', "/etc/server/config.json")
+    Environment.load(os.environ['CONFIG_FILE'])
     logging.info("Configuration file loaded...")
     try:
-        loglevel = Environment.SERVER['LOG']['LEVEL']
-        logging.getLogger().setLevel(loglevel.upper())
+        Logging.set_loglevel(Environment.SERVER['LOG']['LEVEL'])
+        configure_basic_logger(level=Environment.SERVER['LOG']['LEVEL'])
     except KeyError as e:
+        logging.error(e)
         pass
-    logging_dir_exist = False
+    Logging.logging_dir_exist = False
     try:
-        if not os.path.exists(Environment.SERVER["LOG"]["DIR"]):
-            os.mkdir(Environment.SERVER["LOG"]["DIR"], 0o755)
-        RotatingLogs = TimedRotatingFileHandler(
-            filename=os.path.join(Environment.SERVER["LOG"]["DIR"], 'process.log'),
-            when='midnight',
-            backupCount=30
-        )
-        RotatingLogs.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-        logging.getLogger().handlers = [
-            RotatingLogs
-        ]
+        if not args.disable_log_files:
+            os.environ.setdefault('LOG_DIR', Environment.SERVER['LOG']['DIR'])
+            setup_file_logging(level=Environment.SERVER['LOG']['LEVEL'])
         logging.info('Logging handler initialized')
-        os.environ.setdefault("log_dir", Environment.SERVER["LOG"]["DIR"])
-        logging_dir_exist = True
     except KeyError as e:
         pass
     except FileNotFoundError as e:
         pass
     except PermissionError as e:
         pass
-    if len(Environment.Databases) > 0:
-        logging.debug("Connecting to database(s)...")
-        Database.register_engines(echo=Environment.SERVER['CAPTURE'])
-        Database.init()
-        logging.debug("Database(s) connected...")
-    logging.info("Loading options...")
-    Server.load_options()
-    logging.info("Options loaded...")
-    logging.info("Starting the server...")
-    Server().run()
+    start(args)
+
+
+if __name__ == '__main__':
+    main()
