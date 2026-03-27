@@ -4,4 +4,4 @@
 __author__ = "Frederick NEY"
 
 from .module import generate
-from .utils import make_controller, make_middleware, make_project
+from .utils import make_controller, make_middleware, make_project, install_routes

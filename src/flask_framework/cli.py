@@ -5,37 +5,90 @@
 __author__ = 'Frederick NEY'
 
 import os
+import sys
 
-from flask_framework.utils import make_controller, make_middleware, make_project
+from flask_framework.utils import make_controller, make_middleware, make_project, install_routes
 
 
 def parser():
     import argparse
-    parser = argparse.ArgumentParser(description='Python FLASK server')
-    parser.add_argument(
-        '-cp', '--create-project',
-        help='Create project\nexample:\npython -m flask_framework.cli --create-project webapp',
+    parser = argparse.ArgumentParser(description='FastAPI Framework MVC CLI', formatter_class=argparse.RawTextHelpFormatter)
+    action = parser.add_subparsers(dest='action')
+    project_parser = action.add_parser('project', help='Usage:\npython -m fastapi_framework_mvc.cli project -h', formatter_class=argparse.RawTextHelpFormatter)
+    project_parser.add_argument(
+        '-c', '--create', 
+        help='name of the project\nExample:\npython -m fastapi_framework_mvc.cli project --create webapp', 
+        required=True,
+        metavar='NAME'
+    )
+    controller_parser = action.add_parser('controller', help='Usage:\npython -m fastapi_framework_mvc.cli controller -h', formatter_class=argparse.RawTextHelpFormatter)
+    controller_parser.add_argument(
+        '-c', '--create', 
+        help='Create controller\nexample:\npython -m fastapi_framework_mvc.cli controller --create controllers/web/login', 
+        required=True, 
+        metavar='NAME'
+    )
+    controller_parser.add_argument(
+        '-blueprint', '--blueprint-mode', 
+        help='Create a blueprint base controller', 
+        default=False, 
+        action='store_true', 
         required=False
     )
-    parser.add_argument(
-        '-cc', '--create-controller',
-        help='Create controller\nexample:\npython -m flask_framework.cli --create-controller controllers/web/login',
-        required=False
+    middleware_parser = action.add_parser('middleware', help='Usage:\npython -m fastapi_framework_mvc.cli middleware -h', formatter_class=argparse.RawTextHelpFormatter)
+    middleware_parser.add_argument(
+        '-c', '--create', 
+        help='Create middleware\nexample:\npython -m fastapi_framework_mvc.cli middleware --create my_middleware', 
+        required=True, 
+        metavar='NAME'
     )
-    parser.add_argument(
-        '-cm', '--create-middleware',
-        help='Create middleware\nexample:\npython -m flask_framework.cli --create-middleware test',
-        required=False
+    manager_parser = action.add_parser('manager', help='Usage:\npython -m fastapi_framework_mvc.cli manager -h', formatter_class=argparse.RawTextHelpFormatter)
+    manager_parser.add_argument(
+        '-l', '--link-controller', 
+        help='manage app routes\nexample:\npython -m fastapi_framework_mvc.cli manager --link-controller controllers/web/login', 
+        required=True
+    )
+    manager_parser.add_argument(
+        '-p', '--prefix', 
+        help='api prefix (only for api endpoints)', 
+        required=False,
+        default=None
     )
     args = parser.parse_args()
-    if args.create_project:
-        make_project(os.getcwd(), args.create_project, os.path.dirname(os.path.realpath(__file__)))
+    if args.action == 'project':
+        make_project(os.getcwd(), args.create, os.path.dirname(os.path.realpath(__file__)))
         exit(0)
-    elif args.create_controller:
-        make_controller(os.getcwd(), args.create_controller)
+    elif args.action == 'controller':
+        controller = args.create
+        if sys.platform.startswith('win') or sys.platform.startswith('nt'):
+            controller = controller.replace('\\', '/')
+        if controller.startswith('./'):
+            controller = controller.removeprefix('./')
+        make_controller(os.getcwd(), controller, blueprint=args.blueprint_mode)
         exit(0)
-    elif args.create_middleware:
-        make_middleware(os.getcwd(), args.create_middleware)
+    elif args.action == "middleware":
+        middleware = args.create
+        if sys.platform.startswith('win') or sys.platform.startswith('nt'):
+            middleware = middleware.replace('\\', '/')
+        if middleware.startswith('./'):
+            middleware = middleware.removeprefix('./')
+        make_middleware(os.getcwd(), middleware)
+        exit(0)
+    elif args.action == "manager":
+        controller = args.link_controller
+        if sys.platform.startswith('win') or sys.platform.startswith('nt'):
+            controller = controller.replace('\\', '/')
+        if controller.startswith('./'):
+            controller = controller.removeprefix('./')
+        install_routes(
+            os.getcwd(),
+            controller, 
+            type=
+            'ws' if 'controllers/ws/' in controller else 
+            'socket' if 'controllers/socket/' in controller else
+            'errorhandler' if 'errors' in controller else 'web',
+            prefix=args.prefix
+        )
         exit(0)
 
 

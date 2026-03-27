@@ -15,7 +15,6 @@ class Route(object):
         :return: Route object
         \"\"\"
         import controllers
-        return
 """
 
 HTTP_DEFAULT_ENTRY = """class Route(object):
@@ -31,7 +30,6 @@ HTTP_DEFAULT_ENTRY = """class Route(object):
         \"\"\"
         import controllers
         server.add_url_rule('/', 'home', controllers.web.home.index, methods=["GET"])
-        return
 """
 
 HTTP_ERROR_HANDLER_ENTRY = """# coding: utf-8
@@ -51,7 +49,6 @@ class Route(object):
         \"\"\"
         import controllers
 {}
-        return
 """
 
 WS_ENTRY = """# coding: utf-8
@@ -66,7 +63,63 @@ class Handler(object):
         :type socketio: flask_socketio.SocketIO
         \"\"\"
         import controllers
+"""
+
+PLUGINS_ENTRY = """# coding: utf-8
+
+
+class Load(object):
+
+    def __init__(self, srv, scheduler, session, csrf, socket):
+        \"\"\"
+
+        :param srv:
+        :type srv: flask.Flask
+        :param scheduler:
+        :type scheduler: flask_apscheduler.APScheduler
+        :param session:
+        :type session: flask_session.Session | None
+        :param csrf:
+        :type csrf: flask_wtf.csrf.CSRFProtect | None
+        :param socket:
+        :type socket: flask_socketio.SocketIO
+        \"\"\"
+        import controllers
+"""
+
+MIDDLEWARE_ENTRY = """# coding: utf-8
+
+
+class Load(object):
+
+    def __init__(self, server):
+        \"\"\"
+
+        :param server:
+        :type server: flask.Flask
+        \"\"\"
+        import controllers
+
+        
+class Middlewares(object):
+
+    @classmethod
+    def init(cls, server):
+        \"\"\"
+
+        :param server:
+        :type server: flask.Flask
+        \"\"\"
         return
+    
+    @classmethod
+    def before_request(cls, *args, **kwargs):
+        return
+    
+    @classmethod
+    def after_request(cls, *args, **kwargs):
+        return
+
 """
 
 ERROR_ENTRY = """        server.register_error_handler({}, {})\n"""
@@ -85,6 +138,35 @@ class Controller(object):
     def index():
         return
 """
+
+BASE_BLUEPRINT_CONTROLLER = """# coding: utf-8
+
+from flask import Blueprint
+
+bp = Blueprint("{PREFIX}", __name__, prefix="/{PREFIX}")
+
+class Controller(object):
+    \"\"\"
+    {PREFIX} Controller
+
+    Class that handles all kind of allowed operation on {PREFIX}.
+
+    Usualy get is for retrieving content with optional filter arguments,  post is for writing content to backend.
+    \"\"\"
+    
+    @staticmethod
+    @bp.route('', methods="get")
+    def retrieve(fastapi_request: Request):
+        #TODO implement your code here 
+        pass
+    
+    @bp.route('', methods="post")
+    def create(fastapi_request: Request):
+        #TODO implement your code here 
+        pass
+        
+"""
+
 
 BASE_HOME_CONTROLLER = """
 class Controller(object):
@@ -119,12 +201,23 @@ IMPORTS = "from . import {}\n"
 
 IMPORT_CONTROLLER = "from .{} import Controller as {}\n"
 
+IMPORT_BLUEPRINT_CONTROLLER = "from .{} import bp as {}\n"
+
+
 IMPORT_ERROR = "from .{} import http_{}\n"
 
+IMPORT_MIDDLEWARE = "from .{} import {}\n"
+
 HTTP_ERRORS = {
-    404: 'controllers.web.errors.http_404',
-    500: 'controllers.web.errors.http_500'
 }
+
+
+INSTALL_BLUEPRINT = """        {}.register_blueprint({})\n"""
+INSTALL_PREFIXED_BLUEPRINT = """        {}.register_blueprint({}, url_prefix="{}")\n"""
+INSTALL_WEB_ROUTE = """        {}.add_url_rule("/{}", {}, name="ui.{}")\n"""
+INSTALL_API_ROUTE = """        {}.add_url_rule("/api/{}", {}, name="api.{}")\n"""
+INSTALL_WEBSOCKET_ROUTE = """        {}.on_event("socket.{}", {}, namespace="/socket/{}")\n"""
+INSTALL_ERRORS_ROUTE= """        {}.register_error_handler({}, {})\n"""
 
 FLASK_RENDERING_IMPORT = "from flask import render_template as template\n\n"
 
@@ -145,10 +238,6 @@ FLASK_FRAMEWORK_BASE_CONF = """SERVER:
         DIR: log
         LEVEL: debug
 
-DATABASES: {{}}
-
-FLASK:
-  CONFIG: {{}}
 
 SERVICES: 
   filesystem:
