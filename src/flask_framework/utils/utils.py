@@ -98,7 +98,8 @@ def _install_router(basepath, controller, type, prefix=None):
         logging.debug(f'Adding server/{templates.INSTALL_BLUEPRINT.format('server', controller.replace('/', '.')).replace('\n', '')}...')
         new_content = f"{_content}{templates.INSTALL_BLUEPRINT.format('server', controller.replace('/', '.'))}{_ends}"
     else:
-        logging.debug(f'Adding server/{templates.INSTALL_PREFIXED_BLUEPRINT.format('server', controller.replace('/', '.'), prefix).replace('\n', '')}...')
+        bp = importlib.import_module(controller.replace('/', '.'))
+        logging.debug(f'Adding server/{templates.INSTALL_PREFIXED_BLUEPRINT.format('server', controller.replace('/', '.'), f"{prefix}{bp.url_prefix.replace('/', '') if prefix.endswith('/') else bp.url_prefix}").replace('\n', '')}...')
         new_content = f"{_content}{ templates.INSTALL_PREFIXED_BLUEPRINT.format('server', controller.replace('/', '.'), prefix)}{_ends}"
     logging.debug(f'Saving server/{type}.py...')
     fd = open(f'server/{type}.py', 'w')
