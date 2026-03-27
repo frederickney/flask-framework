@@ -158,7 +158,7 @@ def install_routes(basepath, controller, type, prefix=None):
     sys.path.append(basepath)
     if os.path.exists(os.path.join(basepath, os.path.dirname(controller))):
         module = importlib.import_module(controller.replace('/', '.'))
-        if 'router' in dir(module):
+        if 'bp' in dir(module):
             logging.debug(f'Installing router {controller}...')
             #TODO edit server/{type}.py to install router
             _install_router(basepath, controller, type, prefix=prefix)

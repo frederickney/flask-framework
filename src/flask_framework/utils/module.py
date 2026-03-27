@@ -152,6 +152,7 @@ def try_create_web_entry(path):
             fp.write(templates.IMPORT_CONTROLLER.format('home', 'home'))
             fp.close()
             fp = open(os.path.join(os.path.join(path, 'server'), '{}.py'.format('web')), 'w')
+            fp.write(templates.PYTHON_FILE_HEAD)
             fp.write(templates.HTTP_DEFAULT_ENTRY.format('web'))
             fp.close()
             fp = open(os.path.join(os.path.join(path, 'server'), '__init__.py'), 'a')

@@ -143,7 +143,7 @@ BASE_BLUEPRINT_CONTROLLER = """# coding: utf-8
 
 from flask import Blueprint
 
-bp = Blueprint("{PREFIX}", __name__, prefix="/{PREFIX}")
+bp = Blueprint("{PREFIX}", __name__, url_prefix="/{PREFIX}")
 
 class Controller(object):
     \"\"\"
@@ -155,13 +155,14 @@ class Controller(object):
     \"\"\"
     
     @staticmethod
-    @bp.route('', methods="get")
-    def retrieve(fastapi_request: Request):
+    @bp.route('', methods=["get"])
+    def retrieve():
         #TODO implement your code here 
         pass
     
-    @bp.route('', methods="post")
-    def create(fastapi_request: Request):
+    @staticmethod
+    @bp.route('/add', methods=["post"])
+    def create():
         #TODO implement your code here 
         pass
         
