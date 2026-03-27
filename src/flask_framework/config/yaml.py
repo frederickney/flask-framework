@@ -37,9 +37,9 @@ def _load(file):
     :param file: yaml file.
     :type file: str
     :rtype: dict[str, dict]
-    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.NotAConfigurationFileError:
+    :raise flask_framework.Exceptions.ConfigExceptions.NotAConfigurationFileError:
     if file not exist or if is something else than a file.
-    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.InvalidConfigurationFileError:
+    :raise flask_framework.Exceptions.ConfigExceptions.InvalidConfigurationFileError:
     if file is not a valid yaml file.
     """
     import os.path, yaml
@@ -76,9 +76,9 @@ def load(file):
     :param file: yaml file.
     :type file: str
     :rtype: dict[str, dict]
-    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.NotAConfigurationFileError:
+    :raise flask_framework.Exceptions.ConfigExceptions.NotAConfigurationFileError:
     if file not exist or if is something else than a file.
-    :raise fastapi_framework_mvc.Exceptions.ConfigExceptions.InvalidConfigurationFileError:
+    :raise flask_framework.Exceptions.ConfigExceptions.InvalidConfigurationFileError:
     if file is not a valid yaml file.
     """
     return _load(file)

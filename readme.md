@@ -339,7 +339,7 @@ pip3 install
 
 or 
 ```pip 
-pip install fastapi-framework-mvc
+pip install flask-framework-mvc
 ```
 
 CLI interface:
@@ -369,7 +369,7 @@ Create a new project:
 * Powershell:
 
 ```powershell
-fastapi_framework.cli project -c <your project>
+flask_framework.cli project -c <your project>
 ```
 
 or
@@ -476,7 +476,7 @@ When the project is created, you can create new controllers, middlewares and eve
 
 * Powershell:
 ```powershell
-fastapi_framework_mvc.cli controller -c controllers/ws/contents
+flask_framework_mvc.cli controller -c controllers/ws/contents
 ```
 
 * Bash:
@@ -530,7 +530,7 @@ python -m flask_framework.cli manager -l controllers/ws/contents
 
 * Powershell:
 ```powershell
-fastapi_framework_mvc.cli manager -l controllers/ws/contents -p /api/
+flask_framework_mvc.cli manager -l controllers/ws/contents -p /api/
 ```
 
 * Bash:

@@ -13,7 +13,7 @@ from flask_framework.config import Environment
 
 
 def app_parser(parser):
-    database_parser = parser.add_parser('database', help='Usage:\npython -m fastapi_framework_mvc.cli database -h', formatter_class=argparse.RawTextHelpFormatter)
+    database_parser = parser.add_parser('database', help='Usage:\npython -m flask_framework.cli database -h', formatter_class=argparse.RawTextHelpFormatter)
     database_parser.add_argument(
         '-i', '--init',
         help='Create base sqlalchemy database models module for database-connector-kit python module\nThis can be also linked to alembic database migration python module.',
@@ -22,22 +22,20 @@ def app_parser(parser):
     )
 
 
-
-
 def parser():
-    parser = argparse.ArgumentParser(description='FastAPI Framework MVC CLI', formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description='Flask Framework MVC CLI', formatter_class=argparse.RawTextHelpFormatter)
     action = parser.add_subparsers(dest='action')
-    project_parser = action.add_parser('project', help='Usage:\npython -m fastapi_framework_mvc.cli project -h', formatter_class=argparse.RawTextHelpFormatter)
+    project_parser = action.add_parser('project', help='Usage:\npython -m flask_framework.cli project -h', formatter_class=argparse.RawTextHelpFormatter)
     project_parser.add_argument(
         '-c', '--create', 
-        help='name of the project\nExample:\npython -m fastapi_framework_mvc.cli project --create webapp', 
+        help='name of the project\nExample:\npython -m flask_framework.cli project --create webapp', 
         required=True,
         metavar='NAME'
     )
-    controller_parser = action.add_parser('controller', help='Usage:\npython -m fastapi_framework_mvc.cli controller -h', formatter_class=argparse.RawTextHelpFormatter)
+    controller_parser = action.add_parser('controller', help='Usage:\npython -m flask_framework.cli controller -h', formatter_class=argparse.RawTextHelpFormatter)
     controller_parser.add_argument(
         '-c', '--create', 
-        help='Create controller\nexample:\npython -m fastapi_framework_mvc.cli controller --create controllers/web/login', 
+        help='Create controller\nexample:\npython -m flask_framework.cli controller --create controllers/web/login', 
         required=True, 
         metavar='NAME'
     )
@@ -48,17 +46,17 @@ def parser():
         action='store_true', 
         required=False
     )
-    middleware_parser = action.add_parser('middleware', help='Usage:\npython -m fastapi_framework_mvc.cli middleware -h', formatter_class=argparse.RawTextHelpFormatter)
+    middleware_parser = action.add_parser('middleware', help='Usage:\npython -m flask_framework.cli middleware -h', formatter_class=argparse.RawTextHelpFormatter)
     middleware_parser.add_argument(
         '-c', '--create', 
-        help='Create middleware\nexample:\npython -m fastapi_framework_mvc.cli middleware --create my_middleware', 
+        help='Create middleware\nexample:\npython -m flask_framework.cli middleware --create my_middleware', 
         required=True, 
         metavar='NAME'
     )
-    manager_parser = action.add_parser('manager', help='Usage:\npython -m fastapi_framework_mvc.cli manager -h', formatter_class=argparse.RawTextHelpFormatter)
+    manager_parser = action.add_parser('manager', help='Usage:\npython -m flask_framework.cli manager -h', formatter_class=argparse.RawTextHelpFormatter)
     manager_parser.add_argument(
         '-l', '--link-controller', 
-        help='manage app routes\nexample:\npython -m fastapi_framework_mvc.cli manager --link-controller controllers/web/login', 
+        help='manage app routes\nexample:\npython -m flask_framework.cli manager --link-controller controllers/web/login', 
         required=True
     )
     manager_parser.add_argument(
