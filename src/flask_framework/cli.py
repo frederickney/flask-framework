@@ -4,14 +4,27 @@
 
 __author__ = 'Frederick NEY'
 
+import argparse
 import os
 import sys
 
-from flask_framework.utils import make_controller, make_middleware, make_project, install_routes
+from flask_framework.utils import make_controller, make_middleware, make_project, install_routes, create_database_models_modules
+from flask_framework.config import Environment
+
+
+def app_parser(parser):
+    database_parser = parser.add_parser('database', help='Usage:\npython -m fastapi_framework_mvc.cli database -h', formatter_class=argparse.RawTextHelpFormatter)
+    database_parser.add_argument(
+        '-i', '--init',
+        help='Create base sqlalchemy database models module for database-connector-kit python module\nThis can be also linked to alembic database migration python module.',
+        required=True,
+        action='store_true'
+    )
+
+
 
 
 def parser():
-    import argparse
     parser = argparse.ArgumentParser(description='FastAPI Framework MVC CLI', formatter_class=argparse.RawTextHelpFormatter)
     action = parser.add_subparsers(dest='action')
     project_parser = action.add_parser('project', help='Usage:\npython -m fastapi_framework_mvc.cli project -h', formatter_class=argparse.RawTextHelpFormatter)
@@ -54,6 +67,8 @@ def parser():
         required=False,
         default=None
     )
+    if len(Environment.Databases.keys()) > 0:
+        app_parser(action)
     args = parser.parse_args()
     if args.action == 'project':
         make_project(os.getcwd(), args.create, os.path.dirname(os.path.realpath(__file__)))
@@ -90,6 +105,10 @@ def parser():
             prefix=args.prefix
         )
         exit(0)
+    elif len(Environment.Databases.keys()) > 0:
+        if args.action == "database":
+            create_database_models_modules(os.getcwd(), Environment.Databases)
+            exit(0)
 
 
 if __name__ == '__main__':

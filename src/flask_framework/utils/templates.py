@@ -214,7 +214,8 @@ HTTP_ERRORS = {
 
 
 INSTALL_BLUEPRINT = """        {}.register_blueprint({})\n"""
-INSTALL_PREFIXED_BLUEPRINT = """        #Rewrite prefix as -p has been used on blueprint installation it will override the blueprint url_prefix generated on blueprint creation\n        {}.register_blueprint({}, url_prefix="{}")\n"""
+INSTALL_PREFIXED_BLUEPRINT_DOC = """        #Rewrite prefix as -p has been used on blueprint installation it will override the blueprint url_prefix generated on blueprint creation\n"""
+INSTALL_PREFIXED_BLUEPRINT = """        {}.register_blueprint({}, url_prefix="{}")\n"""
 INSTALL_WEB_ROUTE = """        {}.add_url_rule("/{}", {}, name="ui.{}")\n"""
 INSTALL_API_ROUTE = """        {}.add_url_rule("/api/{}", {}, name="api.{}")\n"""
 INSTALL_WEBSOCKET_ROUTE = """        {}.on_event("socket.{}", {}, namespace="/socket/{}")\n"""
@@ -244,3 +245,6 @@ SERVICES:
   filesystem:
     PATH: sessions
 """
+
+DATABASE_MODELS_IMPORTS = """from . import *\n"""
+DATABASE_IMPORTS = """from . import {}\n"""
