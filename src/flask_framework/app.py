@@ -36,7 +36,6 @@ except KeyError as e:
     configure_basic_logger(logging.INFO)
 base_app = BaseApp()
 base_app.load_app()
-core.Process.init(tracking_mode=False)
 logging.info("Server is now starting...")
 app = core.Process.get()
 
