@@ -186,6 +186,14 @@ Example:
 server.add_url_rule('/', 'home', Controllers.Web.HomeController.index, methods=['GET'])
 ```
 
+
+Can also loads router:
+
+```python
+#controllers.ws.router needs to be a flask Blueprint instance
+server.include_router(controllers.web.router)
+```
+
 * Rest api routes:
 
 All the Rest API based routes must be registered inside the __init__ method of the WS.py file.
@@ -196,6 +204,13 @@ Example:
 server.add_url_rule('/api/', 'api', Controllers.WS.ApiController.index, methods=['GET'])
 ```
 
+Can also loads router:
+
+```python
+#controllers.ws.api.router needs to be a flask Blueprint instance
+server.include_router(controllers.ws.api.v1.router)
+```
+
 ## Creating controllers:
 
 Pro tip, when using database, make sure to use decorator __@safe__ from __flask_framework_mvc.Database.decorators__ over your controllers functions that requires database(s) access.
@@ -203,34 +218,34 @@ This ensure database is available after a long period on inactivity on the  data
 
 * Web based http file controllers:
 
-All web based http file controllers must be placed under the ```Controllers.Web``` module.
+All web based http file controllers must be placed under the ```controller.web``` module.
 
-The class based controllers that you register into the app must be imported into the ```__init__.py``` file of the ```Controller.Web``` module.
+The class based controllers that you register into the app must be imported into the ```__init__.py``` file of the ```controller.web``` module.
 
-The file based that contain your view functions must  must also be inmported into the ```__init__.py``` file of the ```Controller.Web``` module.
+The file based that contain your view functions must  must also be inmported into the ```__init__.py``` file of the ```controller.web``` module.
 
 
 * Rest api controllers:
 
 All Rest API based controllers must be placed under the src/Controllers/WS folder.
 
-The class based controllers that you register into the app must be imported into the ```__init__.py``` file of the ```Controller.Web``` module.
+The class based controllers that you register into the app must be imported into the ```__init__.py``` file of the ```controller.ws``` module.
 
-The file based that contain your view functions must  must also be inmported into the ```__init__.py``` file of the ```Controller.Web``` module.
+The file based that contain your view functions must  must also be inmported into the ```__init__.py``` file of the ```controller.ws``` module.
 
 ## Creating models:
 
 
-you can create SQLAlchemy models by creating a new module under the ```Models.Persistent``` module and place each models inside your module that you previously created. 
+you can create SQLAlchemy models by creating a new module under the ```models.Persistent``` module and place each models inside your module that you previously created. 
 
-The models that you register into the app must be an ```Database.Model ``` or ```Database.get_models_by_name('replace that with your database connection name')``` object, you could import this object using the following line into your database model:
+The models that you register into the app must be an ```flask_framework.database.Model ``` or ```flask_framework.database.get_models_by_name('replace that with your database connection name')``` object, you could import this object using the following line into your database model:
 
 
 ```python
 from Database import Database
 ```
 
-All models must be imported inside the ```__init__.py``` of your base module and you must import this module in the ```__init__.py``` of the ```Models.Persistent``` module
+All models must be imported inside the ```__init__.py``` of your base module and you must import this module in the ```__init__.py``` of the ```models.persistent``` module
 
 ## Creating scheduling tasks:
 
@@ -324,35 +339,230 @@ pip3 install
 
 or 
 ```pip 
-pip install flask-framework-mvc
+pip install fastapi-framework-mvc
 ```
 
-* CLI interface
+CLI interface:
+--------------
+
+* Powershell
+
+```powershell
+flask_framework_mvc.cli -h
+```
+* Bash
+
+```bash
+flask_framework_mvc.cli -h
+```
+
+* Python module
 
 ```bash
 python -m flask_framework.cli -h
 ```
 
 
-* Create a new project
+Create a new project:
+------------------------
 
-```bash
-python -m flask_framework.cli -cp <your project>
+* Powershell:
+
+```powershell
+fastapi_framework.cli project -c <your project>
 ```
 
 or
 
 ```bash
-python -m flask_framework.cli --create-project <your project>
+flask_framework_mvc.cli controller -c <your project>
 ```
 
-When the project is created, more command can be used when the env __"CONFIG_FILE"__ is set and can be run through
+* Bash:
 
 ```bash
-python -m flask_framework.app
+flask_framework_mvc.cli project -c <your project>
+```
+or
+
+```bash
+flask_framework_mvc.cli project --create <your project>
 ```
 
+* Python module:
+
+```bash
+python -m flask_framework.cli project -c <your project>
+```
+
+or
+
+```bash
+python -m flask_framework.cli project --create <your project>
+```
+
+A project can also be packaged and later used by the framework. In order to do so, you need to create a 
+__pyproject.toml__ that will build your project into a python package. Best practices ar to put the __pyproject.toml__ 
+in the parent directory of your created project.
+
+Then you will still have to create a __server__ pathon module 
+(and a __models.persistent__ python module if using database connection(s)).
+
+In the __server__ part you will only have to import from your packages the modules under the package server module
+within the \_\_init\_\_.py in __server__. example:
+
+```python
+# coding: utf-8
+#__init__.py
+
+from your_project.server import web, ws, errorhandler, plugins, middleware, socket
+```
+
+
+or if you want multiples application packaged, you will have to create the same python module  __server__ arborescence
+as the one initially on your project but instead of rewriting the routes or loading the routers, you can just for example:
+
+```python
+# coding: utf-8
+# example with two project on the ws.py file
+import your_first_project.server.ws
+import your_second_project.server.ws
+
+
+class Route(object):
+    """
+    Class that will configure all ws services based routes for the server
+    """
+    def __init__(self, server):
+        """
+        Constructor
+        :param server: Flask instance
+        :type server: flask.Flask
+        :return: Route object
+        """
+        your_first_project.server.ws.Route(server)
+        your_second_project.server.ws.Route(server)
+        return
+
+```
+
+In the __models.persistent__ part you will only have to import from your packages the modules under the package models.persistent module
+within the \_\_init\_\_.py in __models.persistent__. example:
+
+```python
+# coding: utf-8
+#__init__.py
+
+from your_project.models.persistent import *
+
+```
+
+or if you want multiples application packaged, and have one or many model declaration conflicts.
+
+```python
+# coding: utf-8
+# example with two project on the __init__.py file
+from your_first_project.models import persistent as  your_first_project # or any other identifier
+from your_second_project.models import persistent as  your_second_project # or any other identifier
+```
+
+Create new controllers:
+------------------------
+
+When the project is created, you can create new controllers, middlewares and even link controllers to the correct file under the server module. Example:
+
+1) create standalone controller:
+---------------------------------
+
+* Powershell:
+```powershell
+fastapi_framework_mvc.cli controller -c controllers/ws/contents
+```
+
+* Bash:
+```bash
+flask_framework_mvc.cli controller -c controllers/ws/contents
+```
+
+* Python module:
+```bash
+python -m flask_framework.cli controller -c controllers/ws/contents
+```
+
+2) create router controller:
+-----------------------------
+
+* Powershell:
+```powershell
+flask_framework_mvc.cli controller -c controllers/ws/contents -router
+```
+
+* Bash:
+```bash
+flask_framework_mvc.cli controller -c controllers/ws/contents -router
+```
+
+* Python module:
+```bash
+python -m flask_framework.cli controller -c controllers/ws/contents -router
+```
+
+3) install standalone controller:
+----------------------------------
+
+* Powershell:
+```powershell
+flask_framework_mvc.cli manager -l controllers/ws/contents
+```
+
+* Bash:
+```bash
+flask_framework_mvc.cli manager -l controllers/ws/contents
+```
+
+* Python module:
+```bash
+python -m flask_framework.cli manager -l controllers/ws/contents
+```
+
+4) install router controller:
+------------------------------
+
+* Powershell:
+```powershell
+fastapi_framework_mvc.cli manager -l controllers/ws/contents -p /api/
+```
+
+* Bash:
+```bash
+flask_framework_mvc.cli manager -l controllers/ws/contents -p /api/
+```
+
+* Python module:
+```bash
+python -m flask_framework.cli manager -l controllers/ws/contents -p /api/
+```
+
+5) Create middlewares:
+------------------------------
+
+* Powershell:
+```powershell
+flask_framework_mvc.cli middleware -c grant/authorization
+```
+
+* Bash:
+```bash
+flask_framework_mvc.cli middleware -c grant/authorization
+```
+
+* Python module:
+```bash
+python -m flask_framework.cli middleware -c grant/authorization
+```
 see -h for usages
+
+---
 
 * Starting the flask server attached to an ide such as PyCharm
 
