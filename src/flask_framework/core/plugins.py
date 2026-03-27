@@ -31,10 +31,10 @@ class Load(object):
         except Exception as e:
             import os
             logging.debug("{}: {} in {}".format(__name__, e, os.getcwd()))
-        try:
-            import Server
-            Server.Plugins.Load(**kwargs)
-        except Exception as e:
-            import os
-            logging.debug("{}: {} in {}".format(__name__, e, os.getcwd()))
+            try:
+                import Server
+                Server.Plugins.Load(**kwargs)
+            except Exception as e:
+                import os
+                logging.debug("{}: {} in {}".format(__name__, e, os.getcwd()))
         return

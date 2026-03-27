@@ -23,10 +23,10 @@ class Load(object):
         except Exception as e:
             import os
             logging.debug("{}: {} in {}".format(__name__, e, os.getcwd()))
-        try:
-            import Server
-            Server.Middleware.Load(srv)
-        except Exception as e:
-            import os
-            logging.debug("{}: {} in {}".format(__name__, e, os.getcwd()))
+            try:
+                import Server
+                Server.Middleware.Load(srv)
+            except Exception as e:
+                import os
+                logging.debug("{}: {} in {}".format(__name__, e, os.getcwd()))
         return
