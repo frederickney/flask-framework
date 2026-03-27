@@ -143,7 +143,9 @@ BASE_BLUEPRINT_CONTROLLER = """# coding: utf-8
 
 from flask import Blueprint
 
+
 bp = Blueprint("{PREFIX}", __name__, url_prefix="/{PREFIX}")
+
 
 class Controller(object):
     \"\"\"
