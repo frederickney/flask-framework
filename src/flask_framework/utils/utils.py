@@ -10,6 +10,7 @@ import importlib
 import re
 
 from flask_framework.exceptions.runtime import web_denied
+from getpass import getpass
 from . import templates
 from .module import generate, create_project, create_server, create_dir
 
@@ -210,3 +211,41 @@ def create_database_models_modules(basepath, databases):
             fp.write(templates.DATABASE_IMPORTS.format(setup['models']))
         fp.close()
         pass
+
+
+@web_denied
+def create_database_conf(databases):
+    name = input("New database connection name: ")
+    driver = input(f"Database driver for the {name}'s connection: ")
+    database = input(f"Schema name for the database {name}: ")
+    address = input(f"Database address for {name}'s connection: ")
+    port = input(f"Database port for {name}'s connection: ")
+    user = input(f"Database user for {name}'s connection: ")
+    password = getpass(f"Database {user}'s password for {name}'s connection: ")
+    
+    default = input(f"Is {name} default database connection? (Y/n):")
+    while default.lower() not in ['y', 'n', 'yes', 'no', 'cancel', '', None]:
+        default = input(f"Is {name} default database connection? (Y/n/cancel):")
+    if default == '' or default == None:
+        default = 'y'
+    if default.lower() == 'cancel':
+        print("Aborted")
+        exit(0)
+    if name not in databases.keys():
+        databases[name] = {}
+    databases[name]['driver'] = driver
+    databases[name]['database'] = database
+    databases[name]['user'] = user
+    databases[name]['password'] = password
+    databases[name]['address'] = address
+    if port is not None and port != '':
+        try:
+            port = int(port)
+            databases[name]['port'] = port
+        except ValueError as e:
+            print(f"Invalid port number: {e}")
+    databases[name]['models'] = name
+    databases[name]['readonly'] = False
+    if default.lower() == 'y' or default.lower() == 'yes':
+        databases['default'] = name
+    return databases

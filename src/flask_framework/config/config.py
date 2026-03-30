@@ -239,3 +239,27 @@ class Environment(object):
         elif service is not None:
             logging.warning("Service '{}' changed".format(service_name))
             cls.Services[service_name] = service_conf
+
+
+    @classmethod
+    @web_denied
+    def update_conf_file(cls, file):
+        """
+        save configuration to file
+        :param file: output file
+        :type file: str
+        """
+        fd = open(file, 'w')
+        import yaml
+        yaml.dump(
+            {
+                'SERVER': cls.SERVER,
+                'DATABASES': cls.Databases,
+                'FLASK':cls.FLASK,
+                'LOGINS': cls.Logins,
+                'SERVICES': cls.Services,
+            },
+            fd,
+            default_flow_style=False
+        )
+        fd.close()
