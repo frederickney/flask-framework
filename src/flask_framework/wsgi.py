@@ -16,7 +16,7 @@ except ImportError as e:
     pass
 
 try:
-    from gunicorn.app.base import BaseApplication as WSGIServer
+    from gunicorn.app.base import Application as WSGIServer
     try:
         import gevent.monkey
         gevent.monkey.patch_all()
