@@ -51,6 +51,7 @@ class Server(WSGIServer, BaseApp):
 
     def __init__(self, options=None):
         Server.options = (options or {}) if not hasattr(Server, 'options') else Server.options
+        BaseApp.__init__(self)
         Server.load_app()
         self.application = Process.get()
         try:
@@ -62,7 +63,6 @@ class Server(WSGIServer, BaseApp):
                 port=Environment.SERVER['BIND']['PORT'],
                 threads=number_of_workers(),
             )
-        BaseApp.__init__(self)
 
     def reload(self):
         """
