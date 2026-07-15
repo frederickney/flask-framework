@@ -33,35 +33,25 @@ dependencies = [
     "requests",
     "urllib3",
     "Werkzeug",
-    "gunicorn",
+    "gunicorn ; platform_system != 'Windows'",
+    "waitress ; platform_system == 'Windows'",
     "pyyaml",
     "pyopenssl",
-    "WTForms",
     "SQLAlchemy",
     "redis",
     "tornado",
+    "gevent",
     "email-validator",
     "Flask",
     "Flask-GeoIP",
-    "Flask-LoginManager",
-    "flask-monitor",
-    "Flask-Profile",
-    "Flask-Builder",
-    "Flask-Auth",
     "Flask-APScheduler",
     "flask-sqlalchemy",
-    "Flask-Sessions",
-    "Flask-Login",
-    "flask-login-saml",
-    "flask-login-oidc",
     "Flask-SocketIO",
-    "Flask-WTF",
     "Flask-Session",
-    "Flask-Script",
-    "Flask-Migrate",
+    "database-connector-kit",
     'importlib-metadata; python_version>"3.7"'
 ]
-version="1.2.0"
+version="1.3.1"
 
 
 [tool.poetry]
@@ -80,12 +70,15 @@ Issues = "https://github.com/frederickney/flask-framework/issues"
 source = "https://github.com/frederickney/flask-framework"
 
 [project.entry-points."flask_framework"]
+asgi = "flask_framework:asgi"
 wsgi = "flask_framework:wsgi"
 server =  "flask_framework:server"
+cli = "flask_framework:cli"
 app =  "flask_framework:app"
 
 [project.scripts]
-flask_framework="flask_framework:app"
-flask_framework_wsgi="flask_framework:wsgi"
-
+"flask_framework_mvc.asgi" = "flask_framework.asgi:main"
+"flask_framework_mvc.wsgi" = "flask_framework.wsgi:main"
+"flask_framework_mvc.server" =  "flask_framework.server:main"
+"flask_framework_mvc.cli" =  "flask_framework.cli:parser"
 

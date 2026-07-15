@@ -1,50 +1,52 @@
 # coding: utf-8
-
+import os
+import sys
 import logging
 
-from flask_framework.Config import Environment
-from flask_framework.Database import Database
-from flask_framework.Server import Process
-# temporary rewrite python modules to enable compatibility to version 1.3.0
-from . import set_upper_version_module
-set_upper_version_module()
+from logging.handlers import TimedRotatingFileHandler
+
+import azure.functions as func
+
+from flask_framework.common import BaseApp
+from flask_framework.config import Environment
+from flask_framework.core import Process
+from flask_framework.core.logging import configure_basic_logger, setup_file_logging
+
 
 
 def AzureFunctionsApp():
-    import os
-    from logging.handlers import TimedRotatingFileHandler
     loglevel = 'warning'
     logging_dir_exist = False
+    configure_basic_logger()
     if os.environ.get("LOG_DIR", None):
-        os.environ.setdefault("log_dir", os.environ.get("LOG_DIR", "/var/log/server/"))
-        os.environ.setdefault("log_file", os.path.join(os.environ.get("log_dir"), 'process.log'))
-        if not os.path.exists(os.path.dirname(os.environ.get('log_file'))):
-            os.mkdir(os.path.dirname(os.environ.get('log_file')), 0o755)
-    if os.environ.get("log_file", None):
-        logging.basicConfig(
-            level=loglevel.upper(),
-            format='%(asctime)s %(levelname)s %(message)s',
-            handlers=[
-                TimedRotatingFileHandler(
-                    filename=os.environ.get('log_file'),
-                    when='midnight',
-                    backupCount=30
-                )
-            ]
-        )
-        logging_dir_exist = True
-    else:
-        logging.basicConfig(
-            level=loglevel.upper(),
-            format='%(asctime)s %(levelname)s %(message)s',
-        )
+        setup_file_logging()
     logging.info("Loading configuration file...")
-    if 'CONFIG_FILE' in os.environ:
-        Environment.load(os.environ['CONFIG_FILE'])
-    else:
-        Environment.load("/etc/server/config.json")
-        os.environ.setdefault('CONFIG_FILE', "/etc/server/config.json")
+    if "CONFIG_FILE" not in os.environ and not os.path.exists("/etc/flask/"):
+        os.environ.setdefault(
+            'CONFIG_FILE',
+            "config/config.yml" if os.path.exists("config/config.yml")
+            else "/etc/flask/config.yml" if os.path.exists("/etc/flask/config.yml")
+            else None
+        )
+    if not 'CONFIG_FILE' in os.environ:
+        print('Unable tp detect any configuration files, use CONFIG_FILE env to overide detection')
+        exit(255)
+    Environment.load(os.environ['CONFIG_FILE'])
     logging.info("Configuration file loaded...")
+    try:
+        configure_basic_logger(
+            'warning' if not 'LEVEL' in Environment.SERVER['LOG'] else Environment.SERVER['LOG']['LEVEL']
+        )
+    except KeyError as e:
+        pass
+    try:
+        setup_file_logging(
+            'warning' if not 'LEVEL' in Environment.SERVER['LOG'] else Environment.SERVER['LOG']['LEVEL']
+        )
+    except KeyError as e:
+        pass
+    except FileNotFoundError as e:
+        pass
     try:
         loglevel = Environment.SERVER['LOG']['LEVEL']
         logging.getLogger().setLevel(loglevel.upper())
@@ -73,22 +75,6 @@ def AzureFunctionsApp():
     except PermissionError as e:
         pass
     logging.info("Loading options...")
-    if len(Environment.Databases) > 0:
-        logging.debug("Connecting to database(s)...")
-        Database.register_engines(echo=Environment.SERVER['CAPTURE'])
-        Database.init()
-        logging.debug("Database(s) connected...")
-    logging.info("Initializing the server...")
-    Process.init(tracking_mode=False)
-    logging.info("Server initialized...")
-    Process.load_plugins()
-    logging.debug("Loading server routes...")
-    Process.load_routes()
-    Process.load_middleware()
-    logging.debug("Server routes loaded...")
-    logging.debug("Loading websocket events")
-    Process.load_socket_events()
-    logging.debug("Websocket events loaded...")
-    logging.info("Options loaded...")
-    logging.info("Starting the server...")
+    base_app = BaseApp()
+    base_app.load_app()
     return Process.wsgi_setup()
