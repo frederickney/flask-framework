@@ -44,6 +44,7 @@ dependencies = [
     "email-validator",
     "Flask",
     "Flask-GeoIP",
+    "Flask-WTF",
     "Flask-APScheduler",
     "flask-sqlalchemy",
     "Flask-SocketIO",
