@@ -251,16 +251,16 @@ server.register_error_handler(500, controllers.web.errors.http_500)
 ```python
 server.add_url_rule(path='/', route=controllers.web.home.index, methods=["GET"], name='home')
 
-# or include a FastAPI APIRouter
-server.include_router(controllers.web.router, prefix='/api/v1')
+# or include a Flask blueprint
+server.register_blueprint(controllers.web.router, prefix='/api/v1')
 ```
 
 **REST API routes** (`server/ws.py`):
 
 ```python
-server.add_api_route('/api/content/', controllers.ws.api.index, methods=['GET'], name='api.content')
+server.add_url_rule('/api/content/', controllers.ws.api.index, methods=['GET'], name='api.content')
 
-# or include a FastAPI APIRouter
+# or include a Flask blueprint
 server.register_blueprint(controllers.ws.api.v1.router, url_prefix='/api/v1/')
 ```
 
