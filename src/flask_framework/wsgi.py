@@ -180,6 +180,7 @@ def main():
         if not args.disable_log_files:
             os.environ.setdefault('LOG_DIR', Environment.SERVER['LOG']['DIR'])
             setup_file_logging(level=Environment.SERVER['LOG']['LEVEL'])
+            Logging.logging_dir_exist = True
         logging.info('Logging handler initialized')
     except KeyError as e:
         pass
